@@ -7,7 +7,11 @@ describe('GET /api/v1/health', () => {
     const response = await request(createApp()).get('/api/v1/health')
 
     expect(response.status).toBe(200)
-    expect(response.body.code).toBe('OK')
-    expect(response.body.data).toEqual({ status: 'ok' })
+    expect(response.body).toEqual({
+      code: 'OK',
+      message: 'success',
+      data: { status: 'ok' },
+      requestId: expect.any(String),
+    })
   })
 })
