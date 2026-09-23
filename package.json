@@ -5,6 +5,7 @@
   "description": "TaskFlow full-stack learning project",
   "scripts": {
     "prepare": "node scripts/setup-git-hooks.mjs",
+    "dev": "node scripts/dev.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "commit:check": "node scripts/validate-staged.mjs",

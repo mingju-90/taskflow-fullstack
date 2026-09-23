@@ -20,6 +20,7 @@ TaskFlow 是一个用于练习全栈开发的项目、任务和成员协作系�
 client/   前端应用
 server/   后端服务
 docs/     需求、设计、原型和进度文档
+scripts/  根目录开发与校验脚本
 ```
 
 ## 快速开始
@@ -30,23 +31,27 @@ docs/     需求、设计、原型和进度文档
 pnpm install
 ```
 
-启动前端开发服务：
+安装前端和后端依赖：
 
 ```bash
-cd client
-pnpm install
+pnpm --dir client install
+pnpm --dir server install
+```
+
+根据 `server/.env.example` 创建本地环境配置。准备完成后，在根目录同时启动前端和后端：
+
+```bash
 pnpm dev
 ```
 
-启动后端开发服务：
+前端默认监听 `http://127.0.0.1:5173/`，后端默认监听 `http://127.0.0.1:3000`，健康检查地址为 `http://127.0.0.1:3000/api/v1/health`。按 `Ctrl+C` 会同时停止两个进程。
+
+也可以分别启动：
 
 ```bash
-cd server
-pnpm install
-pnpm dev
+pnpm --dir client dev
+pnpm --dir server dev
 ```
-
-后端默认监听 `http://127.0.0.1:3000`，健康检查地址为 `http://127.0.0.1:3000/api/v1/health`。首次启动前需要根据 `server/.env.example` 创建本地 `server/.env`。
 
 ## 验证命令
 
