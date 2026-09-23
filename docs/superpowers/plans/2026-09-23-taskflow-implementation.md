@@ -1,165 +1,139 @@
-# TaskFlow Implementation Plan
+# TaskFlow 全栈项目中文实施计划
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Build a complete Vue 3 + Element Plus + Express + Prisma task management application in one repository while keeping the learner responsible for the primary implementation and providing extra Node.js support.
+**目标：** 在一个仓库中完成 Vue 3 + Element Plus + Express + Prisma 任务管理系统，同时保证用户负责主要代码实现，Codex 重点提供 Node.js 和后端支持。
 
-**Architecture:** The repository contains independent `client` and `server` directories. The server is a layered Express API using routes, controllers, services, middleware, Zod schemas, Prisma, and SQLite. The client is a Vue application using Vite, Pinia, Vue Router, Axios, and Element Plus.
+**架构：** 仓库包含彼此独立的 `client` 和 `server` 目录。后端采用 `route -> controller -> service -> Prisma` 分层；前端采用 Vue 3、Vite、Pinia、Vue Router、Axios 和 Element Plus。
 
-**Tech Stack:** Vue 3, TypeScript, Vite, Vue Router, Pinia, Axios, Element Plus, Node.js, Express, Prisma, SQLite, JWT, Zod, Multer, Vitest, Supertest, Vue Test Utils, Playwright.
+**技术栈：** Vue 3、TypeScript、Vite、Vue Router、Pinia、Axios、Element Plus、Node.js、Express、Prisma、SQLite、JWT、Zod、Multer、Vitest、Supertest、Vue Test Utils、Playwright。
 
-**Spec:** `docs/superpowers/specs/2026-09-23-taskflow-design.md`
+**设计文档：** `docs/superpowers/specs/2026-09-23-taskflow-design.md`
 
-## Global Constraints
+> 本文档正文使用中文。代码、命令、包名、接口字段和错误码保留英文，执行时以这些标识符的准确拼写为准。
 
-- Repository root: `/Users/mingju/Desktop/练手代码/111`
-- Branch: `main`
-- Node.js version: 20 or newer
-- Package manager: npm
-- Do not use npm workspaces.
-- `client` and `server` each own their `package.json`, lockfile, scripts, and environment files.
-- All application code uses TypeScript with strict mode enabled.
-- API prefix: `/api/v1`
-- Success envelope: `{ code: "OK", message: string, data: unknown, requestId: string }`
-- Error envelope: `{ code: string, message: string, details: unknown, requestId: string }`
-- Authentication header: `Authorization: Bearer <token>`
-- Project roles: `OWNER`, `MEMBER`
-- Task statuses: `TODO`, `IN_PROGRESS`, `DONE`
-- Task priorities: `LOW`, `MEDIUM`, `HIGH`
-- Pagination defaults: `page=1`, `pageSize=20`, `pageSize` maximum `100`
-- Upload limit: one file at a time, maximum 5 MB, maximum 20 attachments per task
-- Allowed upload types: PDF, PNG, JPEG, plain text
-- Uploaded files are never exposed as public static files.
-- User-facing application copy is Chinese.
-- Each task ends with passing focused tests, a type check, and one commit.
-- Do not implement features from the out-of-scope section of the spec.
+## 学习执行方式
 
-## Learning Execution Mode
+本计划采用“用户主写，Codex 支持”的引导模式：
 
-This plan is executed in guided learning mode:
+1. 用户先写失败测试，再写最小实现。
+2. Codex 重点解释 Node.js、HTTP、Express、Prisma、数据库、鉴权、文件系统和测试概念。
+3. Codex 可以提供骨架、接口签名、测试样例、排错和代码审查。
+4. 用户运行每个验证命令并反馈结果。
+5. 当前任务测试通过并完成提交后，才开始下一个任务。
+6. 前端逻辑由用户主导，后端逻辑可以获得更详细的分步支持。
 
-1. The learner writes the test and implementation code.
-2. Codex explains the Node.js, Express, HTTP, Prisma, database, authentication, file-system, and testing concepts needed for the current step.
-3. Codex may provide missing scaffolding, focused examples, debugging help, and test design, with extra depth on the `server` tasks.
-4. The learner runs each verification command and reports the result.
-5. Codex reviews the implementation against the task interfaces and test expectations.
-6. The next task starts only after the current task passes and its commit is created.
+## 全局约束
 
-The checkbox steps remain the source of truth, but they are performed collaboratively rather than delegated to an agent.
+- 项目根目录：`/Users/mingju/Desktop/练手代码/111`
+- Git 分支：`main`
+- Node.js：20 或更高版本
+- 包管理器：npm
+- 不使用 npm workspace
+- `client` 和 `server` 分别拥有自己的 `package.json`、锁文件、脚本和环境变量
+- 所有应用代码使用严格模式 TypeScript
+- API 前缀：`/api/v1`
+- 成功响应：`{ code: "OK", message: string, data: unknown, requestId: string }`
+- 失败响应：`{ code: string, message: string, details: unknown, requestId: string }`
+- 鉴权请求头：`Authorization: Bearer <token>`
+- 项目角色：`OWNER`、`MEMBER`
+- 任务状态：`TODO`、`IN_PROGRESS`、`DONE`
+- 任务优先级：`LOW`、`MEDIUM`、`HIGH`
+- 分页默认值：`page=1`、`pageSize=20`，最大 `pageSize=100`
+- 单文件上传上限：5 MB
+- 每个任务最多 20 个附件
+- 允许上传：PDF、PNG、JPEG、纯文本
+- 上传文件不能通过公开静态目录访问
+- UI 文案使用中文
+- 每个任务结束后必须有通过的测试、类型检查和一次 Git 提交
+- 不实现设计文档中明确排除的功能
 
-## File Structure
+## 文件结构
 
-### Root
+### 根目录
 
-- `.gitignore`: ignores dependencies, builds, local databases, environment files, test output, and uploads.
-- `README.md`: setup, environment, migration, seed, development, test, and build instructions.
-- `docs/`: approved specification and implementation plan.
+- `.gitignore`：忽略依赖、构建产物、本地数据库、环境文件、测试产物和上传文件。
+- `README.md`：安装、环境、迁移、种子数据、开发、测试和构建说明。
+- `docs/`：设计文档和本实施计划。
 
-### Server
+### 后端
 
-- `server/package.json`: server scripts and dependencies.
-- `server/tsconfig.json`: strict TypeScript server configuration.
-- `server/tsconfig.build.json`: production build configuration limited to `src`.
-- `server/vitest.config.ts`: server test configuration.
-- `server/.env.example`: documented server environment values.
-- `server/prisma/schema.prisma`: data model.
-- `server/prisma/seed.ts`: idempotent development data.
-- `server/src/app.ts`: creates and configures the Express application.
-- `server/src/server.ts`: starts the HTTP server and handles process shutdown.
-- `server/src/config/env.ts`: validates environment variables.
-- `server/src/config/logger.ts`: structured application logger.
-- `server/src/lib/prisma.ts`: shared Prisma client.
-- `server/src/lib/app-error.ts`: typed business error.
-- `server/src/lib/response.ts`: success response helper.
-- `server/src/lib/password.ts`: password hashing functions.
-- `server/src/lib/jwt.ts`: JWT signing and verification.
-- `server/src/lib/upload.ts`: Multer memory upload configuration and file validation.
-- `server/src/middlewares/auth.ts`: bearer-token authentication.
-- `server/src/middlewares/not-found.ts`: unknown-route handler.
-- `server/src/middlewares/error-handler.ts`: global error serializer.
-- `server/src/schemas/auth.schema.ts`: authentication request schemas.
-- `server/src/schemas/project.schema.ts`: project and member request schemas.
-- `server/src/schemas/task.schema.ts`: task request schemas.
-- `server/src/schemas/comment.schema.ts`: comment request schemas.
-- `server/src/services/auth.service.ts`: registration, login, and current-user logic.
-- `server/src/services/project-access.service.ts`: project membership and owner checks.
-- `server/src/services/project.service.ts`: project and member logic.
-- `server/src/services/task.service.ts`: task logic.
-- `server/src/services/comment.service.ts`: comment logic.
-- `server/src/services/attachment.service.ts`: attachment metadata and file logic.
-- `server/src/services/dashboard.service.ts`: dashboard statistics.
-- `server/src/controllers/*.controller.ts`: HTTP input/output handlers.
-- `server/src/routes/*.route.ts`: route declarations.
-- `server/src/types/http.ts`: pagination and authenticated-request types.
-- `server/tests/helpers/database.ts`: isolated database lifecycle helpers.
-- `server/tests/helpers/factories.ts`: reusable test data factories.
-- `server/tests/*.test.ts`: API integration tests.
-- `server/scripts/prepare-e2e.ts`: resets and seeds the end-to-end database.
+- `server/package.json`：后端脚本和依赖。
+- `server/tsconfig.json`：后端严格 TypeScript 配置。
+- `server/tsconfig.build.json`：只编译 `src` 的生产构建配置。
+- `server/vitest.config.ts`：后端测试配置。
+- `server/.env.example`：后端环境变量模板。
+- `server/prisma/schema.prisma`：数据模型。
+- `server/prisma/seed.ts`：幂等开发数据。
+- `server/src/app.ts`：创建并配置 Express 应用。
+- `server/src/server.ts`：监听端口并处理退出。
+- `server/src/config/env.ts`：校验环境变量。
+- `server/src/config/logger.ts`：结构化日志。
+- `server/src/lib/prisma.ts`：共享 Prisma Client。
+- `server/src/lib/app-error.ts`：业务错误类。
+- `server/src/lib/response.ts`：统一成功响应。
+- `server/src/lib/password.ts`：密码哈希。
+- `server/src/lib/jwt.ts`：JWT 签发和验证。
+- `server/src/lib/upload.ts`：Multer 上传配置。
+- `server/src/middlewares/auth.ts`：登录认证。
+- `server/src/middlewares/error-handler.ts`：全局错误处理。
+- `server/src/middlewares/not-found.ts`：404 处理。
+- `server/src/middlewares/request-context.ts`：请求 ID。
+- `server/src/schemas/*.schema.ts`：Zod 请求校验。
+- `server/src/services/*.service.ts`：业务逻辑和权限判断。
+- `server/src/controllers/*.controller.ts`：HTTP 输入输出。
+- `server/src/routes/*.route.ts`：路由声明。
+- `server/src/types/http.ts`：分页等 HTTP 类型。
+- `server/tests/helpers/*.ts`：测试数据库和工厂函数。
+- `server/tests/*.test.ts`：后端集成测试。
+- `server/scripts/prepare-e2e.ts`：准备端到端测试数据库。
 
-### Client
+### 前端
 
-- `client/package.json`: client scripts and dependencies.
-- `client/tsconfig.json`, `client/tsconfig.app.json`, `client/tsconfig.node.json`: strict Vue TypeScript configuration.
-- `client/vite.config.ts`: Vue plugin, dev server, and test configuration.
-- `client/.env.example`: documented client API base URL.
-- `client/index.html`: Vite entry document.
-- `client/src/main.ts`: Vue, Pinia, Router, and Element Plus bootstrap.
-- `client/src/App.vue`: router outlet.
-- `client/src/router/index.ts`: routes and authentication guards.
-- `client/src/api/http.ts`: Axios instance and response parsing.
-- `client/src/api/auth.ts`: authentication requests.
-- `client/src/api/projects.ts`: project and member requests.
-- `client/src/api/tasks.ts`: task requests.
-- `client/src/api/comments.ts`: comment requests.
-- `client/src/api/attachments.ts`: attachment requests.
-- `client/src/api/dashboard.ts`: dashboard requests.
-- `client/src/stores/auth.ts`: authentication state.
-- `client/src/stores/project.ts`: current project state.
-- `client/src/utils/auth-token.ts`: token persistence.
-- `client/src/utils/permissions.ts`: UI permission helpers.
-- `client/src/utils/task-query.ts`: converts task filter state into API parameters.
-- `client/src/layouts/AppLayout.vue`: authenticated application shell.
-- `client/src/views/auth/LoginView.vue`: login page.
-- `client/src/views/auth/RegisterView.vue`: registration page.
-- `client/src/views/DashboardView.vue`: statistics page.
-- `client/src/views/projects/ProjectsView.vue`: project list page.
-- `client/src/views/projects/ProjectDetailView.vue`: project workspace.
-- `client/src/views/tasks/TaskDetailView.vue`: task detail page.
-- `client/src/components/projects/*`: project dialog and member panel.
-- `client/src/components/tasks/*`: task filters, table, and form dialog.
-- `client/src/components/comments/*`: comment list and form.
-- `client/src/components/attachments/*`: upload and attachment list.
-- `client/tests/*`: Vitest tests.
-- `client/e2e/*`: Playwright smoke tests.
-- `client/playwright.config.ts`: end-to-end server and client orchestration.
+- `client/package.json`：前端脚本和依赖。
+- `client/tsconfig*.json`：Vue TypeScript 配置。
+- `client/vite.config.ts`：Vite 和 Vitest 配置。
+- `client/.env.example`：前端 API 地址模板。
+- `client/src/main.ts`：Vue、Pinia、Router、Element Plus 初始化。
+- `client/src/App.vue`：路由出口。
+- `client/src/router/index.ts`：路由和登录守卫。
+- `client/src/api/*.ts`：后端 API 请求。
+- `client/src/stores/*.ts`：认证和当前项目状态。
+- `client/src/utils/*.ts`：Token、权限、任务查询参数工具。
+- `client/src/layouts/AppLayout.vue`：登录后的应用框架。
+- `client/src/views/**/*.vue`：页面。
+- `client/src/components/**/*.vue`：业务组件。
+- `client/tests/*.test.ts`：前端单元测试。
+- `client/e2e/*.spec.ts`：Playwright 测试。
+- `client/playwright.config.ts`：端到端测试配置。
 
 ---
 
-### Task 1: Server Foundation and Health Check
+## 任务 1：搭建后端基础与健康检查
 
-**Files:**
+**目标：** 创建独立的 `server` 项目，可以启动并访问 `GET /api/v1/health`。
 
-- Create: `.gitignore`
-- Create: `README.md`
-- Create: `server/package.json`
-- Create: `server/tsconfig.json`
-- Create: `server/tsconfig.build.json`
-- Create: `server/vitest.config.ts`
-- Create: `server/.env.example`
-- Create: `server/src/config/env.ts`
-- Create: `server/src/app.ts`
-- Create: `server/src/server.ts`
-- Create: `server/src/routes/health.route.ts`
-- Create: `server/tests/health.test.ts`
+**涉及文件：**
 
-**Interfaces:**
+- 新建：`.gitignore`
+- 新建：`README.md`
+- 新建：`server/package.json`
+- 新建：`server/tsconfig.json`
+- 新建：`server/tsconfig.build.json`
+- 新建：`server/vitest.config.ts`
+- 新建：`server/.env.example`
+- 新建：`server/src/config/env.ts`
+- 新建：`server/src/app.ts`
+- 新建：`server/src/server.ts`
+- 新建：`server/src/routes/health.route.ts`
+- 新建：`server/tests/health.test.ts`
 
-- Consumes: nothing.
-- Produces: `createApp(): Express`, `env`, and `GET /api/v1/health`.
+**接口：**
 
-- [ ] **Step 1: Initialize the server and install the foundation dependencies**
+- 依赖：无。
+- 产出：`createApp(): Express`、`env`、`GET /api/v1/health`。
 
-Run:
+- [ ] **步骤 1：安装后端基础依赖**
 
 ```bash
 mkdir -p server/src/config server/src/routes server/tests
@@ -169,11 +143,9 @@ npm install express cors helmet dotenv zod
 npm install -D typescript tsx vitest supertest @types/node @types/express @types/cors @types/supertest
 ```
 
-Expected: `server/package.json` and `server/package-lock.json` exist.
+- [ ] **步骤 2：先写失败的接口测试**
 
-- [ ] **Step 2: Write the failing health test**
-
-Create `server/tests/health.test.ts`:
+创建 `server/tests/health.test.ts`：
 
 ```ts
 import request from 'supertest'
@@ -191,15 +163,17 @@ describe('GET /api/v1/health', () => {
 })
 ```
 
-- [ ] **Step 3: Run the test and verify it fails**
+- [ ] **步骤 3：运行测试并确认失败**
 
-Run: `cd server && npm test -- --run tests/health.test.ts`
+```bash
+npm test -- --run tests/health.test.ts
+```
 
-Expected: FAIL because `../src/app` does not exist.
+预期：因为 `src/app.ts` 不存在而失败。
 
-- [ ] **Step 4: Create the server configuration and health route**
+- [ ] **步骤 4：创建后端配置和健康接口**
 
-Set scripts in `server/package.json`:
+`server/package.json` 脚本：
 
 ```json
 {
@@ -213,7 +187,7 @@ Set scripts in `server/package.json`:
 }
 ```
 
-Create `server/tsconfig.json`:
+`server/tsconfig.json`：
 
 ```json
 {
@@ -233,7 +207,7 @@ Create `server/tsconfig.json`:
 }
 ```
 
-Create `server/tsconfig.build.json`:
+`server/tsconfig.build.json`：
 
 ```json
 {
@@ -249,7 +223,7 @@ Create `server/tsconfig.build.json`:
 }
 ```
 
-Create `server/vitest.config.ts`:
+`server/vitest.config.ts`：
 
 ```ts
 import { defineConfig } from 'vitest/config'
@@ -270,7 +244,7 @@ export default defineConfig({
 })
 ```
 
-Create `server/.env.example`:
+`server/.env.example`：
 
 ```dotenv
 NODE_ENV=development
@@ -282,7 +256,7 @@ UPLOAD_DIR=./uploads
 CLIENT_ORIGIN=http://localhost:5173
 ```
 
-Create `server/src/config/env.ts`:
+`server/src/config/env.ts`：
 
 ```ts
 import 'dotenv/config'
@@ -307,7 +281,7 @@ if (!result.success) {
 export const env = result.data
 ```
 
-Create `server/src/routes/health.route.ts`:
+`server/src/routes/health.route.ts`：
 
 ```ts
 import { Router } from 'express'
@@ -324,14 +298,14 @@ healthRouter.get('/health', (_request, response) => {
 })
 ```
 
-Create `server/src/app.ts`:
+`server/src/app.ts`：
 
 ```ts
 import cors from 'cors'
 import express from 'express'
 import helmet from 'helmet'
-import { env } from './config/env.js'
-import { healthRouter } from './routes/health.route.js'
+import { env } from './config/env'
+import { healthRouter } from './routes/health.route'
 
 export function createApp() {
   const app = express()
@@ -345,35 +319,32 @@ export function createApp() {
 }
 ```
 
-Create `server/src/server.ts`:
+`server/src/server.ts`：
 
 ```ts
 import { createServer } from 'node:http'
-import { createApp } from './app.js'
-import { env } from './config/env.js'
+import { createApp } from './app'
+import { env } from './config/env'
 
 const server = createServer(createApp())
 
-server.listen(env.PORT, () => {
-  console.log(`API listening on http://localhost:${env.PORT}`)
+server.listen(env.PORT, '127.0.0.1', () => {
+  console.log(`API listening on http://127.0.0.1:${env.PORT}`)
 })
 ```
 
-- [ ] **Step 5: Run the health test and type check**
-
-Run:
+- [ ] **步骤 5：验证**
 
 ```bash
-cd server
 npm test -- --run tests/health.test.ts
 npm run typecheck
 ```
 
-Expected: one passing test and no TypeScript errors.
+预期：测试通过，类型检查无错误。
 
-- [ ] **Step 6: Add repository ignores and initial documentation**
+- [ ] **步骤 6：添加基础忽略文件和 README，并提交**
 
-Create `.gitignore`:
+`.gitignore`：
 
 ```gitignore
 node_modules/
@@ -390,33 +361,6 @@ server/uploads/
 .DS_Store
 ```
 
-Create `README.md`:
-
-```markdown
-# TaskFlow
-
-Vue 3 + Element Plus + Express + Prisma 全栈练手项目。
-
-## 目录
-
-- `client`: 前端应用
-- `server`: 后端 API
-- `docs`: 设计和实施文档
-
-## 后端启动
-
-```bash
-cd server
-npm install
-cp .env.example .env
-npm run dev
-```
-
-健康检查地址：`http://localhost:3000/api/v1/health`
-```
-
-- [ ] **Step 7: Commit**
-
 ```bash
 git add .gitignore README.md server
 git commit -m "chore: scaffold TaskFlow server"
@@ -424,266 +368,84 @@ git commit -m "chore: scaffold TaskFlow server"
 
 ---
 
-### Task 2: Error Handling, Request IDs, and Logging
+## 任务 2：统一错误处理、请求 ID 和日志
 
-**Files:**
+**目标：** 所有接口错误都返回统一结构，并给每个请求生成 `requestId`。
 
-- Create: `server/src/lib/app-error.ts`
-- Create: `server/src/lib/response.ts`
-- Create: `server/src/middlewares/not-found.ts`
-- Create: `server/src/middlewares/error-handler.ts`
-- Create: `server/src/middlewares/request-context.ts`
-- Create: `server/src/types/express.d.ts`
-- Modify: `server/src/app.ts`
-- Modify: `server/src/routes/health.route.ts`
-- Test: `server/tests/error-handling.test.ts`
+**涉及文件：**
 
-**Interfaces:**
+- 新建：`server/src/lib/app-error.ts`
+- 新建：`server/src/lib/response.ts`
+- 新建：`server/src/middlewares/not-found.ts`
+- 新建：`server/src/middlewares/error-handler.ts`
+- 新建：`server/src/middlewares/request-context.ts`
+- 新建：`server/src/types/express.d.ts`
+- 修改：`server/src/app.ts`
+- 修改：`server/src/routes/health.route.ts`
+- 新建：`server/tests/error-handling.test.ts`
 
-- Consumes: `createApp()` from Task 1.
-- Produces: `AppError`, `sendSuccess(res, data, message?)`, `errorHandler`, `notFoundHandler`, and `requestContext`.
+**接口：**
 
-- [ ] **Step 1: Write the failing error tests**
+- 产出：`AppError`、`sendSuccess()`、`errorHandler`、`notFoundHandler`、`requestContext`。
 
-Create `server/tests/error-handling.test.ts`:
+- [ ] **步骤 1：写失败测试**
 
-```ts
-import express from 'express'
-import request from 'supertest'
-import { describe, expect, it } from 'vitest'
-import { AppError } from '../src/lib/app-error'
-import { errorHandler } from '../src/middlewares/error-handler'
+测试必须覆盖：
 
-function appWithError(error: unknown) {
-  const app = express()
-  app.get('/error', () => {
-    throw error
-  })
-  app.use(errorHandler)
-  return app
-}
+- `AppError` 返回指定状态码、业务码和消息。
+- 未知错误返回 `500 INTERNAL_ERROR`，不能泄露堆栈。
+- 所有错误响应包含字符串 `requestId`。
 
-describe('error handler', () => {
-  it('serializes an AppError', async () => {
-    const response = await request(
-      appWithError(new AppError(403, 'FORBIDDEN', 'forbidden')),
-    ).get('/error')
+- [ ] **步骤 2：运行测试并确认失败**
 
-    expect(response.status).toBe(403)
-    expect(response.body).toMatchObject({
-      code: 'FORBIDDEN',
-      message: 'forbidden',
-      details: null,
-    })
-    expect(response.body.requestId).toBeTypeOf('string')
-  })
-
-  it('does not leak unknown errors', async () => {
-    const response = await request(appWithError(new Error('secret'))).get('/error')
-
-    expect(response.status).toBe(500)
-    expect(response.body.code).toBe('INTERNAL_ERROR')
-    expect(response.body.message).toBe('服务器内部错误')
-  })
-})
+```bash
+cd server
+npm test -- --run tests/error-handling.test.ts
 ```
 
-- [ ] **Step 2: Run the test and verify it fails**
+- [ ] **步骤 3：实现错误基础设施**
 
-Run: `cd server && npm test -- --run tests/error-handling.test.ts`
-
-Expected: FAIL because `AppError` and `errorHandler` do not exist.
-
-- [ ] **Step 3: Implement the error primitives**
-
-Create `server/src/lib/app-error.ts`:
+`AppError` 构造函数固定为：
 
 ```ts
-export class AppError extends Error {
+class AppError extends Error {
   constructor(
     public readonly status: number,
     public readonly code: string,
     message: string,
     public readonly details: unknown = null,
-  ) {
-    super(message)
-    this.name = 'AppError'
-  }
+  )
 }
 ```
 
-Create `server/src/lib/response.ts`:
+`sendSuccess()` 固定为：
 
 ```ts
-import type { Response } from 'express'
-
-export function sendSuccess<T>(
-  response: Response,
-  data: T,
-  message = 'success',
-) {
-  response.json({
-    code: 'OK',
-    message,
-    data,
-    requestId: response.locals.requestId,
-  })
-}
+sendSuccess<T>(response: Response, data: T, message = 'success')
 ```
 
-- [ ] **Step 4: Implement request IDs, 404 handling, and the global error handler**
+`requestContext` 使用 `randomUUID()` 写入 `response.locals.requestId`。
 
-Create `server/src/types/express.d.ts`:
+`notFoundHandler` 抛出：
 
 ```ts
-import type { AuthUser } from '../middlewares/auth'
-
-declare global {
-  namespace Express {
-    interface Request {
-      auth?: AuthUser
-    }
-  }
-}
-
-export {}
+new AppError(404, 'ROUTE_NOT_FOUND', '接口不存在')
 ```
 
-Temporarily create `server/src/middlewares/auth.ts` so the type import resolves:
+`errorHandler` 必须处理：
 
-```ts
-export interface AuthUser {
-  userId: string
-}
-```
+- `AppError`
+- `ZodError`，返回 `VALIDATION_ERROR` 和字段级 `details`
+- 未知错误，返回 `INTERNAL_ERROR`
 
-Create `server/src/middlewares/request-context.ts`:
-
-```ts
-import { randomUUID } from 'node:crypto'
-import type { NextFunction, Request, Response } from 'express'
-
-export function requestContext(
-  _request: Request,
-  response: Response,
-  next: NextFunction,
-) {
-  response.locals.requestId = randomUUID()
-  next()
-}
-```
-
-Create `server/src/middlewares/not-found.ts`:
-
-```ts
-import type { Request, Response } from 'express'
-import { AppError } from '../lib/app-error.js'
-
-export function notFoundHandler(_request: Request, _response: Response) {
-  throw new AppError(404, 'ROUTE_NOT_FOUND', '接口不存在')
-}
-```
-
-Create `server/src/middlewares/error-handler.ts`:
-
-```ts
-import type { ErrorRequestHandler } from 'express'
-import { ZodError } from 'zod'
-import { AppError } from '../lib/app-error.js'
-
-export const errorHandler: ErrorRequestHandler = (
-  error,
-  _request,
-  response,
-  _next,
-) => {
-  const requestId = response.locals.requestId ?? 'unknown'
-
-  if (error instanceof AppError) {
-    response.status(error.status).json({
-      code: error.code,
-      message: error.message,
-      details: error.details,
-      requestId,
-    })
-    return
-  }
-
-  if (error instanceof ZodError) {
-    response.status(400).json({
-      code: 'VALIDATION_ERROR',
-      message: '请求参数错误',
-      details: error.flatten(),
-      requestId,
-    })
-    return
-  }
-
-  console.error(error)
-  response.status(500).json({
-    code: 'INTERNAL_ERROR',
-    message: '服务器内部错误',
-    details: null,
-    requestId,
-  })
-}
-```
-
-- [ ] **Step 5: Wire middleware into the app and use the shared response helper**
-
-Modify `server/src/app.ts`:
-
-```ts
-import cors from 'cors'
-import express from 'express'
-import helmet from 'helmet'
-import { env } from './config/env.js'
-import { errorHandler } from './middlewares/error-handler.js'
-import { notFoundHandler } from './middlewares/not-found.js'
-import { requestContext } from './middlewares/request-context.js'
-import { healthRouter } from './routes/health.route.js'
-
-export function createApp() {
-  const app = express()
-
-  app.use(requestContext)
-  app.use(helmet())
-  app.use(cors({ origin: env.CLIENT_ORIGIN }))
-  app.use(express.json({ limit: '1mb' }))
-  app.use('/api/v1', healthRouter)
-  app.use(notFoundHandler)
-  app.use(errorHandler)
-
-  return app
-}
-```
-
-Modify `server/src/routes/health.route.ts` to use `sendSuccess`:
-
-```ts
-import { Router } from 'express'
-import { sendSuccess } from '../lib/response.js'
-
-export const healthRouter = Router()
-
-healthRouter.get('/health', (_request, response) => {
-  sendSuccess(response, { status: 'ok' })
-})
-```
-
-- [ ] **Step 6: Re-run tests and type check**
-
-Run:
+- [ ] **步骤 4：完成验证**
 
 ```bash
-cd server
 npm test -- --run tests/health.test.ts tests/error-handling.test.ts
 npm run typecheck
 ```
 
-Expected: all tests pass and TypeScript reports no errors.
-
-- [ ] **Step 7: Commit**
+- [ ] **步骤 5：提交**
 
 ```bash
 git add server
@@ -692,27 +454,25 @@ git commit -m "feat: add API error handling foundation"
 
 ---
 
-### Task 3: Prisma Schema, Migration, Test Database, and Seed
+## 任务 3：Prisma 数据模型、迁移、测试数据库和种子数据
 
-**Files:**
+**目标：** 建立全部核心数据模型，并提供可重复执行的开发数据。
 
-- Create: `server/prisma/schema.prisma`
-- Create: `server/prisma/seed.ts`
-- Create: `server/src/lib/prisma.ts`
-- Create: `server/tests/helpers/database.ts`
-- Create: `server/tests/helpers/factories.ts`
-- Create: `server/tests/seed.test.ts`
-- Modify: `server/package.json`
-- Modify: `server/.env.example`
+**涉及文件：**
 
-**Interfaces:**
+- 新建：`server/prisma/schema.prisma`
+- 新建：`server/prisma/seed.ts`
+- 新建：`server/src/lib/prisma.ts`
+- 新建：`server/tests/helpers/database.ts`
+- 新建：`server/tests/helpers/factories.ts`
+- 新建：`server/tests/seed.test.ts`
+- 修改：`server/package.json`
 
-- Consumes: `env` and `AppError`.
-- Produces: the shared `prisma` client, all data models, `resetDatabase()`, `createUser()`, `createProjectWithOwner()`, and `/api/v1/health`.
+**接口：**
 
-- [ ] **Step 1: Install and initialize Prisma**
+- 产出：`prisma`、`resetDatabase()`、`createUser()`、`createProjectWithOwner()`。
 
-Run:
+- [ ] **步骤 1：安装 Prisma**
 
 ```bash
 cd server
@@ -721,346 +481,103 @@ npm install -D prisma tsx @types/bcryptjs
 npx prisma init --datasource-provider sqlite
 ```
 
-Expected: `server/prisma/schema.prisma` exists.
+- [ ] **步骤 2：先写失败测试**
 
-- [ ] **Step 2: Write the failing seed test**
-
-Create `server/tests/seed.test.ts`:
+测试创建用户后断言：
 
 ```ts
-import { beforeEach, describe, expect, it } from 'vitest'
-import { prisma } from '../src/lib/prisma'
-import { createUser } from './helpers/factories'
-import { resetDatabase } from './helpers/database'
-
-beforeEach(resetDatabase)
-
-describe('database test helpers', () => {
-  it('creates isolated test users', async () => {
-    const user = await createUser({ email: 'owner@example.com' })
-    const count = await prisma.user.count()
-
-    expect(user.email).toBe('owner@example.com')
-    expect(count).toBe(1)
-  })
-})
+const user = await createUser({ email: 'owner@example.com' })
+expect(user.email).toBe('owner@example.com')
+expect(await prisma.user.count()).toBe(1)
 ```
 
-- [ ] **Step 3: Run the test and verify it fails**
-
-Run:
+- [ ] **步骤 3：运行测试并确认失败**
 
 ```bash
-cd server
 DATABASE_URL=file:./test.db npm test -- --run tests/seed.test.ts
 ```
 
-Expected: FAIL because the Prisma models and helpers do not exist.
+- [ ] **步骤 4：定义 Prisma 模型**
 
-- [ ] **Step 4: Define the complete Prisma schema**
+模型必须包含：
 
-Replace `server/prisma/schema.prisma`:
+- `User`
+- `Project`
+- `ProjectMember`
+- `Task`
+- `Comment`
+- `Attachment`
 
-```prisma
-generator client {
-  provider = "prisma-client-js"
-}
+关键关系：
 
-datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
-}
-
-model User {
-  id             String          @id @default(cuid())
-  email          String          @unique
-  username       String          @unique
-  passwordHash   String
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  projectMembers ProjectMember[]
-  createdTasks   Task[]          @relation("TaskCreator")
-  assignedTasks  Task[]          @relation("TaskAssignee")
-  comments       Comment[]
-  attachments    Attachment[]
-}
-
-model Project {
-  id          String          @id @default(cuid())
-  name        String
-  description String          @default("")
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
-  members     ProjectMember[]
-  tasks       Task[]
-}
-
-model ProjectMember {
-  id        String   @id @default(cuid())
-  projectId String
-  userId    String
-  role      String
-  createdAt DateTime @default(now())
-  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([projectId, userId])
-  @@index([projectId])
-  @@index([userId])
-}
-
-model Task {
-  id          String       @id @default(cuid())
-  projectId   String
-  title       String
-  description String       @default("")
-  status      String       @default("TODO")
-  priority    String       @default("MEDIUM")
-  assigneeId  String?
-  creatorId   String
-  dueDate     DateTime?
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  project     Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  assignee    User?        @relation("TaskAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
-  creator     User         @relation("TaskCreator", fields: [creatorId], references: [id], onDelete: Restrict)
-  comments    Comment[]
-  attachments Attachment[]
-
-  @@index([projectId])
-  @@index([status])
-  @@index([assigneeId])
-  @@index([dueDate])
-}
-
-model Comment {
-  id        String   @id @default(cuid())
-  taskId    String
-  authorId  String
-  content   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
-  author    User     @relation(fields: [authorId], references: [id], onDelete: Restrict)
-
-  @@index([taskId])
-}
-
-model Attachment {
-  id           String   @id @default(cuid())
-  taskId       String
-  uploaderId   String
-  originalName String
-  storedName   String   @unique
-  mimeType     String
-  size         Int
-  createdAt    DateTime @default(now())
-  task         Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
-  uploader     User     @relation(fields: [uploaderId], references: [id], onDelete: Restrict)
-
-  @@index([taskId])
-}
+```text
+User N ── ProjectMember ── N Project
+Project 1 ── N Task
+User 1 ── N Task(assignee)
+User 1 ── N Task(creator)
+Task 1 ── N Comment
+Task 1 ── N Attachment
 ```
 
-- [ ] **Step 5: Create the Prisma client and database test helpers**
+关键约束：
 
-Create `server/src/lib/prisma.ts`:
+- `User.email` 唯一。
+- `User.username` 唯一。
+- `ProjectMember` 的 `projectId + userId` 组合唯一。
+- 删除项目级联删除成员、任务、评论和附件记录。
+- 删除任务级联删除评论和附件记录。
+- 删除负责人时将 `assigneeId` 设为 `null`。
+
+`role`、`status`、`priority` 使用 `String`，合法值由 Zod 和 TypeScript 联合类型限制。
+
+- [ ] **步骤 5：实现测试辅助函数**
+
+`resetDatabase()` 按以下顺序清理：
+
+```text
+attachment
+comment
+task
+projectMember
+project
+user
+```
+
+最后删除测试上传目录：
 
 ```ts
-import { PrismaClient } from '@prisma/client'
-
-declare global {
-  var __taskflowPrisma: PrismaClient | undefined
-}
-
-export const prisma = globalThis.__taskflowPrisma ?? new PrismaClient()
-
-if (process.env.NODE_ENV !== 'production') {
-  globalThis.__taskflowPrisma = prisma
-}
+await rm(resolve(env.UPLOAD_DIR), { recursive: true, force: true })
 ```
 
-Create `server/tests/helpers/database.ts`:
+`createUser()` 默认使用动态邮箱和用户名，避免测试冲突。
 
-```ts
-import { rm } from 'node:fs/promises'
-import { resolve } from 'node:path'
-import { env } from '../../src/config/env'
-import { prisma } from '../../src/lib/prisma'
+`createProjectWithOwner()` 在创建项目时同时写入 `OWNER` 成员。
 
-export async function resetDatabase() {
-  await prisma.attachment.deleteMany()
-  await prisma.comment.deleteMany()
-  await prisma.task.deleteMany()
-  await prisma.projectMember.deleteMany()
-  await prisma.project.deleteMany()
-  await prisma.user.deleteMany()
-  await rm(resolve(env.UPLOAD_DIR), { recursive: true, force: true })
-}
-```
+- [ ] **步骤 6：创建幂等种子数据**
 
-Create `server/tests/helpers/factories.ts`:
+种子数据必须包含：
 
-```ts
-import { prisma } from '../../src/lib/prisma'
-import { hashPassword } from '../../src/lib/password'
+- `owner@example.com`
+- `member@example.com`
+- 一个示例项目
+- `TODO`、`IN_PROGRESS`、`DONE` 三个任务
+- 两个用户的密码均为 `password123`
 
-export async function createUser(
-  overrides: Partial<{ email: string; username: string; password: string }> = {},
-) {
-  const suffix = crypto.randomUUID().slice(0, 8)
-  return prisma.user.create({
-    data: {
-      email: overrides.email ?? `user-${suffix}@example.com`,
-      username: overrides.username ?? `user_${suffix}`,
-      passwordHash: await hashPassword(overrides.password ?? 'password123'),
-    },
-  })
-}
+用户和项目使用 `upsert`，重复执行不能产生重复记录。
 
-export async function createProjectWithOwner(
-  userId: string,
-  overrides: Partial<{ name: string; description: string }> = {},
-) {
-  return prisma.project.create({
-    data: {
-      name: overrides.name ?? 'Test Project',
-      description: overrides.description ?? '',
-      members: {
-        create: { userId, role: 'OWNER' },
-      },
-    },
-  })
-}
-```
-
-Create `server/src/lib/password.ts` now because factories depend on it:
-
-```ts
-import bcrypt from 'bcryptjs'
-
-export function hashPassword(password: string) {
-  return bcrypt.hash(password, 12)
-}
-
-export function verifyPassword(password: string, passwordHash: string) {
-  return bcrypt.compare(password, passwordHash)
-}
-```
-
-- [ ] **Step 6: Configure migration and seed scripts**
-
-Add to `server/package.json`:
-
-```json
-{
-  "prisma": {
-    "seed": "tsx prisma/seed.ts"
-  },
-  "scripts": {
-    "db:migrate": "prisma migrate dev",
-    "db:seed": "prisma db seed",
-    "db:generate": "prisma generate"
-  }
-}
-```
-
-- [ ] **Step 7: Create the idempotent development seed**
-
-Create `server/prisma/seed.ts`:
-
-```ts
-import { PrismaClient } from '@prisma/client'
-import { hashPassword } from '../src/lib/password'
-
-const prisma = new PrismaClient()
-
-async function main() {
-  const passwordHash = await hashPassword('password123')
-
-  const owner = await prisma.user.upsert({
-    where: { email: 'owner@example.com' },
-    update: { username: 'owner' },
-    create: { email: 'owner@example.com', username: 'owner', passwordHash },
-  })
-
-  const member = await prisma.user.upsert({
-    where: { email: 'member@example.com' },
-    update: { username: 'member' },
-    create: { email: 'member@example.com', username: 'member', passwordHash },
-  })
-
-  await prisma.project.upsert({
-    where: { id: 'seed-project' },
-    update: { name: 'TaskFlow 示例项目' },
-    create: {
-      id: 'seed-project',
-      name: 'TaskFlow 示例项目',
-      description: '用于本地开发和学习的数据',
-      members: {
-        create: [
-          { userId: owner.id, role: 'OWNER' },
-          { userId: member.id, role: 'MEMBER' },
-        ],
-      },
-      tasks: {
-        create: [
-          {
-            id: 'seed-task-todo',
-            title: '完成项目基础搭建',
-            status: 'TODO',
-            priority: 'HIGH',
-            creatorId: owner.id,
-            assigneeId: member.id,
-          },
-          {
-            id: 'seed-task-progress',
-            title: '联调任务列表',
-            status: 'IN_PROGRESS',
-            priority: 'MEDIUM',
-            creatorId: owner.id,
-            assigneeId: owner.id,
-          },
-          {
-            id: 'seed-task-done',
-            title: '确认接口格式',
-            status: 'DONE',
-            priority: 'LOW',
-            creatorId: owner.id,
-            assigneeId: member.id,
-          },
-        ],
-      },
-    },
-  })
-}
-
-main()
-  .then(() => prisma.$disconnect())
-  .catch(async (error) => {
-    console.error(error)
-    await prisma.$disconnect()
-    process.exit(1)
-  })
-```
-
-- [ ] **Step 8: Generate, migrate, seed, and run tests**
-
-Run:
+- [ ] **步骤 7：生成、迁移、写种子并验证**
 
 ```bash
-cd server
 cp .env.example .env
 npx prisma generate
 npx prisma migrate dev --name init
 DATABASE_URL=file:./test.db npx prisma db push
 DATABASE_URL=file:./test.db npm test -- --run tests/seed.test.ts
 npm run db:seed
+npm run typecheck
 ```
 
-Expected: the test passes and the seed creates two users, one project, and three tasks.
-
-- [ ] **Step 9: Commit**
+- [ ] **步骤 8：提交**
 
 ```bash
 git add server
@@ -1069,350 +586,123 @@ git commit -m "feat: add Prisma data model and seed"
 
 ---
 
-### Task 4: Authentication API
+## 任务 4：注册、登录和 JWT 鉴权 API
 
-**Files:**
+**目标：** 实现 `POST /auth/register`、`POST /auth/login`、`GET /auth/me`。
 
-- Create: `server/src/lib/jwt.ts`
-- Create: `server/src/schemas/auth.schema.ts`
-- Create: `server/src/services/auth.service.ts`
-- Create: `server/src/controllers/auth.controller.ts`
-- Create: `server/src/routes/auth.route.ts`
-- Modify: `server/src/middlewares/auth.ts`
-- Modify: `server/src/routes/health.route.ts`
-- Modify: `server/src/app.ts`
-- Test: `server/tests/auth.test.ts`
+**涉及文件：**
 
-**Interfaces:**
+- 新建：`server/src/lib/jwt.ts`
+- 新建：`server/src/schemas/auth.schema.ts`
+- 新建：`server/src/services/auth.service.ts`
+- 新建：`server/src/controllers/auth.controller.ts`
+- 新建：`server/src/routes/auth.route.ts`
+- 修改：`server/src/middlewares/auth.ts`
+- 修改：`server/src/app.ts`
+- 新建：`server/tests/auth.test.ts`
 
-- Consumes: `prisma`, `AppError`, `hashPassword`, `verifyPassword`, `sendSuccess`, and `env`.
-- Produces: `register(input)`, `login(input)`, `getCurrentUser(userId)`, `requireAuth`, `POST /auth/register`, `POST /auth/login`, and `GET /auth/me`.
+**接口：**
 
-- [ ] **Step 1: Write failing authentication tests**
+- 产出：`register()`、`login()`、`getCurrentUser()`、`requireAuth`。
+- 请求字段：`username`、`email`、`password`。
+- 响应：`{ token, user }`。
 
-Create `server/tests/auth.test.ts`:
+- [ ] **步骤 1：写失败测试**
 
-```ts
-import request from 'supertest'
-import { beforeEach, describe, expect, it } from 'vitest'
-import { createApp } from '../src/app'
-import { resetDatabase } from './helpers/database'
-import { createUser } from './helpers/factories'
+必须覆盖：
 
-const app = createApp()
+- 注册成功后返回 `201`、Token 和公开用户信息。
+- 重复邮箱返回 `409 EMAIL_ALREADY_EXISTS`。
+- 正确密码可以登录。
+- 错误密码返回 `401 INVALID_CREDENTIALS`。
+- 携带 Bearer Token 可以访问 `/auth/me`。
 
-beforeEach(resetDatabase)
-
-describe('authentication', () => {
-  it('registers and returns a token', async () => {
-    const response = await request(app).post('/api/v1/auth/register').send({
-      username: 'learner',
-      email: 'learner@example.com',
-      password: 'password123',
-    })
-
-    expect(response.status).toBe(201)
-    expect(response.body.data.user.email).toBe('learner@example.com')
-    expect(response.body.data.token).toBeTypeOf('string')
-  })
-
-  it('rejects a duplicate email', async () => {
-    await createUser({ email: 'used@example.com', username: 'used' })
-    const response = await request(app).post('/api/v1/auth/register').send({
-      username: 'other',
-      email: 'used@example.com',
-      password: 'password123',
-    })
-
-    expect(response.status).toBe(409)
-    expect(response.body.code).toBe('EMAIL_ALREADY_EXISTS')
-  })
-
-  it('logs in and returns the current user', async () => {
-    await createUser({
-      email: 'member@example.com',
-      username: 'member',
-      password: 'password123',
-    })
-
-    const login = await request(app).post('/api/v1/auth/login').send({
-      email: 'member@example.com',
-      password: 'password123',
-    })
-    const me = await request(app)
-      .get('/api/v1/auth/me')
-      .set('Authorization', `Bearer ${login.body.data.token}`)
-
-    expect(me.status).toBe(200)
-    expect(me.body.data.username).toBe('member')
-  })
-})
-```
-
-- [ ] **Step 2: Run the tests and verify they fail**
-
-Run:
+- [ ] **步骤 2：运行测试并确认失败**
 
 ```bash
 cd server
 DATABASE_URL=file:./test.db npm test -- --run tests/auth.test.ts
 ```
 
-Expected: FAIL with 404 because the authentication routes do not exist.
+- [ ] **步骤 3：实现校验、哈希和 JWT**
 
-- [ ] **Step 3: Implement JWT and Zod validation**
-
-Create `server/src/lib/jwt.ts`:
+注册规则：
 
 ```ts
-import jwt from 'jsonwebtoken'
-import { env } from '../config/env.js'
+username: z.string().trim().min(3).max(20)
+email: z.string().trim().email().toLowerCase()
+password: z.string().min(8).max(72)
+```
 
-export interface AccessTokenPayload {
+JWT Payload 固定为：
+
+```ts
+interface AccessTokenPayload {
   sub: string
 }
-
-export function signAccessToken(userId: string) {
-  return jwt.sign({ sub: userId }, env.JWT_SECRET, {
-    expiresIn: env.JWT_EXPIRES_IN as jwt.SignOptions['expiresIn'],
-  })
-}
-
-export function verifyAccessToken(token: string) {
-  return jwt.verify(token, env.JWT_SECRET) as AccessTokenPayload
-}
 ```
 
-Create `server/src/schemas/auth.schema.ts`:
+密码使用 `bcryptjs` 哈希，成本因子为 12。
+
+- [ ] **步骤 4：实现 Service、Controller 和 Route**
+
+注册逻辑：
+
+1. 查找邮箱或用户名是否已存在。
+2. 哈希密码。
+3. 创建用户。
+4. 签发 Token。
+5. 返回公开用户字段，不能返回 `passwordHash`。
+
+登录逻辑：
+
+1. 按邮箱查询用户。
+2. 比较密码。
+3. 失败统一返回“邮箱或密码错误”。
+4. 成功返回 Token 和公开用户信息。
+
+`requireAuth` 从 `Authorization` 读取 Bearer Token，验证后写入：
 
 ```ts
-import { z } from 'zod'
-
-export const registerSchema = z.object({
-  username: z.string().trim().min(3).max(20),
-  email: z.string().trim().email().toLowerCase(),
-  password: z.string().min(8).max(72),
-})
-
-export const loginSchema = z.object({
-  email: z.string().trim().email().toLowerCase(),
-  password: z.string().min(1).max(72),
-})
-
-export type RegisterInput = z.infer<typeof registerSchema>
-export type LoginInput = z.infer<typeof loginSchema>
+request.auth = { userId: payload.sub }
 ```
 
-Install JWT:
+- [ ] **步骤 5：验证并提交**
 
 ```bash
-cd server
-npm install jsonwebtoken
-npm install -D @types/jsonwebtoken
-```
-
-- [ ] **Step 4: Implement the authentication service**
-
-Create `server/src/services/auth.service.ts`:
-
-```ts
-import { AppError } from '../lib/app-error.js'
-import { signAccessToken } from '../lib/jwt.js'
-import { hashPassword, verifyPassword } from '../lib/password.js'
-import { prisma } from '../lib/prisma.js'
-import type { LoginInput, RegisterInput } from '../schemas/auth.schema.js'
-
-function publicUser(user: {
-  id: string
-  email: string
-  username: string
-  createdAt: Date
-}) {
-  return {
-    id: user.id,
-    email: user.email,
-    username: user.username,
-    createdAt: user.createdAt,
-  }
-}
-
-export async function register(input: RegisterInput) {
-  const existing = await prisma.user.findFirst({
-    where: {
-      OR: [{ email: input.email }, { username: input.username }],
-    },
-  })
-
-  if (existing?.email === input.email) {
-    throw new AppError(409, 'EMAIL_ALREADY_EXISTS', '邮箱已被使用')
-  }
-  if (existing) {
-    throw new AppError(409, 'USERNAME_ALREADY_EXISTS', '用户名已被使用')
-  }
-
-  const user = await prisma.user.create({
-    data: {
-      email: input.email,
-      username: input.username,
-      passwordHash: await hashPassword(input.password),
-    },
-  })
-
-  return { token: signAccessToken(user.id), user: publicUser(user) }
-}
-
-export async function login(input: LoginInput) {
-  const user = await prisma.user.findUnique({ where: { email: input.email } })
-  const valid = user && (await verifyPassword(input.password, user.passwordHash))
-
-  if (!valid) {
-    throw new AppError(401, 'INVALID_CREDENTIALS', '邮箱或密码错误')
-  }
-
-  return { token: signAccessToken(user.id), user: publicUser(user) }
-}
-
-export async function getCurrentUser(userId: string) {
-  const user = await prisma.user.findUnique({ where: { id: userId } })
-  if (!user) {
-    throw new AppError(401, 'UNAUTHORIZED', '登录状态已失效')
-  }
-  return publicUser(user)
-}
-```
-
-- [ ] **Step 5: Implement auth middleware, controller, and routes**
-
-Replace `server/src/middlewares/auth.ts`:
-
-```ts
-import type { NextFunction, Request, Response } from 'express'
-import { AppError } from '../lib/app-error.js'
-import { verifyAccessToken } from '../lib/jwt.js'
-
-export interface AuthUser {
-  userId: string
-}
-
-export function requireAuth(request: Request, _response: Response, next: NextFunction) {
-  const header = request.header('Authorization')
-
-  if (!header?.startsWith('Bearer ')) {
-    next(new AppError(401, 'UNAUTHORIZED', '请先登录'))
-    return
-  }
-
-  try {
-    const payload = verifyAccessToken(header.slice(7))
-    request.auth = { userId: payload.sub }
-    next()
-  } catch {
-    next(new AppError(401, 'TOKEN_EXPIRED', '登录已过期，请重新登录'))
-  }
-}
-```
-
-Create `server/src/controllers/auth.controller.ts`:
-
-```ts
-import type { Request, Response } from 'express'
-import { sendSuccess } from '../lib/response.js'
-import { loginSchema, registerSchema } from '../schemas/auth.schema.js'
-import * as authService from '../services/auth.service.js'
-
-export async function register(request: Request, response: Response) {
-  const result = await authService.register(registerSchema.parse(request.body))
-  sendSuccess(response, result, '注册成功')
-}
-
-export async function login(request: Request, response: Response) {
-  const result = await authService.login(loginSchema.parse(request.body))
-  sendSuccess(response, result, '登录成功')
-}
-
-export async function me(request: Request, response: Response) {
-  const user = await authService.getCurrentUser(request.auth!.userId)
-  sendSuccess(response, user)
-}
-```
-
-Need status 201 for registration. Add `response.status(201)` before `sendSuccess`:
-
-```ts
-response.status(201)
-sendSuccess(response, result, '注册成功')
-```
-
-Create `server/src/routes/auth.route.ts`:
-
-```ts
-import { Router } from 'express'
-import * as authController from '../controllers/auth.controller.js'
-import { requireAuth } from '../middlewares/auth.js'
-
-export const authRouter = Router()
-
-authRouter.post('/register', authController.register)
-authRouter.post('/login', authController.login)
-authRouter.get('/me', requireAuth, authController.me)
-```
-
-Modify `server/src/app.ts`:
-
-```ts
-import { authRouter } from './routes/auth.route.js'
-
-app.use('/api/v1/auth', authRouter)
-```
-
-- [ ] **Step 6: Run focused tests and type check**
-
-Run:
-
-```bash
-cd server
 DATABASE_URL=file:./test.db npm test -- --run tests/auth.test.ts
 npm run typecheck
-```
-
-Expected: registration, duplicate-email, login, and current-user tests pass.
-
-- [ ] **Step 7: Commit**
-
-```bash
 git add server
 git commit -m "feat: add JWT authentication API"
 ```
 
 ---
 
-### Task 5: Client Foundation and Application Shell
+## 任务 5：搭建 Vue 前端和基础应用框架
 
-**Files:**
+**目标：** 创建独立的 `client` 项目，可以运行、测试和构建。
 
-- Create: `client/package.json`
-- Create: `client/tsconfig.json`
-- Create: `client/tsconfig.app.json`
-- Create: `client/tsconfig.node.json`
-- Create: `client/vite.config.ts`
-- Create: `client/.env.example`
-- Create: `client/index.html`
-- Create: `client/src/env.d.ts`
-- Create: `client/src/styles/base.css`
-- Create: `client/src/main.ts`
-- Create: `client/src/App.vue`
-- Create: `client/src/router/index.ts`
-- Create: `client/src/views/HomeView.vue`
-- Test: `client/tests/app-shell.test.ts`
+**涉及文件：**
 
-**Interfaces:**
+- 新建：`client/package.json`
+- 新建：`client/tsconfig.json`
+- 新建：`client/tsconfig.app.json`
+- 新建：`client/tsconfig.node.json`
+- 新建：`client/vite.config.ts`
+- 新建：`client/.env.example`
+- 新建：`client/index.html`
+- 新建：`client/src/main.ts`
+- 新建：`client/src/App.vue`
+- 新建：`client/src/router/index.ts`
+- 新建：`client/src/styles/base.css`
+- 新建：`client/src/views/HomeView.vue`
+- 新建：`client/tests/app-shell.test.ts`
 
-- Consumes: the backend API from Tasks 1-4 when running locally.
-- Produces: Vue application bootstrap, router, base styles, and `/` shell route.
+**接口：**
 
-- [ ] **Step 1: Create client configuration and test dependencies**
+- 产出：Vue 应用启动入口、Router、基础样式和首页路由。
 
-Run:
+- [ ] **步骤 1：安装依赖**
 
 ```bash
 mkdir -p client/src/router client/src/views client/tests
@@ -1422,7 +712,7 @@ npm install vue vue-router pinia axios element-plus
 npm install -D typescript vite @vitejs/plugin-vue vue-tsc vitest @vue/test-utils jsdom
 ```
 
-Set `client/package.json` scripts:
+脚本：
 
 ```json
 {
@@ -1435,87 +725,20 @@ Set `client/package.json` scripts:
 }
 ```
 
-- [ ] **Step 2: Write the failing app-shell test**
+- [ ] **步骤 2：先写失败测试**
 
-Create `client/tests/app-shell.test.ts`:
+挂载 `App.vue` 并使用真实的 `router`，断言页面文本包含 `TaskFlow`。
 
-```ts
-import { mount } from '@vue/test-utils'
-import { describe, expect, it } from 'vitest'
-import App from '../src/App.vue'
-import { router } from '../src/router'
+- [ ] **步骤 3：运行测试并确认失败**
 
-describe('App', () => {
-  it('renders the current route', async () => {
-    await router.push('/')
-    await router.isReady()
-
-    const wrapper = mount(App, {
-      global: { plugins: [router] },
-    })
-
-    expect(wrapper.text()).toContain('TaskFlow')
-  })
-})
+```bash
+cd client
+npm test -- --run tests/app-shell.test.ts
 ```
 
-- [ ] **Step 3: Run the test and verify it fails**
+- [ ] **步骤 4：实现 Vite、TypeScript 和 Vue 入口**
 
-Run: `cd client && npm test -- --run tests/app-shell.test.ts`
-
-Expected: FAIL because the Vue application files do not exist.
-
-- [ ] **Step 4: Create Vite and TypeScript configuration**
-
-Create `client/tsconfig.json`:
-
-```json
-{
-  "files": [],
-  "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
-  ]
-}
-```
-
-Create `client/tsconfig.app.json`:
-
-```json
-{
-  "compilerOptions": {
-    "target": "ES2022",
-    "useDefineForClassFields": true,
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "strict": true,
-    "jsx": "preserve",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "esModuleInterop": true,
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "types": ["vite/client"]
-  },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue", "tests/**/*.ts"]
-}
-```
-
-Create `client/tsconfig.node.json`:
-
-```json
-{
-  "compilerOptions": {
-    "composite": true,
-    "skipLibCheck": true,
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "allowImportingTsExtensions": true
-  },
-  "include": ["vite.config.ts"]
-}
-```
-
-Create `client/vite.config.ts`:
+`vite.config.ts` 使用：
 
 ```ts
 import vue from '@vitejs/plugin-vue'
@@ -1531,2743 +754,793 @@ export default defineConfig({
 })
 ```
 
-Create `client/.env.example`:
+`main.ts` 安装：
+
+```text
+Pinia -> Router -> Element Plus -> mount('#app')
+```
+
+`/src/env.d.ts` 引入 Vite 客户端类型。
+
+`/.env.example` 写入：
 
 ```dotenv
 VITE_API_BASE_URL=http://localhost:3000/api/v1
 ```
 
-- [ ] **Step 5: Create the application shell**
-
-Create `client/index.html`:
-
-```html
-<!doctype html>
-<html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TaskFlow</title>
-  </head>
-  <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.ts"></script>
-  </body>
-</html>
-```
-
-Create `client/src/env.d.ts`:
-
-```ts
-/// <reference types="vite/client" />
-```
-
-Create `client/src/styles/base.css`:
-
-```css
-:root {
-  font-family:
-    Inter, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
-  color: #1f2937;
-  background: #f5f7fa;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-button,
-input,
-textarea,
-select {
-  font: inherit;
-}
-```
-
-Create `client/src/views/HomeView.vue`:
-
-```vue
-<template>
-  <main class="home">
-    <h1>TaskFlow</h1>
-    <p>任务与项目协作台</p>
-  </main>
-</template>
-
-<style scoped>
-.home {
-  padding: 48px;
-}
-</style>
-```
-
-Create `client/src/router/index.ts`:
-
-```ts
-import { createRouter, createWebHistory } from 'vue-router'
-
-export const routes = [
-  {
-    path: '/',
-    name: 'home',
-    component: () => import('../views/HomeView.vue'),
-  },
-]
-
-export const router = createRouter({
-  history: createWebHistory(),
-  routes,
-})
-```
-
-Create `client/src/App.vue`:
-
-```vue
-<template>
-  <RouterView />
-</template>
-```
-
-Create `client/src/main.ts`:
-
-```ts
-import ElementPlus from 'element-plus'
-import 'element-plus/dist/index.css'
-import { createPinia } from 'pinia'
-import { createApp } from 'vue'
-import App from './App.vue'
-import { router } from './router'
-import './styles/base.css'
-
-createApp(App).use(createPinia()).use(router).use(ElementPlus).mount('#app')
-```
-
-- [ ] **Step 6: Run the test, type check, and build**
-
-Run:
+- [ ] **步骤 5：验证并提交**
 
 ```bash
-cd client
 npm test -- --run tests/app-shell.test.ts
 npm run typecheck
 npm run build
-```
-
-Expected: test, type check, and production build pass.
-
-- [ ] **Step 7: Commit**
-
-```bash
 git add client
 git commit -m "chore: scaffold TaskFlow client"
 ```
 
 ---
 
-### Task 6: Login, Registration, Token Handling, and Route Guards
+## 任务 6：登录、注册、Token 和路由守卫
 
-**Files:**
+**目标：** 完成前端认证闭环，刷新页面可以恢复登录状态。
 
-- Create: `client/src/utils/auth-token.ts`
-- Create: `client/src/api/http.ts`
-- Create: `client/src/api/auth.ts`
-- Create: `client/src/stores/auth.ts`
-- Create: `client/src/layouts/AppLayout.vue`
-- Create: `client/src/views/auth/LoginView.vue`
-- Create: `client/src/views/auth/RegisterView.vue`
-- Create: `client/src/views/DashboardView.vue`
-- Modify: `client/src/router/index.ts`
-- Modify: `client/src/App.vue`
-- Modify: `client/tests/app-shell.test.ts`
-- Test: `client/tests/auth.test.ts`
-- Test: `client/tests/http.test.ts`
+**涉及文件：**
 
-**Interfaces:**
+- 新建：`client/src/utils/auth-token.ts`
+- 新建：`client/src/api/http.ts`
+- 新建：`client/src/api/auth.ts`
+- 新建：`client/src/stores/auth.ts`
+- 新建：`client/src/layouts/AppLayout.vue`
+- 新建：`client/src/views/auth/LoginView.vue`
+- 新建：`client/src/views/auth/RegisterView.vue`
+- 新建：`client/src/views/DashboardView.vue`
+- 修改：`client/src/router/index.ts`
+- 修改：`client/src/main.ts`
+- 修改：`client/tests/app-shell.test.ts`
+- 新建：`client/tests/http.test.ts`
+- 新建：`client/tests/auth.test.ts`
 
-- Consumes: the auth API and health API from the server.
-- Produces: `getAccessToken()`, `setAccessToken()`, `clearAccessToken()`, `apiRequest<T>()`, `authApi`, `useAuthStore()`, guarded `/login`, `/register`, and `/dashboard`.
+**接口：**
 
-- [ ] **Step 1: Install Axios test support and write failing HTTP tests**
+- 产出：`getAccessToken()`、`setAccessToken()`、`clearAccessToken()`
+- 产出：`apiRequest<T>()`、`ApiError`
+- 产出：`authApi`、`useAuthStore()`
+- 路由：`/login`、`/register`、`/dashboard`
 
-Run:
+- [ ] **步骤 1：安装测试适配器并写失败测试**
 
 ```bash
 cd client
 npm install -D axios-mock-adapter
 ```
 
-Create `client/tests/http.test.ts`:
+HTTP 测试必须验证：
 
-```ts
-import MockAdapter from 'axios-mock-adapter'
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { apiRequest, http } from '../src/api/http'
-import { clearAccessToken, setAccessToken } from '../src/utils/auth-token'
+- 请求前自动添加 Bearer Token。
+- 成功响应自动解包 `data`。
+- 异常响应转换为 `ApiError`。
 
-const mock = new MockAdapter(http)
+认证 Store 测试必须验证：
 
-beforeEach(() => {
-  clearAccessToken()
-  mock.reset()
-})
+- 登录后保存 Token 和用户。
+- 退出后清空 Token 和用户。
 
-afterEach(clearAccessToken)
-
-describe('http client', () => {
-  it('adds the token and unwraps successful data', async () => {
-    setAccessToken('test-token')
-    mock.onGet('/protected').reply((config) => [
-      200,
-      {
-        code: 'OK',
-        message: 'success',
-        data: { value: 42 },
-        requestId: 'request-1',
-      },
-      { 'x-test-authorization': config.headers?.Authorization },
-    ])
-
-    const data = await apiRequest<{ value: number }>({
-      method: 'GET',
-      url: '/protected',
-    })
-
-    expect(data.value).toBe(42)
-    expect(mock.history.get[0].headers?.Authorization).toBe('Bearer test-token')
-  })
-
-  it('throws a typed ApiError', async () => {
-    mock.onGet('/missing').reply(404, {
-      code: 'ROUTE_NOT_FOUND',
-      message: '接口不存在',
-      details: null,
-      requestId: 'request-2',
-    })
-
-    await expect(
-      apiRequest({ method: 'GET', url: '/missing' }),
-    ).rejects.toMatchObject({
-      code: 'ROUTE_NOT_FOUND',
-      status: 404,
-    })
-  })
-})
-```
-
-- [ ] **Step 2: Run the HTTP tests and verify they fail**
-
-Run: `cd client && npm test -- --run tests/http.test.ts`
-
-Expected: FAIL because the HTTP client does not exist.
-
-- [ ] **Step 3: Implement token persistence and the HTTP client**
-
-Create `client/src/utils/auth-token.ts`:
-
-```ts
-const TOKEN_KEY = 'taskflow.access-token'
-
-export function getAccessToken() {
-  return localStorage.getItem(TOKEN_KEY)
-}
-
-export function setAccessToken(token: string) {
-  localStorage.setItem(TOKEN_KEY, token)
-}
-
-export function clearAccessToken() {
-  localStorage.removeItem(TOKEN_KEY)
-}
-```
-
-Create `client/src/api/http.ts`:
-
-```ts
-import axios, { type AxiosRequestConfig } from 'axios'
-import { clearAccessToken, getAccessToken } from '../utils/auth-token'
-
-interface ApiEnvelope<T> {
-  code: string
-  message: string
-  data: T
-  requestId: string
-}
-
-interface ApiErrorBody {
-  code?: string
-  message?: string
-  details?: unknown
-  requestId?: string
-}
-
-export class ApiError extends Error {
-  constructor(
-    public readonly code: string,
-    message: string,
-    public readonly status?: number,
-    public readonly details?: unknown,
-    public readonly requestId?: string,
-  ) {
-    super(message)
-    this.name = 'ApiError'
-  }
-}
-
-export const http = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000/api/v1',
-  timeout: 10_000,
-})
-
-http.interceptors.request.use((config) => {
-  const token = getAccessToken()
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
-  }
-  return config
-})
-
-http.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    const status = error.response?.status as number | undefined
-    const body = (error.response?.data ?? {}) as ApiErrorBody
-
-    if (status === 401) {
-      clearAccessToken()
-      window.dispatchEvent(new Event('auth:expired'))
-    }
-
-    return Promise.reject(
-      new ApiError(
-        body.code ?? 'NETWORK_ERROR',
-        body.message ?? '网络请求失败',
-        status,
-        body.details,
-        body.requestId,
-      ),
-    )
-  },
-)
-
-export async function apiRequest<T>(config: AxiosRequestConfig): Promise<T> {
-  const response = await http.request<ApiEnvelope<T>>(config)
-  return response.data.data
-}
-```
-
-Create `client/src/api/auth.ts`:
-
-```ts
-import { apiRequest } from './http'
-
-export interface User {
-  id: string
-  email: string
-  username: string
-  createdAt: string
-}
-
-export interface AuthResult {
-  token: string
-  user: User
-}
-
-export const authApi = {
-  register(input: { username: string; email: string; password: string }) {
-    return apiRequest<AuthResult>({
-      method: 'POST',
-      url: '/auth/register',
-      data: input,
-    })
-  },
-  login(input: { email: string; password: string }) {
-    return apiRequest<AuthResult>({
-      method: 'POST',
-      url: '/auth/login',
-      data: input,
-    })
-  },
-  me() {
-    return apiRequest<User>({ method: 'GET', url: '/auth/me' })
-  },
-}
-```
-
-- [ ] **Step 4: Write the failing authentication store test**
-
-Create `client/tests/auth.test.ts`:
-
-```ts
-import { createPinia, setActivePinia } from 'pinia'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { authApi } from '../src/api/auth'
-import { useAuthStore } from '../src/stores/auth'
-import { getAccessToken } from '../src/utils/auth-token'
-
-beforeEach(() => {
-  localStorage.clear()
-  setActivePinia(createPinia())
-  vi.restoreAllMocks()
-})
-
-describe('auth store', () => {
-  it('stores the token and user after login', async () => {
-    vi.spyOn(authApi, 'login').mockResolvedValue({
-      token: 'token-1',
-      user: {
-        id: 'user-1',
-        email: 'user@example.com',
-        username: 'user',
-        createdAt: '2026-09-23T00:00:00.000Z',
-      },
-    })
-
-    const store = useAuthStore()
-    await store.login({ email: 'user@example.com', password: 'password123' })
-
-    expect(store.user?.username).toBe('user')
-    expect(getAccessToken()).toBe('token-1')
-  })
-
-  it('clears state on logout', () => {
-    localStorage.setItem('taskflow.access-token', 'token-1')
-    const store = useAuthStore()
-
-    store.logout()
-
-    expect(store.user).toBeNull()
-    expect(getAccessToken()).toBeNull()
-  })
-})
-```
-
-- [ ] **Step 5: Implement the authentication store**
-
-Create `client/src/stores/auth.ts`:
-
-```ts
-import { defineStore } from 'pinia'
-import { authApi, type User } from '../api/auth'
-import {
-  clearAccessToken,
-  getAccessToken,
-  setAccessToken,
-} from '../utils/auth-token'
-
-export const useAuthStore = defineStore('auth', {
-  state: () => ({
-    user: null as User | null,
-    initialized: false,
-  }),
-  getters: {
-    isAuthenticated: (state) => Boolean(state.user && getAccessToken()),
-  },
-  actions: {
-    async login(input: { email: string; password: string }) {
-      const result = await authApi.login(input)
-      setAccessToken(result.token)
-      this.user = result.user
-      this.initialized = true
-    },
-    async register(input: {
-      username: string
-      email: string
-      password: string
-    }) {
-      const result = await authApi.register(input)
-      setAccessToken(result.token)
-      this.user = result.user
-      this.initialized = true
-    },
-    async bootstrap() {
-      if (this.initialized) return
-      if (!getAccessToken()) {
-        this.initialized = true
-        return
-      }
-      try {
-        this.user = await authApi.me()
-      } catch {
-        clearAccessToken()
-        this.user = null
-      } finally {
-        this.initialized = true
-      }
-    },
-    logout() {
-      clearAccessToken()
-      this.user = null
-      this.initialized = true
-    },
-  },
-})
-```
-
-- [ ] **Step 6: Add auth pages, application layout, and route guard**
-
-Create `client/src/layouts/AppLayout.vue` with a sidebar and logout action:
-
-```vue
-<script setup lang="ts">
-import { useRouter } from 'vue-router'
-import { useAuthStore } from '../stores/auth'
-
-const auth = useAuthStore()
-const router = useRouter()
-
-async function logout() {
-  auth.logout()
-  await router.push('/login')
-}
-</script>
-
-<template>
-  <el-container class="app-layout">
-    <el-aside width="220px">
-      <div class="brand">TaskFlow</div>
-      <el-menu router :default-active="$route.path">
-        <el-menu-item index="/dashboard">总览</el-menu-item>
-        <el-menu-item index="/projects">项目</el-menu-item>
-      </el-menu>
-    </el-aside>
-    <el-container>
-      <el-header class="app-header">
-        <span>{{ auth.user?.username }}</span>
-        <el-button text @click="logout">退出登录</el-button>
-      </el-header>
-      <el-main>
-        <RouterView />
-      </el-main>
-    </el-container>
-  </el-container>
-</template>
-
-<style scoped>
-.app-layout {
-  min-height: 100vh;
-}
-
-.app-layout > .el-aside {
-  background: #ffffff;
-  border-right: 1px solid #e5e7eb;
-}
-
-.brand {
-  padding: 24px 20px;
-  font-size: 20px;
-  font-weight: 700;
-}
-
-.app-header {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 16px;
-  background: #ffffff;
-  border-bottom: 1px solid #e5e7eb;
-}
-</style>
-```
-
-Create `client/src/views/auth/LoginView.vue`:
-
-```vue
-<script setup lang="ts">
-import { reactive, ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { ApiError } from '../../api/http'
-import { useAuthStore } from '../../stores/auth'
-
-const auth = useAuthStore()
-const router = useRouter()
-const loading = ref(false)
-const errorMessage = ref('')
-const form = reactive({ email: '', password: '' })
-
-async function submit() {
-  loading.value = true
-  errorMessage.value = ''
-  try {
-    await auth.login(form)
-    await router.push('/dashboard')
-  } catch (error) {
-    errorMessage.value = error instanceof ApiError ? error.message : '登录失败'
-  } finally {
-    loading.value = false
-  }
-}
-</script>
-
-<template>
-  <main class="auth-page">
-    <el-card class="auth-card">
-      <h1>登录 TaskFlow</h1>
-      <el-alert v-if="errorMessage" :title="errorMessage" type="error" show-icon />
-      <el-form label-position="top" @submit.prevent="submit">
-        <el-form-item label="邮箱">
-          <el-input v-model="form.email" type="email" />
-        </el-form-item>
-        <el-form-item label="密码">
-          <el-input v-model="form.password" type="password" show-password />
-        </el-form-item>
-        <el-button type="primary" native-type="submit" :loading="loading">
-          登录
-        </el-button>
-        <RouterLink to="/register">注册账号</RouterLink>
-      </el-form>
-    </el-card>
-  </main>
-</template>
-
-<style scoped>
-.auth-page {
-  display: grid;
-  min-height: 100vh;
-  place-items: center;
-  padding: 24px;
-}
-
-.auth-card {
-  width: min(420px, 100%);
-}
-</style>
-```
-
-Create `client/src/views/auth/RegisterView.vue` with the same structure and these form fields:
-
-```ts
-const form = reactive({ username: '', email: '', password: '' })
-```
-
-Submit with `await auth.register(form)` and route to `/dashboard`.
-
-Create `client/src/views/DashboardView.vue` initially:
-
-```vue
-<template>
-  <section>
-    <h1>工作台</h1>
-    <p>总览数据将在看板任务中接入。</p>
-  </section>
-</template>
-```
-
-Modify `client/src/router/index.ts`:
-
-```ts
-import { createRouter, createWebHistory } from 'vue-router'
-import { useAuthStore } from '../stores/auth'
-
-export const routes = [
-  {
-    path: '/login',
-    name: 'login',
-    component: () => import('../views/auth/LoginView.vue'),
-    meta: { guestOnly: true },
-  },
-  {
-    path: '/register',
-    name: 'register',
-    component: () => import('../views/auth/RegisterView.vue'),
-    meta: { guestOnly: true },
-  },
-  {
-    path: '/',
-    component: () => import('../layouts/AppLayout.vue'),
-    meta: { requiresAuth: true },
-    children: [
-      { path: '', redirect: '/dashboard' },
-      {
-        path: 'dashboard',
-        name: 'dashboard',
-        component: () => import('../views/DashboardView.vue'),
-      },
-    ],
-  },
-]
-
-export const router = createRouter({
-  history: createWebHistory(),
-  routes,
-})
-
-router.beforeEach(async (to) => {
-  const auth = useAuthStore()
-  await auth.bootstrap()
-
-  if (to.meta.requiresAuth && !auth.isAuthenticated) {
-    return { name: 'login' }
-  }
-  if (to.meta.guestOnly && auth.isAuthenticated) {
-    return { name: 'dashboard' }
-  }
-})
-```
-
-Modify `client/src/main.ts` to install Pinia before the router, because the guard uses the store:
-
-```ts
-const pinia = createPinia()
-
-createApp(App).use(pinia).use(router).use(ElementPlus).mount('#app')
-```
-
-Modify `client/tests/app-shell.test.ts` so the mounted test app installs Pinia:
-
-```ts
-import { createPinia } from 'pinia'
-
-const wrapper = mount(App, {
-  global: { plugins: [createPinia(), router] },
-})
-```
-
-- [ ] **Step 7: Run tests, type check, and build**
-
-Run:
+- [ ] **步骤 2：运行测试并确认失败**
 
 ```bash
-cd client
 npm test -- --run tests/http.test.ts tests/auth.test.ts
+```
+
+- [ ] **步骤 3：实现 Token 和 Axios 客户端**
+
+Token 保存键固定为：
+
+```text
+taskflow.access-token
+```
+
+Axios 基地址：
+
+```ts
+import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000/api/v1'
+```
+
+遇到 `401` 时：
+
+1. 清除 Token。
+2. 触发 `auth:expired` 事件。
+3. 抛出带 `code`、`message`、`status`、`details`、`requestId` 的 `ApiError`。
+
+- [ ] **步骤 4：实现认证 Store 和页面**
+
+Store 状态固定包含：
+
+```ts
+{
+  user: User | null
+  initialized: boolean
+}
+```
+
+Store 动作固定包含：
+
+```text
+login
+register
+bootstrap
+logout
+```
+
+`bootstrap()`：
+
+- 无 Token 时直接标记初始化完成。
+- 有 Token 时调用 `/auth/me`。
+- 请求失败时清除 Token。
+
+登录和注册页面使用 Element Plus 表单，错误信息直接展示服务端消息。
+
+- [ ] **步骤 5：实现路由守卫**
+
+路由元数据：
+
+```ts
+meta: { requiresAuth: true }
+meta: { guestOnly: true }
+```
+
+守卫先执行 `auth.bootstrap()`：
+
+- 未登录访问受保护页面：跳转 `/login`。
+- 已登录访问登录或注册页：跳转 `/dashboard`。
+
+`app-shell.test.ts` 挂载时必须安装 `createPinia()`。
+
+- [ ] **步骤 6：验证并提交**
+
+```bash
+npm test -- --run tests/http.test.ts tests/auth.test.ts tests/app-shell.test.ts
 npm run typecheck
 npm run build
-```
-
-Expected: tests, type check, and build pass.
-
-- [ ] **Step 8: Commit**
-
-```bash
 git add client
 git commit -m "feat: add client authentication flow"
 ```
 
 ---
 
-### Task 7: Projects and Members API
+## 任务 7：项目和成员后端 API
 
-**Files:**
+**目标：** 实现项目的增删改查、成员添加和成员移除。
 
-- Create: `server/src/types/http.ts`
-- Create: `server/src/schemas/project.schema.ts`
-- Create: `server/src/services/project-access.service.ts`
-- Create: `server/src/services/project.service.ts`
-- Create: `server/src/controllers/project.controller.ts`
-- Create: `server/src/routes/project.route.ts`
-- Create: `server/tests/helpers/auth.ts`
-- Modify: `server/src/app.ts`
-- Test: `server/tests/projects.test.ts`
+**涉及文件：**
 
-**Interfaces:**
+- 新建：`server/src/types/http.ts`
+- 新建：`server/src/schemas/project.schema.ts`
+- 新建：`server/src/services/project-access.service.ts`
+- 新建：`server/src/services/project.service.ts`
+- 新建：`server/src/controllers/project.controller.ts`
+- 新建：`server/src/routes/project.route.ts`
+- 新建：`server/tests/helpers/auth.ts`
+- 新建：`server/tests/projects.test.ts`
+- 修改：`server/src/app.ts`
 
-- Consumes: `requireAuth`, `prisma`, `AppError`, `sendSuccess`, `createUser()`, and JWT helpers.
-- Produces: `Paginated<T>`, `paginationSchema`, `requireProjectMember()`, `requireProjectOwner()`, and project/member HTTP routes.
+**接口：**
 
-- [ ] **Step 1: Write failing project and member tests**
+- 产出：`Paginated<T>`
+- 产出：`requireProjectMember()`、`requireProjectOwner()`
+- 产出：项目列表、创建、详情、修改、删除、成员列表、添加成员、移除成员接口
 
-Create `server/tests/helpers/auth.ts`:
+- [ ] **步骤 1：写失败测试**
 
-```ts
-import { signAccessToken } from '../../src/lib/jwt'
-import { createUser } from './factories'
+必须覆盖：
 
-export async function createAuthenticatedUser(
-  overrides: Partial<{ email: string; username: string; password: string }> = {},
-) {
-  const user = await createUser(overrides)
-  return { user, token: signAccessToken(user.id) }
-}
-```
+- 创建项目后，创建者自动成为 `OWNER`。
+- 非项目成员访问项目返回 `403 PROJECT_MEMBER_REQUIRED`。
+- `OWNER` 可以添加成员。
+- `MEMBER` 不能移除成员，返回 `403 PROJECT_OWNER_REQUIRED`。
+- 重复添加成员返回 `409 MEMBER_ALREADY_EXISTS`。
+- 移除负责人返回 `409 OWNER_CANNOT_BE_REMOVED`。
 
-Create `server/tests/projects.test.ts`:
-
-```ts
-import request from 'supertest'
-import { beforeEach, describe, expect, it } from 'vitest'
-import { createApp } from '../src/app'
-import { prisma } from '../src/lib/prisma'
-import { createAuthenticatedUser } from './helpers/auth'
-import { resetDatabase } from './helpers/database'
-import { createProjectWithOwner } from './helpers/factories'
-
-const app = createApp()
-
-beforeEach(resetDatabase)
-
-describe('projects', () => {
-  it('creates a project and writes the owner membership', async () => {
-    const { token } = await createAuthenticatedUser()
-
-    const response = await request(app)
-      .post('/api/v1/projects')
-      .set('Authorization', `Bearer ${token}`)
-      .send({ name: 'First project', description: 'Learning' })
-
-    expect(response.status).toBe(201)
-    expect(response.body.data.name).toBe('First project')
-    expect(response.body.data.members[0].role).toBe('OWNER')
-  })
-
-  it('does not expose a project to a non-member', async () => {
-    const owner = await createAuthenticatedUser()
-    const outsider = await createAuthenticatedUser()
-    const project = await createProjectWithOwner(owner.user.id)
-
-    const response = await request(app)
-      .get(`/api/v1/projects/${project.id}`)
-      .set('Authorization', `Bearer ${outsider.token}`)
-
-    expect(response.status).toBe(403)
-    expect(response.body.code).toBe('PROJECT_MEMBER_REQUIRED')
-  })
-
-  it('allows only an owner to add and remove a member', async () => {
-    const owner = await createAuthenticatedUser()
-    const member = await createAuthenticatedUser()
-    const project = await createProjectWithOwner(owner.user.id)
-
-    const added = await request(app)
-      .post(`/api/v1/projects/${project.id}/members`)
-      .set('Authorization', `Bearer ${owner.token}`)
-      .send({ identifier: member.user.email })
-
-    expect(added.status).toBe(201)
-
-    const forbidden = await request(app)
-      .delete(`/api/v1/projects/${project.id}/members/${member.user.id}`)
-      .set('Authorization', `Bearer ${member.token}`)
-
-    expect(forbidden.status).toBe(403)
-    expect(forbidden.body.code).toBe('PROJECT_OWNER_REQUIRED')
-  })
-})
-```
-
-- [ ] **Step 2: Run the tests and verify they fail**
-
-Run:
+- [ ] **步骤 2：运行测试并确认失败**
 
 ```bash
 cd server
 DATABASE_URL=file:./test.db npm test -- --run tests/projects.test.ts
 ```
 
-Expected: FAIL with 404 because project routes do not exist.
+- [ ] **步骤 3：定义分页和请求校验**
 
-- [ ] **Step 3: Add pagination types and project schemas**
-
-Create `server/src/types/http.ts`:
+分页规则：
 
 ```ts
-export interface Paginated<T> {
-  items: T[]
-  page: number
-  pageSize: number
-  total: number
+page: z.coerce.number().int().min(1).default(1)
+pageSize: z.coerce.number().int().min(1).max(100).default(20)
+```
+
+项目创建输入固定为：
+
+```ts
+{
+  name: string
+  description: string
 }
 ```
 
-Create `server/src/schemas/project.schema.ts`:
+成员添加输入固定为：
 
 ```ts
-import { z } from 'zod'
-
-export const paginationSchema = z.object({
-  page: z.coerce.number().int().min(1).default(1),
-  pageSize: z.coerce.number().int().min(1).max(100).default(20),
-})
-
-export const projectListQuerySchema = paginationSchema.extend({
-  keyword: z.string().trim().optional(),
-  role: z.enum(['OWNER', 'MEMBER']).optional(),
-})
-
-export const projectCreateSchema = z.object({
-  name: z.string().trim().min(1).max(80),
-  description: z.string().trim().max(1000).default(''),
-})
-
-export const projectUpdateSchema = z
-  .object({
-    name: z.string().trim().min(1).max(80).optional(),
-    description: z.string().trim().max(1000).optional(),
-  })
-  .refine(
-  (value) => Object.keys(value).length > 0,
-  '至少提供一个需要修改的字段',
-  )
-
-export const memberCreateSchema = z.object({
-  identifier: z.string().trim().min(1),
-})
-
-export type ProjectListQuery = z.infer<typeof projectListQuerySchema>
-export type ProjectCreateInput = z.infer<typeof projectCreateSchema>
-export type ProjectUpdateInput = z.infer<typeof projectUpdateSchema>
-```
-
-- [ ] **Step 4: Implement project access checks**
-
-Create `server/src/services/project-access.service.ts`:
-
-```ts
-import type { Prisma } from '@prisma/client'
-import { AppError } from '../lib/app-error.js'
-import { prisma } from '../lib/prisma.js'
-
-export async function requireProjectMember(
-  projectId: string,
-  userId: string,
-) {
-  const membership = await prisma.projectMember.findUnique({
-    where: { projectId_userId: { projectId, userId } },
-  })
-
-  if (!membership) {
-    throw new AppError(403, 'PROJECT_MEMBER_REQUIRED', '你没有访问该项目')
-  }
-
-  return membership
-}
-
-export async function requireProjectOwner(projectId: string, userId: string) {
-  const membership = await requireProjectMember(projectId, userId)
-
-  if (membership.role !== 'OWNER') {
-    throw new AppError(403, 'PROJECT_OWNER_REQUIRED', '只有项目负责人可以执行此操作')
-  }
-
-  return membership
+{
+  identifier: string
 }
 ```
 
-- [ ] **Step 5: Implement the project and member service**
+- [ ] **步骤 4：实现项目权限检查**
 
-Create `server/src/services/project.service.ts`:
+`requireProjectMember()`：
 
-```ts
-import { AppError } from '../lib/app-error.js'
-import { prisma } from '../lib/prisma.js'
-import type {
-  ProjectCreateInput,
-  ProjectListQuery,
-  ProjectUpdateInput,
-} from '../schemas/project.schema.js'
-import type { Paginated } from '../types/http.js'
-import {
-  requireProjectMember,
-  requireProjectOwner,
-} from './project-access.service.js'
+1. 查询 `ProjectMember`。
+2. 不存在时抛出 `403 PROJECT_MEMBER_REQUIRED`。
+3. 返回成员记录。
 
-export async function listProjects(
-  userId: string,
-  query: ProjectListQuery,
-): Promise<Paginated<object>> {
-  const where: Prisma.ProjectMemberWhereInput = {
-    userId,
-    ...(query.role ? { role: query.role } : {}),
-    project: query.keyword
-      ? { name: { contains: query.keyword } }
-      : undefined,
-  }
+`requireProjectOwner()`：
 
-  const [memberships, total] = await prisma.$transaction([
-    prisma.projectMember.findMany({
-      where,
-      include: { project: true },
-      orderBy: { project: { updatedAt: 'desc' } },
-      skip: (query.page - 1) * query.pageSize,
-      take: query.pageSize,
-    }),
-    prisma.projectMember.count({ where }),
-  ])
+1. 先调用 `requireProjectMember()`。
+2. 角色不是 `OWNER` 时抛出 `403 PROJECT_OWNER_REQUIRED`。
+3. 返回成员记录。
 
-  return {
-    items: memberships.map(({ project, role }) => ({ ...project, role })),
-    page: query.page,
-    pageSize: query.pageSize,
-    total,
-  }
-}
+- [ ] **步骤 5：实现项目 Service**
 
-export async function createProject(userId: string, input: ProjectCreateInput) {
-  return prisma.project.create({
-    data: {
-      ...input,
-      members: { create: { userId, role: 'OWNER' } },
-    },
-    include: {
-      members: {
-        include: {
-          user: {
-            select: { id: true, username: true, email: true },
-          },
-        },
-      },
-    },
-  })
-}
+创建项目时必须在同一个 Prisma 写入中同时创建项目和 `OWNER` 成员。
 
-export async function getProject(projectId: string, userId: string) {
-  await requireProjectMember(projectId, userId)
+删除项目时当前使用 Prisma 级联删除；附件文件清理会在任务 13 补充。
 
-  const project = await prisma.project.findUnique({
-    where: { id: projectId },
-    include: {
-      members: {
-        include: {
-          user: {
-            select: { id: true, username: true, email: true },
-          },
-        },
-        orderBy: { createdAt: 'asc' },
-      },
-    },
-  })
+添加成员时：
 
-  if (!project) {
-    throw new AppError(404, 'PROJECT_NOT_FOUND', '项目不存在')
-  }
+- 只有 `OWNER` 可以操作。
+- 按邮箱或用户名查询用户。
+- 重复成员返回 `409`。
 
-  return project
-}
+移除成员时：
 
-export async function updateProject(
-  projectId: string,
-  userId: string,
-  input: ProjectUpdateInput,
-) {
-  await requireProjectOwner(projectId, userId)
-  return prisma.project.update({ where: { id: projectId }, data: input })
-}
+- 不能移除自己。
+- 不能移除任何 `OWNER`。
+- 成员不存在返回 `404`。
 
-export async function deleteProject(projectId: string, userId: string) {
-  await requireProjectOwner(projectId, userId)
-  await prisma.project.delete({ where: { id: projectId } })
-}
+- [ ] **步骤 6：实现 Controller 和 Route**
 
-export async function listMembers(projectId: string, userId: string) {
-  await requireProjectMember(projectId, userId)
-  return prisma.projectMember.findMany({
-    where: { projectId },
-    include: {
-      user: { select: { id: true, username: true, email: true } },
-    },
-    orderBy: { createdAt: 'asc' },
-  })
-}
+路由固定为：
 
-export async function addMember(
-  projectId: string,
-  ownerId: string,
-  identifier: string,
-) {
-  await requireProjectOwner(projectId, ownerId)
-
-  const user = await prisma.user.findFirst({
-    where: {
-      OR: [{ email: identifier }, { username: identifier }],
-    },
-  })
-
-  if (!user) {
-    throw new AppError(404, 'USER_NOT_FOUND', '用户不存在')
-  }
-
-  const existing = await prisma.projectMember.findUnique({
-    where: { projectId_userId: { projectId, userId: user.id } },
-  })
-
-  if (existing) {
-    throw new AppError(409, 'MEMBER_ALREADY_EXISTS', '该用户已经是项目成员')
-  }
-
-  return prisma.projectMember.create({
-    data: { projectId, userId: user.id, role: 'MEMBER' },
-    include: {
-      user: { select: { id: true, username: true, email: true } },
-    },
-  })
-}
-
-export async function removeMember(
-  projectId: string,
-  ownerId: string,
-  memberUserId: string,
-) {
-  await requireProjectOwner(projectId, ownerId)
-
-  if (ownerId === memberUserId) {
-    throw new AppError(409, 'OWNER_CANNOT_BE_REMOVED', '项目负责人不能被移除')
-  }
-
-  const membership = await prisma.projectMember.findUnique({
-    where: { projectId_userId: { projectId, userId: memberUserId } },
-  })
-
-  if (!membership) {
-    throw new AppError(404, 'MEMBER_NOT_FOUND', '项目成员不存在')
-  }
-  if (membership.role === 'OWNER') {
-    throw new AppError(409, 'OWNER_CANNOT_BE_REMOVED', '项目负责人不能被移除')
-  }
-
-  await prisma.projectMember.delete({ where: { id: membership.id } })
-}
+```text
+GET    /api/v1/projects
+POST   /api/v1/projects
+GET    /api/v1/projects/:projectId
+PATCH  /api/v1/projects/:projectId
+DELETE /api/v1/projects/:projectId
+GET    /api/v1/projects/:projectId/members
+POST   /api/v1/projects/:projectId/members
+DELETE /api/v1/projects/:projectId/members/:userId
 ```
 
-- [ ] **Step 6: Implement project controller and routes**
-
-Create `server/src/controllers/project.controller.ts`:
-
-```ts
-import type { Request, Response } from 'express'
-import { sendSuccess } from '../lib/response.js'
-import {
-  memberCreateSchema,
-  projectCreateSchema,
-  projectListQuerySchema,
-  projectUpdateSchema,
-} from '../schemas/project.schema.js'
-import * as projectService from '../services/project.service.js'
-
-export async function list(request: Request, response: Response) {
-  const result = await projectService.listProjects(
-    request.auth!.userId,
-    projectListQuerySchema.parse(request.query),
-  )
-  sendSuccess(response, result)
-}
-
-export async function create(request: Request, response: Response) {
-  const result = await projectService.createProject(
-    request.auth!.userId,
-    projectCreateSchema.parse(request.body),
-  )
-  response.status(201)
-  sendSuccess(response, result, '项目创建成功')
-}
-
-export async function detail(request: Request, response: Response) {
-  sendSuccess(
-    response,
-    await projectService.getProject(
-      request.params.projectId,
-      request.auth!.userId,
-    ),
-  )
-}
-
-export async function update(request: Request, response: Response) {
-  sendSuccess(
-    response,
-    await projectService.updateProject(
-      request.params.projectId,
-      request.auth!.userId,
-      projectUpdateSchema.parse(request.body),
-    ),
-  )
-}
-
-export async function remove(request: Request, response: Response) {
-  await projectService.deleteProject(
-    request.params.projectId,
-    request.auth!.userId,
-  )
-  sendSuccess(response, null, '项目已删除')
-}
-
-export async function members(request: Request, response: Response) {
-  sendSuccess(
-    response,
-    await projectService.listMembers(
-      request.params.projectId,
-      request.auth!.userId,
-    ),
-  )
-}
-
-export async function addMember(request: Request, response: Response) {
-  const { identifier } = memberCreateSchema.parse(request.body)
-  const result = await projectService.addMember(
-    request.params.projectId,
-    request.auth!.userId,
-    identifier,
-  )
-  response.status(201)
-  sendSuccess(response, result, '成员添加成功')
-}
-
-export async function removeMember(request: Request, response: Response) {
-  await projectService.removeMember(
-    request.params.projectId,
-    request.auth!.userId,
-    request.params.userId,
-  )
-  sendSuccess(response, null, '成员已移除')
-}
-```
-
-Create `server/src/routes/project.route.ts`:
-
-```ts
-import { Router } from 'express'
-import * as projectController from '../controllers/project.controller.js'
-import { requireAuth } from '../middlewares/auth.js'
-
-export const projectRouter = Router()
-
-projectRouter.use(requireAuth)
-projectRouter.get('/', projectController.list)
-projectRouter.post('/', projectController.create)
-projectRouter.get('/:projectId', projectController.detail)
-projectRouter.patch('/:projectId', projectController.update)
-projectRouter.delete('/:projectId', projectController.remove)
-projectRouter.get('/:projectId/members', projectController.members)
-projectRouter.post('/:projectId/members', projectController.addMember)
-projectRouter.delete(
-  '/:projectId/members/:userId',
-  projectController.removeMember,
-)
-```
-
-Modify `server/src/app.ts`:
-
-```ts
-import { projectRouter } from './routes/project.route.js'
-
-app.use('/api/v1/projects', projectRouter)
-```
-
-- [ ] **Step 7: Run tests and type check**
-
-Run:
+- [ ] **步骤 7：验证并提交**
 
 ```bash
-cd server
 DATABASE_URL=file:./test.db npm test -- --run tests/projects.test.ts
 npm run typecheck
-```
-
-Expected: project ownership, outsider rejection, member creation, and owner-only removal tests pass.
-
-- [ ] **Step 8: Commit**
-
-```bash
 git add server
 git commit -m "feat: add project and member APIs"
 ```
 
 ---
 
-### Task 8: Project List, Detail, and Member UI
+## 任务 8：项目列表、详情和成员管理前端
 
-**Files:**
+**目标：** 用户可以在界面上创建项目、查看项目、修改项目和维护成员。
 
-- Create: `client/src/api/projects.ts`
-- Create: `client/src/stores/project.ts`
-- Create: `client/src/utils/permissions.ts`
-- Create: `client/src/components/projects/ProjectFormDialog.vue`
-- Create: `client/src/components/projects/MemberPanel.vue`
-- Create: `client/src/views/projects/ProjectsView.vue`
-- Create: `client/src/views/projects/ProjectDetailView.vue`
-- Modify: `client/src/router/index.ts`
-- Modify: `client/src/layouts/AppLayout.vue`
-- Test: `client/tests/project-store.test.ts`
-- Test: `client/tests/permissions.test.ts`
+**涉及文件：**
 
-**Interfaces:**
+- 新建：`client/src/api/projects.ts`
+- 新建：`client/src/stores/project.ts`
+- 新建：`client/src/utils/permissions.ts`
+- 新建：`client/src/components/projects/ProjectFormDialog.vue`
+- 新建：`client/src/components/projects/MemberPanel.vue`
+- 新建：`client/src/views/projects/ProjectsView.vue`
+- 新建：`client/src/views/projects/ProjectDetailView.vue`
+- 修改：`client/src/router/index.ts`
+- 修改：`client/src/layouts/AppLayout.vue`
+- 新建：`client/tests/project-store.test.ts`
+- 新建：`client/tests/permissions.test.ts`
 
-- Consumes: `apiRequest<T>()`, `useAuthStore()`, and project API routes.
-- Produces: `projectApi`, `useProjectStore()`, `canManageProject()`, `/projects`, and `/projects/:projectId`.
+**接口：**
 
-- [ ] **Step 1: Write failing permission and store tests**
+- 产出：`projectApi`
+- 产出：`useProjectStore()`
+- 产出：`canManageProject()`
+- 路由：`/projects`、`/projects/:projectId`
 
-Create `client/tests/permissions.test.ts`:
+- [ ] **步骤 1：写失败测试**
 
-```ts
-import { describe, expect, it } from 'vitest'
-import { canManageProject } from '../src/utils/permissions'
+测试必须验证：
 
-describe('canManageProject', () => {
-  it('allows only an owner', () => {
-    expect(canManageProject('OWNER')).toBe(true)
-    expect(canManageProject('MEMBER')).toBe(false)
-    expect(canManageProject(undefined)).toBe(false)
-  })
-})
-```
+- `OWNER` 返回 `true`。
+- `MEMBER` 和 `undefined` 返回 `false`。
+- 项目详情加载后能根据当前用户 ID 得到正确角色。
 
-Create `client/tests/project-store.test.ts`:
-
-```ts
-import { createPinia, setActivePinia } from 'pinia'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { projectApi } from '../src/api/projects'
-import { useProjectStore } from '../src/stores/project'
-
-beforeEach(() => {
-  setActivePinia(createPinia())
-  vi.restoreAllMocks()
-})
-
-describe('project store', () => {
-  it('loads a project and exposes the current role', async () => {
-    vi.spyOn(projectApi, 'detail').mockResolvedValue({
-      id: 'project-1',
-      name: 'Project',
-      description: '',
-      updatedAt: '2026-09-23T00:00:00.000Z',
-      members: [
-        {
-          id: 'member-1',
-          role: 'OWNER',
-          user: {
-            id: 'user-1',
-            email: 'owner@example.com',
-            username: 'owner',
-          },
-        },
-      ],
-    })
-
-    const store = useProjectStore()
-    await store.load('project-1', 'user-1')
-
-    expect(store.currentRole).toBe('OWNER')
-  })
-})
-```
-
-- [ ] **Step 2: Run the tests and verify they fail**
-
-Run:
+- [ ] **步骤 2：运行测试并确认失败**
 
 ```bash
 cd client
 npm test -- --run tests/permissions.test.ts tests/project-store.test.ts
 ```
 
-Expected: FAIL because the project API, store, and permission helper do not exist.
+- [ ] **步骤 3：实现项目 API 和权限工具**
 
-- [ ] **Step 3: Implement project types, API, permissions, and store**
+`projectApi` 固定包含：
 
-Create `client/src/api/projects.ts`:
-
-```ts
-import { apiRequest } from './http'
-
-export type ProjectRole = 'OWNER' | 'MEMBER'
-
-export interface ProjectMember {
-  id: string
-  role: ProjectRole
-  user: { id: string; username: string; email: string }
-}
-
-export interface ProjectSummary {
-  id: string
-  name: string
-  description: string
-  updatedAt: string
-  role: ProjectRole
-}
-
-export interface ProjectDetail {
-  id: string
-  name: string
-  description: string
-  updatedAt: string
-  members: ProjectMember[]
-}
-
-export interface PaginatedProjects {
-  items: ProjectSummary[]
-  page: number
-  pageSize: number
-  total: number
-}
-
-export const projectApi = {
-  list(params: {
-    page?: number
-    pageSize?: number
-    keyword?: string
-    role?: ProjectRole
-  }) {
-    return apiRequest<PaginatedProjects>({
-      method: 'GET',
-      url: '/projects',
-      params,
-    })
-  },
-  create(input: { name: string; description: string }) {
-    return apiRequest<ProjectDetail>({
-      method: 'POST',
-      url: '/projects',
-      data: input,
-    })
-  },
-  detail(projectId: string) {
-    return apiRequest<ProjectDetail>({
-      method: 'GET',
-      url: `/projects/${projectId}`,
-    })
-  },
-  update(projectId: string, input: { name?: string; description?: string }) {
-    return apiRequest<ProjectDetail>({
-      method: 'PATCH',
-      url: `/projects/${projectId}`,
-      data: input,
-    })
-  },
-  remove(projectId: string) {
-    return apiRequest<null>({
-      method: 'DELETE',
-      url: `/projects/${projectId}`,
-    })
-  },
-  members(projectId: string) {
-    return apiRequest<ProjectMember[]>({
-      method: 'GET',
-      url: `/projects/${projectId}/members`,
-    })
-  },
-  addMember(projectId: string, identifier: string) {
-    return apiRequest<ProjectMember>({
-      method: 'POST',
-      url: `/projects/${projectId}/members`,
-      data: { identifier },
-    })
-  },
-  removeMember(projectId: string, userId: string) {
-    return apiRequest<null>({
-      method: 'DELETE',
-      url: `/projects/${projectId}/members/${userId}`,
-    })
-  },
-}
+```text
+list
+create
+detail
+update
+remove
+members
+addMember
+removeMember
 ```
 
-Create `client/src/utils/permissions.ts`:
+角色类型固定为：
 
 ```ts
-import type { ProjectRole } from '../api/projects'
-
-export function canManageProject(role: ProjectRole | undefined) {
-  return role === 'OWNER'
-}
+type ProjectRole = 'OWNER' | 'MEMBER'
 ```
 
-Create `client/src/stores/project.ts`:
+`canManageProject()` 只在角色为 `OWNER` 时返回 `true`。
 
-```ts
-import { defineStore } from 'pinia'
-import {
-  projectApi,
-  type ProjectDetail,
-  type ProjectRole,
-} from '../api/projects'
+- [ ] **步骤 4：实现项目 Store**
 
-export const useProjectStore = defineStore('project', {
-  state: () => ({
-    current: null as ProjectDetail | null,
-    currentUserId: '',
-    loading: false,
-  }),
-  getters: {
-    currentRole(state): ProjectRole | undefined {
-      return state.current?.members.find(
-        (member) => member.user.id === state.currentUserId,
-      )?.role
-    },
-  },
-  actions: {
-    async load(projectId: string, userId: string) {
-      this.loading = true
-      this.currentUserId = userId
-      try {
-        this.current = await projectApi.detail(projectId)
-      } finally {
-        this.loading = false
-      }
-    },
-    clear() {
-      this.current = null
-      this.currentUserId = ''
-    },
-  },
-})
-```
-
-- [ ] **Step 4: Implement the project dialogs, views, and member panel**
-
-Create `client/src/components/projects/ProjectFormDialog.vue` with:
-
-- Props: `modelValue: boolean`, `project?: { id: string; name: string; description: string }`.
-- Emits: `update:modelValue`, `saved`.
-- Owns local `name` and `description` fields.
-- Calls `projectApi.create()` when `project` is absent.
-- Calls `projectApi.update(project.id, input)` when `project` exists.
-- Displays Element Plus validation errors.
-
-Create `client/src/components/projects/MemberPanel.vue` with:
-
-- Props: `projectId: string`, `members: ProjectMember[]`, `canManage: boolean`.
-- Emits: `changed`.
-- Uses an input with label `邮箱或用户名` for adding members.
-- Calls `projectApi.addMember()` and `projectApi.removeMember()`.
-- Hides add/remove controls when `canManage` is false.
-
-Create `client/src/views/projects/ProjectsView.vue` with:
-
-- Keyword input, role select with `全部角色`, `我负责的`, `我参与的`, search button, and page controls.
-- `el-table` with project name, description, role, and update time.
-- A row click that routes to `/projects/:projectId`.
-- A `新建项目` button that opens `ProjectFormDialog`.
-- Empty state text `还没有项目`.
-
-Create `client/src/views/projects/ProjectDetailView.vue` with:
-
-- Reads `projectId` from `route.params.projectId`.
-- Calls `projectStore.load(projectId, auth.user!.id)` on mount and when the ID changes.
-- Shows project name and description.
-- Shows an owner-only edit button and a delete button.
-- Renders `MemberPanel`.
-- Leaves a clearly labeled `任务` section as the next task's insertion point.
-
-Add routes in `client/src/router/index.ts` under the authenticated layout:
+Store 状态固定包含：
 
 ```ts
 {
-  path: 'projects',
-  name: 'projects',
-  component: () => import('../views/projects/ProjectsView.vue'),
-},
-{
-  path: 'projects/:projectId',
-  name: 'project-detail',
-  component: () => import('../views/projects/ProjectDetailView.vue'),
-},
+  current: ProjectDetail | null
+  currentUserId: string
+  loading: boolean
+}
 ```
 
-Update the sidebar menu to include:
+`currentRole` getter 根据 `currentUserId` 在 `current.members` 中查找角色。
 
-```vue
-<el-menu-item index="/projects">项目</el-menu-item>
-```
+`load(projectId, userId)` 负责请求详情并设置当前用户 ID。
 
-- [ ] **Step 5: Run tests, type check, and build**
+`clear()` 同时清空项目、当前用户 ID 和加载状态。
 
-Run:
+- [ ] **步骤 5：实现页面和组件**
+
+项目列表页面包含：
+
+- 关键字输入。
+- 角色筛选：`全部角色`、`我负责的`、`我参与的`。
+- 分页。
+- 项目名称、描述、角色、更新时间。
+- `新建项目` 按钮。
+
+项目详情页面包含：
+
+- 项目名称和描述。
+- `OWNER` 可见的编辑和删除按钮。
+- 成员面板。
+- 预留的 `任务` 区域。
+
+成员面板只有在 `canManage` 为 `true` 时才显示添加和删除按钮。
+
+- [ ] **步骤 6：验证并提交**
 
 ```bash
-cd client
 npm test -- --run tests/permissions.test.ts tests/project-store.test.ts
 npm run typecheck
 npm run build
-```
-
-Expected: tests, type check, and build pass.
-
-- [ ] **Step 6: Commit**
-
-```bash
 git add client
 git commit -m "feat: add project and member UI"
 ```
 
 ---
 
-### Task 9: Tasks API with Filters, Pagination, and Assignment Rules
+## 任务 9：任务后端 API
 
-**Files:**
+**目标：** 实现任务 CRUD、筛选、分页、负责人校验和删除权限。
 
-- Create: `server/src/schemas/task.schema.ts`
-- Create: `server/src/services/task.service.ts`
-- Create: `server/src/controllers/task.controller.ts`
-- Create: `server/src/routes/task.route.ts`
-- Create: `server/src/routes/project-task.route.ts`
-- Modify: `server/src/app.ts`
-- Modify: `server/tests/helpers/factories.ts`
-- Test: `server/tests/tasks.test.ts`
+**涉及文件：**
 
-**Interfaces:**
+- 新建：`server/src/schemas/task.schema.ts`
+- 新建：`server/src/services/task.service.ts`
+- 新建：`server/src/controllers/task.controller.ts`
+- 新建：`server/src/routes/project-task.route.ts`
+- 新建：`server/src/routes/task.route.ts`
+- 修改：`server/src/app.ts`
+- 修改：`server/tests/helpers/factories.ts`
+- 新建：`server/tests/tasks.test.ts`
 
-- Consumes: `requireProjectMember()`, `paginationSchema`, `prisma`, and `AppError`.
-- Produces: `listTasks()`, `createTask()`, `getTask()`, `updateTask()`, `deleteTask()`, and task HTTP routes.
+**接口：**
 
-- [ ] **Step 1: Add a task factory and write failing task tests**
+- 产出：`listTasks()`、`createTask()`、`getTask()`、`updateTask()`、`deleteTask()`
+- 列表筛选：`keyword`、`status`、`priority`、`assigneeId`、`dueBefore`、`page`、`pageSize`
 
-Add to `server/tests/helpers/factories.ts`:
+- [ ] **步骤 1：写失败测试**
 
-```ts
-export async function createTask(
-  projectId: string,
-  creatorId: string,
-  overrides: Partial<{
-    title: string
-    status: string
-    priority: string
-    assigneeId: string
-    dueDate: Date
-  }> = {},
-) {
-  return prisma.task.create({
-    data: {
-      projectId,
-      creatorId,
-      title: overrides.title ?? 'Test task',
-      status: overrides.status ?? 'TODO',
-      priority: overrides.priority ?? 'MEDIUM',
-      assigneeId: overrides.assigneeId,
-      dueDate: overrides.dueDate,
-    },
-  })
-}
-```
+必须覆盖：
 
-Create `server/tests/tasks.test.ts`:
+- 项目成员可以创建任务。
+- 按状态筛选任务。
+- 非项目成员不能设置成负责人。
+- 普通成员可以编辑任务。
+- 普通成员不能删除他人创建的任务。
+- `OWNER` 可以删除任意任务。
 
-```ts
-import request from 'supertest'
-import { beforeEach, describe, expect, it } from 'vitest'
-import { createApp } from '../src/app'
-import { createAuthenticatedUser } from './helpers/auth'
-import { resetDatabase } from './helpers/database'
-import { createProjectWithOwner, createTask } from './helpers/factories'
-
-const app = createApp()
-
-beforeEach(resetDatabase)
-
-describe('tasks', () => {
-  it('creates and filters tasks inside a project', async () => {
-    const owner = await createAuthenticatedUser()
-    const project = await createProjectWithOwner(owner.user.id)
-
-    await request(app)
-      .post(`/api/v1/projects/${project.id}/tasks`)
-      .set('Authorization', `Bearer ${owner.token}`)
-      .send({
-        title: 'First task',
-        description: '',
-        status: 'TODO',
-        priority: 'HIGH',
-      })
-
-    const response = await request(app)
-      .get(`/api/v1/projects/${project.id}/tasks?status=TODO&page=1&pageSize=20`)
-      .set('Authorization', `Bearer ${owner.token}`)
-
-    expect(response.status).toBe(200)
-    expect(response.body.data.total).toBe(1)
-    expect(response.body.data.items[0].priority).toBe('HIGH')
-  })
-
-  it('rejects an assignee who is not a project member', async () => {
-    const owner = await createAuthenticatedUser()
-    const outsider = await createAuthenticatedUser()
-    const project = await createProjectWithOwner(owner.user.id)
-
-    const response = await request(app)
-      .post(`/api/v1/projects/${project.id}/tasks`)
-      .set('Authorization', `Bearer ${owner.token}`)
-      .send({
-        title: 'Invalid assignment',
-        assigneeId: outsider.user.id,
-      })
-
-    expect(response.status).toBe(400)
-    expect(response.body.code).toBe('ASSIGNEE_NOT_PROJECT_MEMBER')
-  })
-
-  it('allows a member to edit but prevents deleting another creator task', async () => {
-    const owner = await createAuthenticatedUser()
-    const member = await createAuthenticatedUser()
-    const project = await createProjectWithOwner(owner.user.id)
-    await prisma.projectMember.create({
-      data: { projectId: project.id, userId: member.user.id, role: 'MEMBER' },
-    })
-    const task = await createTask(project.id, owner.user.id)
-
-    const update = await request(app)
-      .patch(`/api/v1/tasks/${task.id}`)
-      .set('Authorization', `Bearer ${member.token}`)
-      .send({ status: 'IN_PROGRESS' })
-    const remove = await request(app)
-      .delete(`/api/v1/tasks/${task.id}`)
-      .set('Authorization', `Bearer ${member.token}`)
-
-    expect(update.status).toBe(200)
-    expect(remove.status).toBe(403)
-    expect(remove.body.code).toBe('TASK_DELETE_FORBIDDEN')
-  })
-})
-```
-
-- [ ] **Step 2: Run the tests and verify they fail**
-
-Run:
+- [ ] **步骤 2：运行测试并确认失败**
 
 ```bash
 cd server
 DATABASE_URL=file:./test.db npm test -- --run tests/tasks.test.ts
 ```
 
-Expected: FAIL with 404 because task routes do not exist.
+- [ ] **步骤 3：定义任务校验**
 
-- [ ] **Step 3: Define task validation schemas**
-
-Create `server/src/schemas/task.schema.ts`:
+状态：
 
 ```ts
-import { z } from 'zod'
-import { paginationSchema } from './project.schema.js'
-
-export const taskStatusSchema = z.enum(['TODO', 'IN_PROGRESS', 'DONE'])
-export const taskPrioritySchema = z.enum(['LOW', 'MEDIUM', 'HIGH'])
-
-export const taskListQuerySchema = paginationSchema.extend({
-  keyword: z.string().trim().optional(),
-  status: taskStatusSchema.optional(),
-  priority: taskPrioritySchema.optional(),
-  assigneeId: z.string().trim().optional(),
-  dueBefore: z.coerce.date().optional(),
-})
-
-export const taskCreateSchema = z.object({
-  title: z.string().trim().min(1).max(120),
-  description: z.string().trim().max(5000).default(''),
-  status: taskStatusSchema.default('TODO'),
-  priority: taskPrioritySchema.default('MEDIUM'),
-  assigneeId: z.string().trim().nullable().optional(),
-  dueDate: z.coerce.date().nullable().optional(),
-})
-
-export const taskUpdateSchema = z
-  .object({
-    title: z.string().trim().min(1).max(120).optional(),
-    description: z.string().trim().max(5000).optional(),
-    status: taskStatusSchema.optional(),
-    priority: taskPrioritySchema.optional(),
-    assigneeId: z.string().trim().nullable().optional(),
-    dueDate: z.coerce.date().nullable().optional(),
-  })
-  .refine(
-    (value) => Object.keys(value).length > 0,
-    '至少提供一个需要修改的字段',
-  )
-
-export type TaskListQuery = z.infer<typeof taskListQuerySchema>
-export type TaskCreateInput = z.infer<typeof taskCreateSchema>
-export type TaskUpdateInput = z.infer<typeof taskUpdateSchema>
+type TaskStatus = 'TODO' | 'IN_PROGRESS' | 'DONE'
 ```
 
-- [ ] **Step 4: Implement task services**
-
-Create `server/src/services/task.service.ts`:
+优先级：
 
 ```ts
-import type { Prisma } from '@prisma/client'
-import { AppError } from '../lib/app-error.js'
-import { prisma } from '../lib/prisma.js'
-import type {
-  TaskCreateInput,
-  TaskListQuery,
-  TaskUpdateInput,
-} from '../schemas/task.schema.js'
-import type { Paginated } from '../types/http.js'
-import { requireProjectMember } from './project-access.service.js'
-
-const taskInclude = {
-  assignee: { select: { id: true, username: true, email: true } },
-  creator: { select: { id: true, username: true, email: true } },
-} satisfies Prisma.TaskInclude
-
-async function requireAssigneeMembership(
-  projectId: string,
-  assigneeId: string | null | undefined,
-) {
-  if (!assigneeId) return
-
-  const membership = await prisma.projectMember.findUnique({
-    where: { projectId_userId: { projectId, userId: assigneeId } },
-  })
-
-  if (!membership) {
-    throw new AppError(
-      400,
-      'ASSIGNEE_NOT_PROJECT_MEMBER',
-      '任务负责人必须是项目成员',
-    )
-  }
-}
-
-export async function listTasks(
-  userId: string,
-  projectId: string,
-  query: TaskListQuery,
-): Promise<Paginated<object>> {
-  await requireProjectMember(projectId, userId)
-
-  const where: Prisma.TaskWhereInput = {
-    projectId,
-    ...(query.status ? { status: query.status } : {}),
-    ...(query.priority ? { priority: query.priority } : {}),
-    ...(query.assigneeId ? { assigneeId: query.assigneeId } : {}),
-    ...(query.dueBefore ? { dueDate: { lte: query.dueBefore } } : {}),
-    ...(query.keyword
-      ? {
-          OR: [
-            { title: { contains: query.keyword } },
-            { description: { contains: query.keyword } },
-          ],
-        }
-      : {}),
-  }
-
-  const [items, total] = await prisma.$transaction([
-    prisma.task.findMany({
-      where,
-      include: taskInclude,
-      orderBy: [{ status: 'asc' }, { createdAt: 'desc' }],
-      skip: (query.page - 1) * query.pageSize,
-      take: query.pageSize,
-    }),
-    prisma.task.count({ where }),
-  ])
-
-  return { items, page: query.page, pageSize: query.pageSize, total }
-}
-
-export async function createTask(
-  userId: string,
-  projectId: string,
-  input: TaskCreateInput,
-) {
-  await requireProjectMember(projectId, userId)
-  await requireAssigneeMembership(projectId, input.assigneeId)
-
-  return prisma.task.create({
-    data: {
-      ...input,
-      projectId,
-      creatorId: userId,
-    },
-    include: taskInclude,
-  })
-}
-
-async function findTaskForMember(taskId: string, userId: string) {
-  const task = await prisma.task.findUnique({
-    where: { id: taskId },
-    include: taskInclude,
-  })
-
-  if (!task) {
-    throw new AppError(404, 'TASK_NOT_FOUND', '任务不存在')
-  }
-
-  const membership = await requireProjectMember(task.projectId, userId)
-  return { task, membership }
-}
-
-export async function getTask(taskId: string, userId: string) {
-  return (await findTaskForMember(taskId, userId)).task
-}
-
-export async function updateTask(
-  taskId: string,
-  userId: string,
-  input: TaskUpdateInput,
-) {
-  const { task } = await findTaskForMember(taskId, userId)
-  await requireAssigneeMembership(task.projectId, input.assigneeId)
-
-  return prisma.task.update({
-    where: { id: taskId },
-    data: input,
-    include: taskInclude,
-  })
-}
-
-export async function deleteTask(taskId: string, userId: string) {
-  const { task, membership } = await findTaskForMember(taskId, userId)
-
-  if (task.creatorId !== userId && membership.role !== 'OWNER') {
-    throw new AppError(403, 'TASK_DELETE_FORBIDDEN', '你不能删除该任务')
-  }
-
-  await prisma.task.delete({ where: { id: taskId } })
-}
+type TaskPriority = 'LOW' | 'MEDIUM' | 'HIGH'
 ```
 
-- [ ] **Step 5: Implement task controller and routes**
+创建字段：
 
-Create `server/src/controllers/task.controller.ts`:
-
-```ts
-import type { Request, Response } from 'express'
-import { sendSuccess } from '../lib/response.js'
-import {
-  taskCreateSchema,
-  taskListQuerySchema,
-  taskUpdateSchema,
-} from '../schemas/task.schema.js'
-import * as taskService from '../services/task.service.js'
-
-export async function list(request: Request, response: Response) {
-  sendSuccess(
-    response,
-    await taskService.listTasks(
-      request.auth!.userId,
-      request.params.projectId,
-      taskListQuerySchema.parse(request.query),
-    ),
-  )
-}
-
-export async function create(request: Request, response: Response) {
-  const result = await taskService.createTask(
-    request.auth!.userId,
-    request.params.projectId,
-    taskCreateSchema.parse(request.body),
-  )
-  response.status(201)
-  sendSuccess(response, result, '任务创建成功')
-}
-
-export async function detail(request: Request, response: Response) {
-  sendSuccess(
-    response,
-    await taskService.getTask(request.params.taskId, request.auth!.userId),
-  )
-}
-
-export async function update(request: Request, response: Response) {
-  sendSuccess(
-    response,
-    await taskService.updateTask(
-      request.params.taskId,
-      request.auth!.userId,
-      taskUpdateSchema.parse(request.body),
-    ),
-  )
-}
-
-export async function remove(request: Request, response: Response) {
-  await taskService.deleteTask(request.params.taskId, request.auth!.userId)
-  sendSuccess(response, null, '任务已删除')
-}
+```text
+title
+description
+status
+priority
+assigneeId
+dueDate
 ```
 
-Create `server/src/routes/project-task.route.ts`:
+更新接口单独定义可选的同名字段，避免默认值在局部更新时覆盖原数据。
 
-```ts
-import { Router } from 'express'
-import * as taskController from '../controllers/task.controller.js'
-import { requireAuth } from '../middlewares/auth.js'
+- [ ] **步骤 4：实现任务 Service**
 
-export const projectTaskRouter = Router({ mergeParams: true })
+所有操作先调用 `requireProjectMember()`。
 
-projectTaskRouter.use(requireAuth)
-projectTaskRouter.get('/', taskController.list)
-projectTaskRouter.post('/', taskController.create)
+创建任务前，如果存在 `assigneeId`，必须确认该用户是项目成员。
+
+更新任务同样重新校验负责人。
+
+删除规则：
+
+```text
+task.creatorId === currentUserId
+或
+membership.role === 'OWNER'
 ```
 
-Create `server/src/routes/task.route.ts`:
+否则返回 `403 TASK_DELETE_FORBIDDEN`。
 
-```ts
-import { Router } from 'express'
-import * as taskController from '../controllers/task.controller.js'
-import { requireAuth } from '../middlewares/auth.js'
+列表查询使用 Prisma `where` 组合筛选条件，并用事务同时执行：
 
-export const taskRouter = Router()
-
-taskRouter.use(requireAuth)
-taskRouter.get('/:taskId', taskController.detail)
-taskRouter.patch('/:taskId', taskController.update)
-taskRouter.delete('/:taskId', taskController.remove)
+```text
+findMany
+count
 ```
 
-Modify `server/src/app.ts`:
+- [ ] **步骤 5：实现 Controller 和 Route**
 
-```ts
-import { projectTaskRouter } from './routes/project-task.route.js'
-import { taskRouter } from './routes/task.route.js'
+路由固定为：
 
-app.use('/api/v1/projects/:projectId/tasks', projectTaskRouter)
-app.use('/api/v1/tasks', taskRouter)
+```text
+GET    /api/v1/projects/:projectId/tasks
+POST   /api/v1/projects/:projectId/tasks
+GET    /api/v1/tasks/:taskId
+PATCH  /api/v1/tasks/:taskId
+DELETE /api/v1/tasks/:taskId
 ```
 
-- [ ] **Step 6: Run tests and type check**
-
-Run:
+- [ ] **步骤 6：验证并提交**
 
 ```bash
-cd server
 DATABASE_URL=file:./test.db npm test -- --run tests/tasks.test.ts
 npm run typecheck
-```
-
-Expected: task creation, filters, assignment validation, update permission, and delete permission tests pass.
-
-- [ ] **Step 7: Commit**
-
-```bash
 git add server
 git commit -m "feat: add task APIs"
 ```
 
 ---
 
-### Task 10: Task List, Filters, Forms, and Task Detail UI
+## 任务 10：任务列表、筛选、表单和详情前端
 
-**Files:**
+**目标：** 在项目详情中管理任务，并提供任务详情页面。
 
-- Create: `client/src/api/tasks.ts`
-- Create: `client/src/components/tasks/TaskFilters.vue`
-- Create: `client/src/components/tasks/TaskTable.vue`
-- Create: `client/src/components/tasks/TaskFormDialog.vue`
-- Create: `client/src/views/tasks/TaskDetailView.vue`
-- Create: `client/src/utils/task-query.ts`
-- Modify: `client/src/views/projects/ProjectDetailView.vue`
-- Modify: `client/src/router/index.ts`
-- Test: `client/tests/task-filters.test.ts`
+**涉及文件：**
 
-**Interfaces:**
+- 新建：`client/src/api/tasks.ts`
+- 新建：`client/src/utils/task-query.ts`
+- 新建：`client/src/components/tasks/TaskFilters.vue`
+- 新建：`client/src/components/tasks/TaskTable.vue`
+- 新建：`client/src/components/tasks/TaskFormDialog.vue`
+- 新建：`client/src/views/tasks/TaskDetailView.vue`
+- 修改：`client/src/views/projects/ProjectDetailView.vue`
+- 修改：`client/src/router/index.ts`
+- 新建：`client/tests/task-filters.test.ts`
 
-- Consumes: `projectApi`, `useProjectStore()`, `apiRequest<T>()`, and task API routes.
-- Produces: `taskApi`, `toTaskQuery()`, task table/filter/form components, `/projects/:projectId/tasks/:taskId`, and the task section in project detail.
+**接口：**
 
-- [ ] **Step 1: Write the failing filter conversion test**
+- 产出：`taskApi`
+- 产出：`toTaskQuery()`
+- 路由：`/projects/:projectId/tasks/:taskId`
 
-Create `client/tests/task-filters.test.ts`:
+- [ ] **步骤 1：写筛选转换测试**
 
-```ts
-import { describe, expect, it } from 'vitest'
-import { toTaskQuery } from '../src/utils/task-query'
+`toTaskQuery()` 必须：
 
-describe('toTaskQuery', () => {
-  it('omits empty filters and keeps pagination', () => {
-    expect(
-      toTaskQuery({
-        keyword: '  ',
-        status: '',
-        priority: 'HIGH',
-        assigneeId: '',
-        dueBefore: '',
-        page: 2,
-        pageSize: 20,
-      }),
-    ).toEqual({
-      page: 2,
-      pageSize: 20,
-      priority: 'HIGH',
-    })
-  })
-})
-```
+- 删除空白关键字。
+- 删除空状态、空优先级、空负责人和空日期。
+- 始终保留 `page` 和 `pageSize`。
 
-- [ ] **Step 2: Run the test and verify it fails**
-
-Run: `cd client && npm test -- --run tests/task-filters.test.ts`
-
-Expected: FAIL because `task-query.ts` does not exist.
-
-- [ ] **Step 3: Implement the task API**
-
-Create `client/src/api/tasks.ts`:
-
-```ts
-import { apiRequest } from './http'
-
-export type TaskStatus = 'TODO' | 'IN_PROGRESS' | 'DONE'
-export type TaskPriority = 'LOW' | 'MEDIUM' | 'HIGH'
-
-export interface TaskUser {
-  id: string
-  username: string
-  email: string
-}
-
-export interface Task {
-  id: string
-  projectId: string
-  title: string
-  description: string
-  status: TaskStatus
-  priority: TaskPriority
-  assigneeId: string | null
-  assignee: TaskUser | null
-  creatorId: string
-  creator: TaskUser
-  dueDate: string | null
-  createdAt: string
-  updatedAt: string
-}
-
-export interface TaskQuery {
-  page: number
-  pageSize: number
-  keyword?: string
-  status?: TaskStatus
-  priority?: TaskPriority
-  assigneeId?: string
-  dueBefore?: string
-}
-
-export interface PaginatedTasks {
-  items: Task[]
-  page: number
-  pageSize: number
-  total: number
-}
-
-export interface TaskCreateInput {
-  title: string
-  description: string
-  status: TaskStatus
-  priority: TaskPriority
-  assigneeId: string | null
-  dueDate: string | null
-}
-
-export const taskApi = {
-  list(projectId: string, params: TaskQuery) {
-    return apiRequest<PaginatedTasks>({
-      method: 'GET',
-      url: `/projects/${projectId}/tasks`,
-      params,
-    })
-  },
-  create(projectId: string, input: TaskCreateInput) {
-    return apiRequest<Task>({
-      method: 'POST',
-      url: `/projects/${projectId}/tasks`,
-      data: input,
-    })
-  },
-  detail(taskId: string) {
-    return apiRequest<Task>({
-      method: 'GET',
-      url: `/tasks/${taskId}`,
-    })
-  },
-  update(taskId: string, input: Partial<TaskCreateInput>) {
-    return apiRequest<Task>({
-      method: 'PATCH',
-      url: `/tasks/${taskId}`,
-      data: input,
-    })
-  },
-  remove(taskId: string) {
-    return apiRequest<null>({
-      method: 'DELETE',
-      url: `/tasks/${taskId}`,
-    })
-  },
-}
-```
-
-- [ ] **Step 4: Implement task filter conversion and components**
-
-Create `client/src/utils/task-query.ts`:
-
-```ts
-import type {
-  TaskPriority,
-  TaskQuery,
-  TaskStatus,
-} from '../api/tasks'
-
-export interface TaskFilterState {
-  keyword: string
-  status: TaskStatus | ''
-  priority: TaskPriority | ''
-  assigneeId: string
-  dueBefore: string
-  page: number
-  pageSize: number
-}
-
-export function toTaskQuery(state: TaskFilterState): TaskQuery {
-  return {
-    page: state.page,
-    pageSize: state.pageSize,
-    ...(state.keyword.trim() ? { keyword: state.keyword.trim() } : {}),
-    ...(state.status ? { status: state.status } : {}),
-    ...(state.priority ? { priority: state.priority } : {}),
-    ...(state.assigneeId ? { assigneeId: state.assigneeId } : {}),
-    ...(state.dueBefore ? { dueBefore: state.dueBefore } : {}),
-  }
-}
-```
-
-Import `toTaskQuery()` inside `TaskFilters.vue`.
-
-The component template contains:
-
-- Input labeled `搜索任务`.
-- Status select with `全部状态`, `待处理`, `进行中`, `已完成`.
-- Priority select with `全部优先级`, `低`, `中`, `高`.
-- Assignee select populated from project members with `全部负责人`.
-- Date picker labeled `截止时间早于` mapped to `dueBefore`.
-- Emits `change` with `toTaskQuery(state)`.
-
-Create `client/src/components/tasks/TaskTable.vue` with:
-
-- Props: `tasks: Task[]`, `loading: boolean`, `total: number`, `page: number`, `pageSize: number`.
-- Emits: `edit`, `delete`, `page-change`, `row-click`.
-- Columns: title, status tag, priority tag, assignee, due date, update time.
-- Maps `TODO` to `待处理`, `IN_PROGRESS` to `进行中`, `DONE` to `已完成`.
-- Maps priorities to `低`, `中`, `高`.
-
-Create `client/src/components/tasks/TaskFormDialog.vue` with:
-
-- Props: `modelValue`, `projectId`, `members`, `task?: Task`.
-- Emits: `update:modelValue`, `saved`.
-- Fields: title, description, status, priority, assignee, due date.
-- Uses `taskApi.create()` or `taskApi.update()`.
-- Converts Element Plus date values to ISO strings before sending.
-
-- [ ] **Step 5: Integrate the task section into project detail**
-
-Modify `client/src/views/projects/ProjectDetailView.vue`:
-
-- Add a `任务` card.
-- Call `taskApi.list(projectId, query)` after the project loads.
-- Render `TaskFilters`, `TaskTable`, and `新建任务`.
-- On row click, route to `/projects/:projectId/tasks/:taskId`.
-- Refresh the project detail after task create, update, or delete.
-- Show `暂无任务` when the response total is zero.
-
-- [ ] **Step 6: Implement task detail and route**
-
-Create `client/src/views/tasks/TaskDetailView.vue` with:
-
-- Loads `taskApi.detail(taskId)` on mount.
-- Shows title, creator, assignee, due date, status, and priority.
-- Provides an edit button that opens `TaskFormDialog`.
-- Provides a delete button for the task creator or project owner.
-- Routes back to `/projects/:projectId` after deletion.
-- Leaves a `评论` section and an `附件` section for Tasks 12 and 14.
-
-Add the route under the authenticated layout:
-
-```ts
-{
-  path: 'projects/:projectId/tasks/:taskId',
-  name: 'task-detail',
-  component: () => import('../views/tasks/TaskDetailView.vue'),
-}
-```
-
-- [ ] **Step 7: Run tests, type check, and build**
-
-Run:
+- [ ] **步骤 2：运行测试并确认失败**
 
 ```bash
 cd client
 npm test -- --run tests/task-filters.test.ts
-npm run typecheck
-npm run build
 ```
 
-Expected: filter test, type check, and build pass.
+- [ ] **步骤 3：实现任务 API 和查询转换**
 
-- [ ] **Step 8: Commit**
+`taskApi` 固定包含：
+
+```text
+list
+create
+detail
+update
+remove
+```
+
+筛选组件包含：
+
+- 搜索任务。
+- 状态：全部、待处理、进行中、已完成。
+- 优先级：全部、低、中、高。
+- 负责人。
+- 截止时间早于。
+
+- [ ] **步骤 4：实现任务表格和表单**
+
+表格显示：
+
+- 标题。
+- 状态。
+- 优先级。
+- 负责人。
+- 截止时间。
+- 更新时间。
+
+表单显示：
+
+- 标题。
+- 描述。
+- 状态。
+- 优先级。
+- 负责人。
+- 截止日期。
+
+提交前把日期转换为 ISO 字符串。
+
+- [ ] **步骤 5：集成项目详情和任务详情**
+
+项目详情：
+
+- 加载任务列表。
+- 新建、编辑、删除任务后刷新列表。
+- 点击任务跳转详情。
+
+任务详情：
+
+- 显示任务全部核心字段。
+- 支持编辑和按权限删除。
+- 预留评论和附件区域。
+
+- [ ] **步骤 6：验证并提交**
 
 ```bash
+npm test -- --run tests/task-filters.test.ts
+npm run typecheck
+npm run build
 git add client
 git commit -m "feat: add task management UI"
 ```
 
 ---
 
-### Task 11: Comments API
+## 任务 11：评论后端 API
 
-**Files:**
+**目标：** 项目成员可以查看和发布评论，作者或项目负责人可以删除评论。
 
-- Create: `server/src/schemas/comment.schema.ts`
-- Create: `server/src/services/comment.service.ts`
-- Create: `server/src/controllers/comment.controller.ts`
-- Create: `server/src/routes/comment.route.ts`
-- Create: `server/src/routes/task-comment.route.ts`
-- Modify: `server/src/app.ts`
-- Test: `server/tests/comments.test.ts`
+**涉及文件：**
 
-**Interfaces:**
+- 新建：`server/src/schemas/comment.schema.ts`
+- 新建：`server/src/services/comment.service.ts`
+- 新建：`server/src/controllers/comment.controller.ts`
+- 新建：`server/src/routes/task-comment.route.ts`
+- 新建：`server/src/routes/comment.route.ts`
+- 修改：`server/src/app.ts`
+- 新建：`server/tests/comments.test.ts`
 
-- Consumes: `requireProjectMember()`, `paginationSchema`, `prisma`, and `AppError`.
-- Produces: comment list, create, and delete endpoints.
+**接口：**
 
-- [ ] **Step 1: Write failing comment tests**
+- 产出：评论列表、创建评论、删除评论接口。
+- 评论内容长度为 1 到 2000。
 
-Create `server/tests/comments.test.ts`:
+- [ ] **步骤 1：写失败测试**
 
-```ts
-import request from 'supertest'
-import { beforeEach, describe, expect, it } from 'vitest'
-import { createApp } from '../src/app'
-import { prisma } from '../src/lib/prisma'
-import { createAuthenticatedUser } from './helpers/auth'
-import { resetDatabase } from './helpers/database'
-import { createProjectWithOwner, createTask } from './helpers/factories'
+必须覆盖：
 
-const app = createApp()
+- 项目成员可以发布评论。
+- 评论列表按创建时间正序返回。
+- 评论作者可以删除。
+- 项目负责人可以删除。
+- 其他普通成员不能删除，返回 `403 COMMENT_DELETE_FORBIDDEN`。
 
-beforeEach(resetDatabase)
-
-describe('comments', () => {
-  it('creates and lists a comment', async () => {
-    const owner = await createAuthenticatedUser()
-    const project = await createProjectWithOwner(owner.user.id)
-    const task = await createTask(project.id, owner.user.id)
-
-    const created = await request(app)
-      .post(`/api/v1/tasks/${task.id}/comments`)
-      .set('Authorization', `Bearer ${owner.token}`)
-      .send({ content: '第一条评论' })
-    const listed = await request(app)
-      .get(`/api/v1/tasks/${task.id}/comments`)
-      .set('Authorization', `Bearer ${owner.token}`)
-
-    expect(created.status).toBe(201)
-    expect(listed.body.data.items).toHaveLength(1)
-    expect(listed.body.data.items[0].content).toBe('第一条评论')
-  })
-
-  it('allows only the author or project owner to delete', async () => {
-    const owner = await createAuthenticatedUser()
-    const member = await createAuthenticatedUser()
-    const other = await createAuthenticatedUser()
-    const project = await createProjectWithOwner(owner.user.id)
-    await prisma.projectMember.createMany({
-      data: [
-        { projectId: project.id, userId: member.user.id, role: 'MEMBER' },
-        { projectId: project.id, userId: other.user.id, role: 'MEMBER' },
-      ],
-    })
-    const task = await createTask(project.id, owner.user.id)
-    const comment = await prisma.comment.create({
-      data: { taskId: task.id, authorId: member.user.id, content: 'keep' },
-    })
-
-    const forbidden = await request(app)
-      .delete(`/api/v1/comments/${comment.id}`)
-      .set('Authorization', `Bearer ${other.token}`)
-    const allowed = await request(app)
-      .delete(`/api/v1/comments/${comment.id}`)
-      .set('Authorization', `Bearer ${owner.token}`)
-
-    expect(forbidden.status).toBe(403)
-    expect(forbidden.body.code).toBe('COMMENT_DELETE_FORBIDDEN')
-    expect(allowed.status).toBe(200)
-  })
-})
-```
-
-- [ ] **Step 2: Run the tests and verify they fail**
-
-Run:
+- [ ] **步骤 2：运行测试并确认失败**
 
 ```bash
 cd server
 DATABASE_URL=file:./test.db npm test -- --run tests/comments.test.ts
 ```
 
-Expected: FAIL with 404 because comment routes do not exist.
+- [ ] **步骤 3：实现评论 Service**
 
-- [ ] **Step 3: Implement comment schema and service**
+查询任务后调用 `requireProjectMember()`。
 
-Create `server/src/schemas/comment.schema.ts`:
+删除规则：
 
-```ts
-import { z } from 'zod'
-import { paginationSchema } from './project.schema.js'
-
-export const commentListQuerySchema = paginationSchema
-
-export const commentCreateSchema = z.object({
-  content: z.string().trim().min(1).max(2000),
-})
+```text
+comment.authorId === currentUserId
+或
+membership.role === 'OWNER'
 ```
 
-Create `server/src/services/comment.service.ts`:
+列表返回分页结构：
 
 ```ts
-import { AppError } from '../lib/app-error.js'
-import { prisma } from '../lib/prisma.js'
-import type { Paginated } from '../types/http.js'
-import { requireProjectMember } from './project-access.service.js'
-
-async function getTaskAndMembership(taskId: string, userId: string) {
-  const task = await prisma.task.findUnique({ where: { id: taskId } })
-
-  if (!task) {
-    throw new AppError(404, 'TASK_NOT_FOUND', '任务不存在')
-  }
-
-  const membership = await requireProjectMember(task.projectId, userId)
-  return { task, membership }
-}
-
-export async function listComments(
-  taskId: string,
-  userId: string,
-  page: number,
-  pageSize: number,
-): Promise<Paginated<object>> {
-  await getTaskAndMembership(taskId, userId)
-
-  const where = { taskId }
-  const [items, total] = await prisma.$transaction([
-    prisma.comment.findMany({
-      where,
-      include: {
-        author: { select: { id: true, username: true, email: true } },
-      },
-      orderBy: { createdAt: 'asc' },
-      skip: (page - 1) * pageSize,
-      take: pageSize,
-    }),
-    prisma.comment.count({ where }),
-  ])
-
-  return { items, page, pageSize, total }
-}
-
-export async function createComment(
-  taskId: string,
-  userId: string,
-  content: string,
-) {
-  await getTaskAndMembership(taskId, userId)
-
-  return prisma.comment.create({
-    data: { taskId, authorId: userId, content },
-    include: {
-      author: { select: { id: true, username: true, email: true } },
-    },
-  })
-}
-
-export async function deleteComment(commentId: string, userId: string) {
-  const comment = await prisma.comment.findUnique({
-    where: { id: commentId },
-    include: { task: true },
-  })
-
-  if (!comment) {
-    throw new AppError(404, 'COMMENT_NOT_FOUND', '评论不存在')
-  }
-
-  const membership = await requireProjectMember(comment.task.projectId, userId)
-  const canDelete =
-    comment.authorId === userId || membership.role === 'OWNER'
-
-  if (!canDelete) {
-    throw new AppError(403, 'COMMENT_DELETE_FORBIDDEN', '你不能删除该评论')
-  }
-
-  await prisma.comment.delete({ where: { id: commentId } })
+{
+  items: Comment[]
+  page: number
+  pageSize: number
+  total: number
 }
 ```
 
-- [ ] **Step 4: Implement comment controller and routes**
+- [ ] **步骤 4：实现路由**
 
-Create `server/src/controllers/comment.controller.ts`:
-
-```ts
-import type { Request, Response } from 'express'
-import { sendSuccess } from '../lib/response.js'
-import {
-  commentCreateSchema,
-  commentListQuerySchema,
-} from '../schemas/comment.schema.js'
-import * as commentService from '../services/comment.service.js'
-
-export async function list(request: Request, response: Response) {
-  const query = commentListQuerySchema.parse(request.query)
-  sendSuccess(
-    response,
-    await commentService.listComments(
-      request.params.taskId,
-      request.auth!.userId,
-      query.page,
-      query.pageSize,
-    ),
-  )
-}
-
-export async function create(request: Request, response: Response) {
-  const { content } = commentCreateSchema.parse(request.body)
-  const result = await commentService.createComment(
-    request.params.taskId,
-    request.auth!.userId,
-    content,
-  )
-  response.status(201)
-  sendSuccess(response, result, '评论已发布')
-}
-
-export async function remove(request: Request, response: Response) {
-  await commentService.deleteComment(
-    request.params.commentId,
-    request.auth!.userId,
-  )
-  sendSuccess(response, null, '评论已删除')
-}
+```text
+GET    /api/v1/tasks/:taskId/comments
+POST   /api/v1/tasks/:taskId/comments
+DELETE /api/v1/comments/:commentId
 ```
 
-Create `server/src/routes/task-comment.route.ts`:
-
-```ts
-import { Router } from 'express'
-import * as commentController from '../controllers/comment.controller.js'
-import { requireAuth } from '../middlewares/auth.js'
-
-export const taskCommentRouter = Router({ mergeParams: true })
-
-taskCommentRouter.use(requireAuth)
-taskCommentRouter.get('/', commentController.list)
-taskCommentRouter.post('/', commentController.create)
-```
-
-Create `server/src/routes/comment.route.ts`:
-
-```ts
-import { Router } from 'express'
-import * as commentController from '../controllers/comment.controller.js'
-import { requireAuth } from '../middlewares/auth.js'
-
-export const commentRouter = Router()
-
-commentRouter.use(requireAuth)
-commentRouter.delete('/:commentId', commentController.remove)
-```
-
-Modify `server/src/app.ts`:
-
-```ts
-import { commentRouter } from './routes/comment.route.js'
-import { taskCommentRouter } from './routes/task-comment.route.js'
-
-app.use('/api/v1/tasks/:taskId/comments', taskCommentRouter)
-app.use('/api/v1/comments', commentRouter)
-```
-
-- [ ] **Step 5: Run tests and type check**
-
-Run:
+- [ ] **步骤 5：验证并提交**
 
 ```bash
-cd server
 DATABASE_URL=file:./test.db npm test -- --run tests/comments.test.ts
 npm run typecheck
-```
-
-Expected: comment create, list, author deletion, and owner deletion tests pass.
-
-- [ ] **Step 6: Commit**
-
-```bash
 git add server
 git commit -m "feat: add comment APIs"
 ```
 
 ---
 
-### Task 12: Comments UI
+## 任务 12：评论前端
 
-**Files:**
+**目标：** 在任务详情中查看、发布和删除评论。
 
-- Create: `client/src/api/comments.ts`
-- Create: `client/src/components/comments/CommentList.vue`
-- Create: `client/src/components/comments/CommentForm.vue`
-- Modify: `client/src/views/tasks/TaskDetailView.vue`
-- Test: `client/tests/comments.test.ts`
+**涉及文件：**
 
-**Interfaces:**
+- 新建：`client/src/api/comments.ts`
+- 新建：`client/src/components/comments/CommentForm.vue`
+- 新建：`client/src/components/comments/CommentList.vue`
+- 修改：`client/src/views/tasks/TaskDetailView.vue`
+- 新建：`client/tests/comments.test.ts`
 
-- Consumes: `apiRequest<T>()`, `useAuthStore()`, `useProjectStore()`, and comment API routes.
-- Produces: `commentApi`, comment list/form components, and task-detail comment integration.
+**接口：**
 
-- [ ] **Step 1: Write a failing comment API test**
+- 产出：`commentApi`
+- 产出：评论表单和评论列表组件。
 
-Create `client/tests/comments.test.ts`:
+- [ ] **步骤 1：写失败测试**
 
-```ts
-import MockAdapter from 'axios-mock-adapter'
-import { beforeEach, describe, expect, it } from 'vitest'
-import { commentApi } from '../src/api/comments'
-import { http } from '../src/api/http'
+测试 `commentApi.create()` 能正确调用：
 
-const mock = new MockAdapter(http)
-
-beforeEach(() => mock.reset())
-
-describe('commentApi', () => {
-  it('creates a comment', async () => {
-    mock.onPost('/tasks/task-1/comments').reply(201, {
-      code: 'OK',
-      message: '评论已发布',
-      data: { id: 'comment-1', content: 'hello' },
-      requestId: 'request-1',
-    })
-
-    const result = await commentApi.create('task-1', 'hello')
-
-    expect(result.id).toBe('comment-1')
-  })
-})
+```text
+POST /tasks/:taskId/comments
 ```
 
-- [ ] **Step 2: Run the test and verify it fails**
+并返回评论对象。
 
-Run: `cd client && npm test -- --run tests/comments.test.ts`
+- [ ] **步骤 2：运行测试并确认失败**
 
-Expected: FAIL because `commentApi` does not exist.
-
-- [ ] **Step 3: Implement the comment API and components**
-
-Create `client/src/api/comments.ts`:
-
-```ts
-import { apiRequest } from './http'
-
-export interface Comment {
-  id: string
-  taskId: string
-  authorId: string
-  content: string
-  createdAt: string
-  updatedAt: string
-  author: { id: string; username: string; email: string }
-}
-
-export interface PaginatedComments {
-  items: Comment[]
-  page: number
-  pageSize: number
-  total: number
-}
-
-export const commentApi = {
-  list(taskId: string, page = 1, pageSize = 50) {
-    return apiRequest<PaginatedComments>({
-      method: 'GET',
-      url: `/tasks/${taskId}/comments`,
-      params: { page, pageSize },
-    })
-  },
-  create(taskId: string, content: string) {
-    return apiRequest<Comment>({
-      method: 'POST',
-      url: `/tasks/${taskId}/comments`,
-      data: { content },
-    })
-  },
-  remove(commentId: string) {
-    return apiRequest<null>({
-      method: 'DELETE',
-      url: `/comments/${commentId}`,
-    })
-  },
-}
+```bash
+cd client
+npm test -- --run tests/comments.test.ts
 ```
 
-Create `client/src/components/comments/CommentForm.vue`:
+- [ ] **步骤 3：实现评论 API 和组件**
 
-- Props: `taskId: string`.
-- Emits: `created`.
-- Contains an `el-input` textarea with a maximum length of 2000.
-- Disables submit for empty text.
-- Calls `commentApi.create()` and resets the field.
+`commentApi` 固定包含：
 
-Create `client/src/components/comments/CommentList.vue`:
+```text
+list
+create
+remove
+```
 
-- Props: `comments: Comment[]`, `currentUserId: string`, `canManage: boolean`.
-- Emits: `deleted`.
-- Shows author, local date, content, and delete button.
-- Shows delete when the current user is the author or `canManage` is true.
-- Calls `commentApi.remove()`.
+评论表单：
 
-- [ ] **Step 4: Integrate comments into task detail**
+- 最大 2000 字。
+- 空内容时禁用提交。
+- 成功后清空输入并通知父组件。
 
-Modify `client/src/views/tasks/TaskDetailView.vue`:
+评论列表：
 
-- Load comments in parallel with the task:
+- 显示作者、本地时间和内容。
+- 作者或项目负责人显示删除按钮。
+- 删除成功后通知父组件刷新。
+
+- [ ] **步骤 4：集成任务详情**
+
+任务和评论并行加载：
 
 ```ts
 const [taskResult, commentResult] = await Promise.all([
   taskApi.detail(taskId),
   commentApi.list(taskId),
 ])
-task.value = taskResult
-comments.value = commentResult.items
 ```
 
-- Render `CommentForm` and `CommentList` in the `评论` section.
-- Set `canManage` from `projectStore.currentRole === 'OWNER'`.
-- Reload comments after create or delete.
-- Show `暂无评论` when the list is empty.
-
-- [ ] **Step 5: Run tests, type check, and build**
-
-Run:
+- [ ] **步骤 5：验证并提交**
 
 ```bash
-cd client
 npm test -- --run tests/comments.test.ts
 npm run typecheck
 npm run build
-```
-
-Expected: test, type check, and build pass.
-
-- [ ] **Step 6: Commit**
-
-```bash
 git add client
 git commit -m "feat: add comment UI"
 ```
 
 ---
 
-### Task 13: Attachments API and File Lifecycle
+## 任务 13：附件后端 API 和文件生命周期
 
-**Files:**
+**目标：** 实现附件上传、下载、删除，并确保项目或任务删除时清理文件。
 
-- Create: `server/src/lib/upload.ts`
-- Create: `server/src/services/attachment.service.ts`
-- Create: `server/src/controllers/attachment.controller.ts`
-- Create: `server/src/routes/task-attachment.route.ts`
-- Create: `server/src/routes/attachment.route.ts`
-- Modify: `server/src/middlewares/error-handler.ts`
-- Modify: `server/src/services/task.service.ts`
-- Modify: `server/src/services/project.service.ts`
-- Modify: `server/src/app.ts`
-- Test: `server/tests/attachments.test.ts`
+**涉及文件：**
 
-**Interfaces:**
+- 新建：`server/src/lib/upload.ts`
+- 新建：`server/src/services/attachment.service.ts`
+- 新建：`server/src/controllers/attachment.controller.ts`
+- 新建：`server/src/routes/task-attachment.route.ts`
+- 新建：`server/src/routes/attachment.route.ts`
+- 修改：`server/src/middlewares/error-handler.ts`
+- 修改：`server/src/services/task.service.ts`
+- 修改：`server/src/services/project.service.ts`
+- 修改：`server/src/app.ts`
+- 新建：`server/tests/attachments.test.ts`
 
-- Consumes: `env.UPLOAD_DIR`, `requireProjectMember()`, `prisma`, and task access helpers.
-- Produces: `upload`, `uploadAttachment()`, `downloadAttachment()`, `deleteAttachment()`, attachment download route, and attachment metadata in task responses.
+**接口：**
 
-- [ ] **Step 1: Install Multer and write failing attachment tests**
+- 产出：`upload`、`uploadAttachment()`、`downloadAttachment()`、`deleteAttachment()`
+- 产出：受控附件下载接口。
 
-Run:
+- [ ] **步骤 1：安装 Multer 并写失败测试**
 
 ```bash
 cd server
@@ -4275,824 +1548,273 @@ npm install multer
 npm install -D @types/multer
 ```
 
-Create `server/tests/attachments.test.ts`:
+测试必须覆盖：
 
-```ts
-import request from 'supertest'
-import { beforeEach, describe, expect, it } from 'vitest'
-import { createApp } from '../src/app'
-import { prisma } from '../src/lib/prisma'
-import { createAuthenticatedUser } from './helpers/auth'
-import { resetDatabase } from './helpers/database'
-import { createProjectWithOwner, createTask } from './helpers/factories'
+- 项目成员可以上传和下载文本文件。
+- 非项目成员下载返回 `403 PROJECT_MEMBER_REQUIRED`。
+- 超过 5 MB 返回 `400 FILE_TOO_LARGE`。
+- 非允许 MIME 类型返回 `400 FILE_TYPE_NOT_ALLOWED`。
+- 超过 20 个附件返回 `400 ATTACHMENT_LIMIT_REACHED`。
 
-const app = createApp()
-
-beforeEach(resetDatabase)
-
-describe('attachments', () => {
-  it('uploads and downloads a text file for a project member', async () => {
-    const owner = await createAuthenticatedUser()
-    const project = await createProjectWithOwner(owner.user.id)
-    const task = await createTask(project.id, owner.user.id)
-
-    const uploaded = await request(app)
-      .post(`/api/v1/tasks/${task.id}/attachments`)
-      .set('Authorization', `Bearer ${owner.token}`)
-      .attach('file', Buffer.from('hello'), {
-        filename: 'note.txt',
-        contentType: 'text/plain',
-      })
-
-    expect(uploaded.status).toBe(201)
-
-    const downloaded = await request(app)
-      .get(`/api/v1/attachments/${uploaded.body.data.id}/download`)
-      .set('Authorization', `Bearer ${owner.token}`)
-
-    expect(downloaded.status).toBe(200)
-    expect(downloaded.text).toBe('hello')
-  })
-
-  it('rejects a non-member download', async () => {
-    const owner = await createAuthenticatedUser()
-    const outsider = await createAuthenticatedUser()
-    const project = await createProjectWithOwner(owner.user.id)
-    const task = await createTask(project.id, owner.user.id)
-    const attachment = await prisma.attachment.create({
-      data: {
-        taskId: task.id,
-        uploaderId: owner.user.id,
-        originalName: 'note.txt',
-        storedName: 'missing.txt',
-        mimeType: 'text/plain',
-        size: 5,
-      },
-    })
-
-    const response = await request(app)
-      .get(`/api/v1/attachments/${attachment.id}/download`)
-      .set('Authorization', `Bearer ${outsider.token}`)
-
-    expect(response.status).toBe(403)
-    expect(response.body.code).toBe('PROJECT_MEMBER_REQUIRED')
-  })
-})
-```
-
-- [ ] **Step 2: Run the tests and verify they fail**
-
-Run:
+- [ ] **步骤 2：运行测试并确认失败**
 
 ```bash
-cd server
 DATABASE_URL=file:./test.db npm test -- --run tests/attachments.test.ts
 ```
 
-Expected: FAIL with 404 because attachment routes do not exist.
+- [ ] **步骤 3：实现上传中间件**
 
-- [ ] **Step 3: Implement Multer validation**
-
-Create `server/src/lib/upload.ts`:
+Multer 使用内存存储：
 
 ```ts
-import multer from 'multer'
-import { AppError } from './app-error.js'
-
-const allowedMimeTypes = new Set([
-  'application/pdf',
-  'image/png',
-  'image/jpeg',
-  'text/plain',
-])
-
-export const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: { fileSize: 5 * 1024 * 1024, files: 1 },
-  fileFilter: (_request, file, callback) => {
-    if (!allowedMimeTypes.has(file.mimetype)) {
-      callback(
-        new AppError(
-          400,
-          'FILE_TYPE_NOT_ALLOWED',
-          '仅支持 PDF、PNG、JPEG 和文本文件',
-        ),
-      )
-      return
-    }
-    callback(null, true)
-  },
-})
+multer.memoryStorage()
 ```
 
-Modify `server/src/middlewares/error-handler.ts` to map Multer size errors:
+限制：
 
 ```ts
-import multer from 'multer'
-
-if (error instanceof multer.MulterError && error.code === 'LIMIT_FILE_SIZE') {
-  response.status(400).json({
-    code: 'FILE_TOO_LARGE',
-    message: '文件不能超过 5 MB',
-    details: null,
-    requestId,
-  })
-  return
+{
+  fileSize: 5 * 1024 * 1024,
+  files: 1
 }
 ```
 
-- [ ] **Step 4: Implement attachment services**
+允许的 MIME：
 
-Create `server/src/services/attachment.service.ts`:
-
-```ts
-import { randomUUID } from 'node:crypto'
-import { mkdir, readFile, unlink, writeFile } from 'node:fs/promises'
-import { extname, join, resolve } from 'node:path'
-import { env } from '../config/env.js'
-import { AppError } from '../lib/app-error.js'
-import { prisma } from '../lib/prisma.js'
-import { requireProjectMember } from './project-access.service.js'
-
-async function getAttachmentForMember(attachmentId: string, userId: string) {
-  const attachment = await prisma.attachment.findUnique({
-    where: { id: attachmentId },
-    include: { task: true },
-  })
-
-  if (!attachment) {
-    throw new AppError(404, 'ATTACHMENT_NOT_FOUND', '附件不存在')
-  }
-
-  const membership = await requireProjectMember(
-    attachment.task.projectId,
-    userId,
-  )
-  return { attachment, membership }
-}
-
-export async function uploadAttachment(
-  taskId: string,
-  userId: string,
-  file: Express.Multer.File,
-) {
-  const task = await prisma.task.findUnique({ where: { id: taskId } })
-
-  if (!task) {
-    throw new AppError(404, 'TASK_NOT_FOUND', '任务不存在')
-  }
-
-  await requireProjectMember(task.projectId, userId)
-
-  const count = await prisma.attachment.count({ where: { taskId } })
-  if (count >= 20) {
-    throw new AppError(400, 'ATTACHMENT_LIMIT_REACHED', '每个任务最多上传 20 个附件')
-  }
-
-  const extension = extname(file.originalname).toLowerCase()
-  const storedName = `${randomUUID()}${extension}`
-  const uploadDirectory = resolve(env.UPLOAD_DIR)
-  const filePath = join(uploadDirectory, storedName)
-
-  await mkdir(uploadDirectory, { recursive: true })
-  await writeFile(filePath, file.buffer)
-
-  try {
-    return await prisma.attachment.create({
-      data: {
-        taskId,
-        uploaderId: userId,
-        originalName: file.originalname,
-        storedName,
-        mimeType: file.mimetype,
-        size: file.size,
-      },
-    })
-  } catch (error) {
-    await unlink(filePath).catch(() => undefined)
-    throw error
-  }
-}
-
-export async function downloadAttachment(
-  attachmentId: string,
-  userId: string,
-) {
-  const { attachment } = await getAttachmentForMember(attachmentId, userId)
-  const filePath = join(resolve(env.UPLOAD_DIR), attachment.storedName)
-
-  try {
-    const buffer = await readFile(filePath)
-    return { attachment, buffer }
-  } catch {
-    throw new AppError(404, 'ATTACHMENT_FILE_MISSING', '附件文件不存在')
-  }
-}
-
-export async function deleteAttachment(
-  attachmentId: string,
-  userId: string,
-) {
-  const { attachment, membership } = await getAttachmentForMember(
-    attachmentId,
-    userId,
-  )
-  const task = await prisma.task.findUnique({
-    where: { id: attachment.taskId },
-  })
-
-  const canDelete =
-    attachment.uploaderId === userId ||
-    task?.creatorId === userId ||
-    membership.role === 'OWNER'
-
-  if (!canDelete) {
-    throw new AppError(403, 'ATTACHMENT_DELETE_FORBIDDEN', '你不能删除该附件')
-  }
-
-  await prisma.attachment.delete({ where: { id: attachmentId } })
-  await unlink(join(resolve(env.UPLOAD_DIR), attachment.storedName)).catch(
-    () => undefined,
-  )
-}
-
-export async function removeAttachmentFiles(storedNames: string[]) {
-  await Promise.all(
-    storedNames.map((storedName) =>
-      unlink(join(resolve(env.UPLOAD_DIR), storedName)).catch(() => undefined),
-    ),
-  )
-}
+```text
+application/pdf
+image/png
+image/jpeg
+text/plain
 ```
 
-- [ ] **Step 5: Include attachments in task responses and clean files on deletion**
+错误处理中间件需要识别：
 
-Modify `taskInclude` in `server/src/services/task.service.ts`:
+```ts
+error instanceof multer.MulterError
+```
+
+并处理 `LIMIT_FILE_SIZE`。
+
+- [ ] **步骤 4：实现附件 Service**
+
+上传流程：
+
+1. 查询任务。
+2. 调用 `requireProjectMember()`。
+3. 检查附件数量。
+4. 生成随机文件名：`${randomUUID()}${extension}`。
+5. 创建上传目录。
+6. 写入文件。
+7. 创建附件记录。
+8. 数据库创建失败时删除刚写入的文件。
+
+下载流程：
+
+1. 查询附件和任务。
+2. 校验项目成员。
+3. 读取文件。
+4. 设置 `Content-Type` 和 `Content-Disposition`。
+5. 返回二进制文件。
+
+删除规则：
+
+```text
+uploaderId === currentUserId
+或
+task.creatorId === currentUserId
+或
+membership.role === 'OWNER'
+```
+
+- [ ] **步骤 5：把附件加入任务详情**
+
+任务查询的 `include` 必须增加：
 
 ```ts
 attachments: {
   include: {
-    uploader: { select: { id: true, username: true, email: true } },
+    uploader: {
+      select: { id: true, username: true, email: true }
+    }
   },
-  orderBy: { createdAt: 'desc' },
-},
-```
-
-Import `removeAttachmentFiles` from `attachment.service.js`.
-
-Modify `deleteTask()`:
-
-```ts
-const attachments = await prisma.attachment.findMany({
-  where: { taskId },
-  select: { storedName: true },
-})
-
-await prisma.task.delete({ where: { id: taskId } })
-await removeAttachmentFiles(attachments.map((item) => item.storedName))
-```
-
-Modify `deleteProject()` in `server/src/services/project.service.ts`:
-
-```ts
-const attachments = await prisma.attachment.findMany({
-  where: { task: { projectId } },
-  select: { storedName: true },
-})
-
-await prisma.project.delete({ where: { id: projectId } })
-await removeAttachmentFiles(attachments.map((item) => item.storedName))
-```
-
-- [ ] **Step 6: Implement attachment controller and routes**
-
-Create `server/src/controllers/attachment.controller.ts`:
-
-```ts
-import type { Request, Response } from 'express'
-import { AppError } from '../lib/app-error.js'
-import { sendSuccess } from '../lib/response.js'
-import * as attachmentService from '../services/attachment.service.js'
-
-export async function upload(request: Request, response: Response) {
-  if (!request.file) {
-    throw new AppError(400, 'FILE_REQUIRED', '请选择需要上传的文件')
-  }
-
-  const result = await attachmentService.uploadAttachment(
-    request.params.taskId,
-    request.auth!.userId,
-    request.file,
-  )
-  response.status(201)
-  sendSuccess(response, result, '附件上传成功')
-}
-
-export async function download(request: Request, response: Response) {
-  const { attachment, buffer } = await attachmentService.downloadAttachment(
-    request.params.attachmentId,
-    request.auth!.userId,
-  )
-
-  response.setHeader('Content-Type', attachment.mimeType)
-  response.setHeader(
-    'Content-Disposition',
-    `attachment; filename*=UTF-8''${encodeURIComponent(attachment.originalName)}`,
-  )
-  response.send(buffer)
-}
-
-export async function remove(request: Request, response: Response) {
-  await attachmentService.deleteAttachment(
-    request.params.attachmentId,
-    request.auth!.userId,
-  )
-  sendSuccess(response, null, '附件已删除')
+  orderBy: { createdAt: 'desc' }
 }
 ```
 
-Create `server/src/routes/task-attachment.route.ts`:
+- [ ] **步骤 6：补充文件和记录清理**
 
-```ts
-import { Router } from 'express'
-import * as attachmentController from '../controllers/attachment.controller.js'
-import { requireAuth } from '../middlewares/auth.js'
-import { upload } from '../lib/upload.js'
+删除任务前查询附件文件名，数据库删除成功后尽力删除文件。
 
-export const taskAttachmentRouter = Router({ mergeParams: true })
+删除项目前查询所有任务附件文件名，项目删除后尽力删除文件。
 
-taskAttachmentRouter.use(requireAuth)
-taskAttachmentRouter.post(
-  '/',
-  upload.single('file'),
-  attachmentController.upload,
-)
+文件删除失败只记录，不回滚已经完成的数据库删除。
+
+- [ ] **步骤 7：实现路由**
+
+```text
+POST   /api/v1/tasks/:taskId/attachments
+GET    /api/v1/attachments/:attachmentId/download
+DELETE /api/v1/attachments/:attachmentId
 ```
 
-Create `server/src/routes/attachment.route.ts`:
-
-```ts
-import { Router } from 'express'
-import * as attachmentController from '../controllers/attachment.controller.js'
-import { requireAuth } from '../middlewares/auth.js'
-
-export const attachmentRouter = Router()
-
-attachmentRouter.use(requireAuth)
-attachmentRouter.get('/:attachmentId/download', attachmentController.download)
-attachmentRouter.delete('/:attachmentId', attachmentController.remove)
-```
-
-Modify `server/src/app.ts`:
-
-```ts
-import { attachmentRouter } from './routes/attachment.route.js'
-import { taskAttachmentRouter } from './routes/task-attachment.route.js'
-
-app.use('/api/v1/tasks/:taskId/attachments', taskAttachmentRouter)
-app.use('/api/v1/attachments', attachmentRouter)
-```
-
-- [ ] **Step 7: Run tests and type check**
-
-Run:
+- [ ] **步骤 8：验证并提交**
 
 ```bash
-cd server
 DATABASE_URL=file:./test.db npm test -- --run tests/attachments.test.ts
 npm run typecheck
-```
-
-Expected: upload, download, and non-member rejection tests pass.
-
-- [ ] **Step 8: Commit**
-
-```bash
 git add server
 git commit -m "feat: add attachment APIs"
 ```
 
 ---
 
-### Task 14: Attachment UI
+## 任务 14：附件前端
 
-**Files:**
+**目标：** 在任务详情页上传、下载和删除附件。
 
-- Create: `client/src/api/attachments.ts`
-- Create: `client/src/components/attachments/AttachmentPanel.vue`
-- Modify: `client/src/api/tasks.ts`
-- Modify: `client/src/views/tasks/TaskDetailView.vue`
-- Test: `client/tests/attachments.test.ts`
+**涉及文件：**
 
-**Interfaces:**
+- 新建：`client/src/api/attachments.ts`
+- 新建：`client/src/components/attachments/AttachmentPanel.vue`
+- 修改：`client/src/api/tasks.ts`
+- 修改：`client/src/views/tasks/TaskDetailView.vue`
+- 新建：`client/tests/attachments.test.ts`
 
-- Consumes: `http`, `apiRequest<T>()`, task attachments from the task response, and attachment routes.
-- Produces: `attachmentApi` and attachment upload/list/download/delete UI.
+**接口：**
 
-- [ ] **Step 1: Write the failing attachment API test**
+- 产出：`attachmentApi`
+- `Task` 接口增加 `attachments: Attachment[]`
 
-Create `client/tests/attachments.test.ts`:
+- [ ] **步骤 1：写失败测试**
 
-```ts
-import MockAdapter from 'axios-mock-adapter'
-import { beforeEach, describe, expect, it } from 'vitest'
-import { attachmentApi } from '../src/api/attachments'
-import { http } from '../src/api/http'
+测试上传时：
 
-const mock = new MockAdapter(http)
+- 请求体是 `FormData`。
+- 文件字段名为 `file`。
+- 返回附件对象。
 
-beforeEach(() => mock.reset())
-
-describe('attachmentApi', () => {
-  it('uploads a file as multipart data', async () => {
-    mock.onPost('/tasks/task-1/attachments').reply((config) => {
-      expect(config.data).toBeInstanceOf(FormData)
-      return [
-        201,
-        {
-          code: 'OK',
-          message: '附件上传成功',
-          data: { id: 'attachment-1', originalName: 'note.txt' },
-          requestId: 'request-1',
-        },
-      ]
-    })
-
-    const result = await attachmentApi.upload(
-      'task-1',
-      new File(['hello'], 'note.txt', { type: 'text/plain' }),
-    )
-
-    expect(result.id).toBe('attachment-1')
-  })
-})
-```
-
-- [ ] **Step 2: Run the test and verify it fails**
-
-Run: `cd client && npm test -- --run tests/attachments.test.ts`
-
-Expected: FAIL because `attachmentApi` does not exist.
-
-- [ ] **Step 3: Implement the attachment API**
-
-Create `client/src/api/attachments.ts`:
-
-```ts
-import { apiRequest, http } from './http'
-
-export interface Attachment {
-  id: string
-  taskId: string
-  uploaderId: string
-  originalName: string
-  mimeType: string
-  size: number
-  createdAt: string
-  uploader: { id: string; username: string; email: string }
-}
-
-export const attachmentApi = {
-  upload(taskId: string, file: File) {
-    const data = new FormData()
-    data.append('file', file)
-
-    return apiRequest<Attachment>({
-      method: 'POST',
-      url: `/tasks/${taskId}/attachments`,
-      data,
-    })
-  },
-  remove(attachmentId: string) {
-    return apiRequest<null>({
-      method: 'DELETE',
-      url: `/attachments/${attachmentId}`,
-    })
-  },
-  async download(attachment: Attachment) {
-    const response = await http.get<Blob>(
-      `/attachments/${attachment.id}/download`,
-      { responseType: 'blob' },
-    )
-    const url = URL.createObjectURL(response.data)
-    const anchor = document.createElement('a')
-    anchor.href = url
-    anchor.download = attachment.originalName
-    anchor.click()
-    URL.revokeObjectURL(url)
-  },
-}
-```
-
-Modify the `Task` interface in `client/src/api/tasks.ts`:
-
-```ts
-import type { Attachment } from './attachments'
-
-export interface Task {
-  id: string
-  projectId: string
-  title: string
-  description: string
-  status: TaskStatus
-  priority: TaskPriority
-  assigneeId: string | null
-  assignee: TaskUser | null
-  creatorId: string
-  creator: TaskUser
-  dueDate: string | null
-  createdAt: string
-  updatedAt: string
-  attachments: Attachment[]
-}
-```
-
-- [ ] **Step 4: Implement the attachment panel and integrate it**
-
-Create `client/src/components/attachments/AttachmentPanel.vue` with:
-
-- Props: `taskId: string`, `attachments: Attachment[]`, `currentUserId: string`, `taskCreatorId: string`, `canManage: boolean`.
-- Emits: `changed`.
-- Uses `el-upload` with `:auto-upload="false"`, `:limit="1"`, and accepted `.pdf,.png,.jpg,.jpeg,.txt`.
-- Rejects files larger than 5 MB before calling the API.
-- Calls `attachmentApi.upload()`, then emits `changed`.
-- Shows filename, uploader, size, download button, and delete button.
-- Shows delete when the current user is uploader, task creator, or project owner.
-
-Modify `client/src/views/tasks/TaskDetailView.vue`:
-
-- Render `AttachmentPanel` in the `附件` section.
-- Pass `task.attachments`.
-- Reload the task after upload or delete so metadata stays authoritative.
-- Show `暂无附件` when the array is empty.
-
-- [ ] **Step 5: Run tests, type check, and build**
-
-Run:
+- [ ] **步骤 2：运行测试并确认失败**
 
 ```bash
 cd client
 npm test -- --run tests/attachments.test.ts
-npm run typecheck
-npm run build
 ```
 
-Expected: test, type check, and build pass.
+- [ ] **步骤 3：实现附件 API**
 
-- [ ] **Step 6: Commit**
+```ts
+attachmentApi.upload(taskId, file)
+attachmentApi.download(attachment)
+attachmentApi.remove(attachmentId)
+```
+
+下载时：
+
+- 使用 `responseType: 'blob'`。
+- 创建临时对象 URL。
+- 使用原始文件名触发浏览器下载。
+- 下载后释放对象 URL。
+
+- [ ] **步骤 4：实现附件面板**
+
+面板必须：
+
+- 只允许 `.pdf、.png、.jpg、.jpeg、.txt`。
+- 前端先检查 5 MB。
+- 上传成功后通知父组件。
+- 显示文件名、上传者、大小和时间。
+- 根据权限显示下载和删除按钮。
+
+- [ ] **步骤 5：集成任务详情**
+
+上传或删除后重新加载任务详情，保证附件列表以服务端数据为准。
+
+- [ ] **步骤 6：验证并提交**
 
 ```bash
+npm test -- --run tests/attachments.test.ts
+npm run typecheck
+npm run build
 git add client
 git commit -m "feat: add attachment UI"
 ```
 
 ---
 
-### Task 15: Dashboard API
+## 任务 15：看板后端 API
 
-**Files:**
+**目标：** 返回当前用户可访问项目中的任务统计和最近项目。
 
-- Create: `server/src/services/dashboard.service.ts`
-- Create: `server/src/controllers/dashboard.controller.ts`
-- Create: `server/src/routes/dashboard.route.ts`
-- Modify: `server/src/app.ts`
-- Test: `server/tests/dashboard.test.ts`
+**涉及文件：**
 
-**Interfaces:**
+- 新建：`server/src/services/dashboard.service.ts`
+- 新建：`server/src/controllers/dashboard.controller.ts`
+- 新建：`server/src/routes/dashboard.route.ts`
+- 修改：`server/src/app.ts`
+- 新建：`server/tests/dashboard.test.ts`
 
-- Consumes: `prisma`, `requireAuth`, and `sendSuccess`.
-- Produces: `getDashboardSummary(userId)` and `GET /api/v1/dashboard/summary`.
+**接口：**
 
-- [ ] **Step 1: Write the failing dashboard test**
+- 产出：`getDashboardSummary(userId)`
+- 接口：`GET /api/v1/dashboard/summary`
 
-Create `server/tests/dashboard.test.ts`:
+- [ ] **步骤 1：写失败测试**
 
-```ts
-import request from 'supertest'
-import { beforeEach, describe, expect, it } from 'vitest'
-import { createApp } from '../src/app'
-import { createAuthenticatedUser } from './helpers/auth'
-import { resetDatabase } from './helpers/database'
-import { createProjectWithOwner, createTask } from './helpers/factories'
+创建一个含三个任务的项目：
 
-const app = createApp()
+- 一个 `TODO` 且已逾期。
+- 一个 `IN_PROGRESS`。
+- 一个 `DONE`。
 
-beforeEach(resetDatabase)
+断言：
 
-describe('dashboard summary', () => {
-  it('counts statuses, overdue tasks, and recent projects', async () => {
-    const owner = await createAuthenticatedUser()
-    const project = await createProjectWithOwner(owner.user.id, {
-      name: 'Dashboard project',
-    })
-
-    await createTask(project.id, owner.user.id, {
-      title: 'Todo',
-      status: 'TODO',
-      dueDate: new Date('2020-01-01T00:00:00.000Z'),
-    })
-    await createTask(project.id, owner.user.id, {
-      title: 'Progress',
-      status: 'IN_PROGRESS',
-    })
-    await createTask(project.id, owner.user.id, {
-      title: 'Done',
-      status: 'DONE',
-    })
-
-    const response = await request(app)
-      .get('/api/v1/dashboard/summary')
-      .set('Authorization', `Bearer ${owner.token}`)
-
-    expect(response.status).toBe(200)
-    expect(response.body.data.counts).toEqual({
-      total: 3,
-      todo: 1,
-      inProgress: 1,
-      done: 1,
-      overdue: 1,
-    })
-    expect(response.body.data.recentProjects[0].name).toBe('Dashboard project')
-  })
-})
+```json
+{
+  "total": 3,
+  "todo": 1,
+  "inProgress": 1,
+  "done": 1,
+  "overdue": 1
+}
 ```
 
-- [ ] **Step 2: Run the test and verify it fails**
+并断言最近项目包含该项目。
 
-Run:
+- [ ] **步骤 2：运行测试并确认失败**
 
 ```bash
 cd server
 DATABASE_URL=file:./test.db npm test -- --run tests/dashboard.test.ts
 ```
 
-Expected: FAIL with 404 because the dashboard route does not exist.
+- [ ] **步骤 3：实现统计 Service**
 
-- [ ] **Step 3: Implement the dashboard service**
-
-Create `server/src/services/dashboard.service.ts`:
+可访问任务条件：
 
 ```ts
-import type { Prisma } from '@prisma/client'
-import { prisma } from '../lib/prisma.js'
-
-export async function getDashboardSummary(userId: string) {
-  const accessibleTask: Prisma.TaskWhereInput = {
-    project: { members: { some: { userId } } },
-  }
-
-  const [
-    total,
-    todo,
-    inProgress,
-    done,
-    overdue,
-    recentProjects,
-  ] = await prisma.$transaction([
-    prisma.task.count({ where: accessibleTask }),
-    prisma.task.count({ where: { ...accessibleTask, status: 'TODO' } }),
-    prisma.task.count({
-      where: { ...accessibleTask, status: 'IN_PROGRESS' },
-    }),
-    prisma.task.count({ where: { ...accessibleTask, status: 'DONE' } }),
-    prisma.task.count({
-      where: {
-        ...accessibleTask,
-        status: { not: 'DONE' },
-        dueDate: { lt: new Date() },
-      },
-    }),
-    prisma.project.findMany({
-      where: { members: { some: { userId } } },
-      select: { id: true, name: true, description: true, updatedAt: true },
-      orderBy: { updatedAt: 'desc' },
-      take: 5,
-    }),
-  ])
-
-  return {
-    counts: { total, todo, inProgress, done, overdue },
-    recentProjects,
+{
+  project: {
+    members: {
+      some: { userId }
+    }
   }
 }
 ```
 
-- [ ] **Step 4: Implement the dashboard controller and route**
-
-Create `server/src/controllers/dashboard.controller.ts`:
+逾期条件：
 
 ```ts
-import type { Request, Response } from 'express'
-import { sendSuccess } from '../lib/response.js'
-import { getDashboardSummary } from '../services/dashboard.service.js'
-
-export async function summary(request: Request, response: Response) {
-  sendSuccess(response, await getDashboardSummary(request.auth!.userId))
+{
+  status: { not: 'DONE' },
+  dueDate: { lt: new Date() }
 }
 ```
 
-Create `server/src/routes/dashboard.route.ts`:
+返回：
 
 ```ts
-import { Router } from 'express'
-import * as dashboardController from '../controllers/dashboard.controller.js'
-import { requireAuth } from '../middlewares/auth.js'
-
-export const dashboardRouter = Router()
-
-dashboardRouter.use(requireAuth)
-dashboardRouter.get('/summary', dashboardController.summary)
-```
-
-Modify `server/src/app.ts`:
-
-```ts
-import { dashboardRouter } from './routes/dashboard.route.js'
-
-app.use('/api/v1/dashboard', dashboardRouter)
-```
-
-- [ ] **Step 5: Run tests and type check**
-
-Run:
-
-```bash
-cd server
-DATABASE_URL=file:./test.db npm test -- --run tests/dashboard.test.ts
-npm run typecheck
-```
-
-Expected: dashboard count and recent-project test passes.
-
-- [ ] **Step 6: Commit**
-
-```bash
-git add server
-git commit -m "feat: add dashboard API"
-```
-
----
-
-### Task 16: Dashboard UI
-
-**Files:**
-
-- Create: `client/src/api/dashboard.ts`
-- Modify: `client/src/views/DashboardView.vue`
-- Test: `client/tests/dashboard.test.ts`
-
-**Interfaces:**
-
-- Consumes: `apiRequest<T>()` and `GET /dashboard/summary`.
-- Produces: `dashboardApi` and the dashboard summary page.
-
-- [ ] **Step 1: Write the failing dashboard API test**
-
-Create `client/tests/dashboard.test.ts`:
-
-```ts
-import MockAdapter from 'axios-mock-adapter'
-import { beforeEach, describe, expect, it } from 'vitest'
-import { dashboardApi } from '../src/api/dashboard'
-import { http } from '../src/api/http'
-
-const mock = new MockAdapter(http)
-
-beforeEach(() => mock.reset())
-
-describe('dashboardApi', () => {
-  it('loads summary counts', async () => {
-    mock.onGet('/dashboard/summary').reply(200, {
-      code: 'OK',
-      message: 'success',
-      data: {
-        counts: { total: 3, todo: 1, inProgress: 1, done: 1, overdue: 0 },
-        recentProjects: [],
-      },
-      requestId: 'request-1',
-    })
-
-    const result = await dashboardApi.summary()
-
-    expect(result.counts.total).toBe(3)
-  })
-})
-```
-
-- [ ] **Step 2: Run the test and verify it fails**
-
-Run: `cd client && npm test -- --run tests/dashboard.test.ts`
-
-Expected: FAIL because `dashboardApi` does not exist.
-
-- [ ] **Step 3: Implement the dashboard API and view**
-
-Create `client/src/api/dashboard.ts`:
-
-```ts
-import { apiRequest } from './http'
-
-export interface DashboardSummary {
+{
   counts: {
     total: number
     todo: number
@@ -5100,74 +1822,103 @@ export interface DashboardSummary {
     done: number
     overdue: number
   }
-  recentProjects: Array<{
-    id: string
-    name: string
-    description: string
-    updatedAt: string
-  }>
-}
-
-export const dashboardApi = {
-  summary() {
-    return apiRequest<DashboardSummary>({
-      method: 'GET',
-      url: '/dashboard/summary',
-    })
-  },
+  recentProjects: Project[]
 }
 ```
 
-Modify `client/src/views/DashboardView.vue`:
+最近项目按 `updatedAt` 降序，最多 5 条。
 
-- Load `dashboardApi.summary()` on mount.
-- Show five compact statistic cards: `全部任务`, `待处理`, `进行中`, `已完成`, `逾期`.
-- Show a completion progress bar calculated as `done / total`, treating zero total as 0 percent.
-- Render recent projects in an Element Plus table with name, description, and update time.
-- Make project rows route to `/projects/:projectId`.
-- Show `暂无项目` when the recent-project array is empty.
-- Handle loading and request failure without removing the page structure.
+- [ ] **步骤 4：实现 Controller 和 Route，并验证**
 
-- [ ] **Step 4: Run tests, type check, and build**
+```bash
+DATABASE_URL=file:./test.db npm test -- --run tests/dashboard.test.ts
+npm run typecheck
+git add server
+git commit -m "feat: add dashboard API"
+```
 
-Run:
+---
+
+## 任务 16：看板前端
+
+**目标：** 登录后的首页显示任务统计和最近项目。
+
+**涉及文件：**
+
+- 新建：`client/src/api/dashboard.ts`
+- 修改：`client/src/views/DashboardView.vue`
+- 新建：`client/tests/dashboard.test.ts`
+
+**接口：**
+
+- 产出：`dashboardApi.summary()`
+
+- [ ] **步骤 1：写失败测试**
+
+测试调用：
+
+```text
+GET /dashboard/summary
+```
+
+并返回五个统计数字和最近项目数组。
+
+- [ ] **步骤 2：运行测试并确认失败**
 
 ```bash
 cd client
 npm test -- --run tests/dashboard.test.ts
-npm run typecheck
-npm run build
 ```
 
-Expected: test, type check, and build pass.
+- [ ] **步骤 3：实现 API 和页面**
 
-- [ ] **Step 5: Commit**
+统计卡片：
+
+```text
+全部任务
+待处理
+进行中
+已完成
+逾期
+```
+
+完成进度：
+
+```ts
+total === 0 ? 0 : done / total
+```
+
+最近项目表格显示项目名、描述和更新时间，点击进入 `/projects/:projectId`。
+
+- [ ] **步骤 4：验证并提交**
 
 ```bash
+npm test -- --run tests/dashboard.test.ts
+npm run typecheck
+npm run build
 git add client
 git commit -m "feat: add dashboard UI"
 ```
 
 ---
 
-### Task 17: Playwright End-to-End Smoke Test
+## 任务 17：Playwright 端到端冒烟测试
 
-**Files:**
+**目标：** 用一条浏览器测试验证主要流程可以完整运行。
 
-- Create: `client/playwright.config.ts`
-- Create: `client/e2e/taskflow.spec.ts`
-- Modify: `client/package.json`
-- Modify: `server/package.json`
-- Create: `server/scripts/prepare-e2e.ts`
+**涉及文件：**
 
-**Interfaces:**
+- 新建：`client/playwright.config.ts`
+- 新建：`client/e2e/taskflow.spec.ts`
+- 修改：`client/package.json`
+- 修改：`server/package.json`
+- 新建：`server/scripts/prepare-e2e.ts`
 
-- Consumes: both dev servers, the development database, and all user-facing flows.
-- Produces: one runnable `npm run test:e2e` command from `client`.
+**接口：**
 
-- [ ] **Step 1: Install Playwright and create the test preparation script**
+- 产出：从 `client` 执行 `npm run test:e2e`。
 
-Run:
+- [ ] **步骤 1：安装 Playwright**
 
 ```bash
 cd client
@@ -5175,25 +1926,15 @@ npm install -D @playwright/test
 npx playwright install chromium
 ```
 
-Create `server/scripts/prepare-e2e.ts`:
+- [ ] **步骤 2：准备独立 E2E 数据库**
 
-```ts
-import { execFileSync } from 'node:child_process'
+`server/scripts/prepare-e2e.ts`：
 
-process.env.DATABASE_URL = 'file:./e2e.db'
+1. 设置 `DATABASE_URL=file:./e2e.db`。
+2. 执行 `prisma db push --force-reset`。
+3. 执行 `prisma db seed`。
 
-execFileSync('npx', ['prisma', 'db', 'push', '--force-reset'], {
-  stdio: 'inherit',
-  env: process.env,
-})
-
-execFileSync('npx', ['prisma', 'db', 'seed'], {
-  stdio: 'inherit',
-  env: process.env,
-})
-```
-
-Add to `server/package.json`:
+`server` 增加：
 
 ```json
 {
@@ -5204,146 +1945,61 @@ Add to `server/package.json`:
 }
 ```
 
-Install `cross-env`:
+安装：
 
 ```bash
 cd server
 npm install -D cross-env
 ```
 
-- [ ] **Step 2: Write the failing end-to-end test**
+- [ ] **步骤 3：先写失败的浏览器测试**
 
-Create `client/e2e/taskflow.spec.ts`:
+一条测试覆盖：
 
-```ts
-import { expect, test } from '@playwright/test'
+1. 注册。
+2. 创建项目。
+3. 创建任务。
+4. 修改状态。
+5. 添加评论。
+6. 退出登录。
 
-test('registers, creates a project and task, comments, and logs out', async ({
-  page,
-}) => {
-  const suffix = Date.now()
-  const username = `learner_${suffix}`
-  const email = `${username}@example.com`
+使用可访问标签定位：
 
-  await page.goto('/register')
-  await page.getByLabel('用户名').fill(username)
-  await page.getByLabel('邮箱').fill(email)
-  await page.getByLabel('密码').fill('password123')
-  await page.getByRole('button', { name: '注册' }).click()
-
-  await expect(page).toHaveURL(/dashboard/)
-
-  await page.goto('/projects')
-  await page.getByRole('button', { name: '新建项目' }).click()
-  await page.getByLabel('项目名称').fill('E2E 项目')
-  await page.getByRole('button', { name: '保存' }).click()
-  await page.getByText('E2E 项目').click()
-
-  await page.getByRole('button', { name: '新建任务' }).click()
-  await page.getByLabel('任务标题').fill('E2E 任务')
-  await page.getByRole('button', { name: '保存' }).click()
-  await page.getByText('E2E 任务').click()
-
-  await page.getByLabel('评论内容').fill('E2E 评论')
-  await page.getByRole('button', { name: '发布评论' }).click()
-  await expect(page.getByText('E2E 评论')).toBeVisible()
-
-  await page.getByRole('button', { name: '退出登录' }).click()
-  await expect(page).toHaveURL(/login/)
-})
+```text
+用户名
+邮箱
+密码
+注册
+项目名称
+保存
+任务标题
+新建任务
+评论内容
+发布评论
+退出登录
 ```
 
-- [ ] **Step 3: Create the Playwright configuration**
+- [ ] **步骤 4：配置同时启动前后端**
 
-Create `client/playwright.config.ts`:
+`playwright.config.ts` 配置两个 `webServer`：
 
-```ts
-import { defineConfig, devices } from '@playwright/test'
-
-export default defineConfig({
-  testDir: './e2e',
-  fullyParallel: false,
-  retries: 0,
-  reporter: 'list',
-  use: {
-    baseURL: 'http://127.0.0.1:5173',
-    trace: 'retain-on-failure',
-  },
-  projects: [
-    {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
-    },
-  ],
-  webServer: [
-    {
-      command: 'npm run e2e:prepare && npm run dev:e2e',
-      cwd: '../server',
-      url: 'http://127.0.0.1:3000/api/v1/health',
-      reuseExistingServer: false,
-      timeout: 120_000,
-    },
-    {
-      command: 'npm run dev -- --host 127.0.0.1',
-      cwd: '.',
-      url: 'http://127.0.0.1:5173',
-      reuseExistingServer: false,
-      timeout: 120_000,
-    },
-  ],
-})
+```text
+server: npm run e2e:prepare && npm run dev:e2e
+client: npm run dev -- --host 127.0.0.1
 ```
 
-Add to `client/package.json`:
+后端 `NODE_ENV=test` 时监听 `0.0.0.0`。
 
-```json
-{
-  "scripts": {
-    "test:e2e": "playwright test"
-  }
-}
-```
-
-The server must bind to `0.0.0.0` when `NODE_ENV=test`. Modify `server/src/server.ts`:
-
-```ts
-const host = env.NODE_ENV === 'test' ? '0.0.0.0' : '127.0.0.1'
-
-server.listen(env.PORT, host, () => {
-  console.log(`API listening on http://${host}:${env.PORT}`)
-})
-```
-
-- [ ] **Step 4: Run the test and verify it fails**
-
-Run: `cd client && npm run test:e2e`
-
-Expected: the test starts both applications and fails on the first missing label or control before the end-to-end flow is complete.
-
-- [ ] **Step 5: Align accessible labels and controls until the flow passes**
-
-Update the relevant Vue components:
-
-- Registration inputs must use labels `用户名`, `邮箱`, and `密码`.
-- Registration submit button text must be `注册`.
-- Project form input must use label `项目名称`.
-- Project and task dialog submit buttons must use text `保存`.
-- Task form title input must use label `任务标题`.
-- New task button text must be `新建任务`.
-- Comment textarea must use label `评论内容`.
-- Comment submit button text must be `发布评论`.
-- Logout button text must be `退出登录`.
-
-Run:
+- [ ] **步骤 5：运行并修复选择器**
 
 ```bash
 cd client
 npm run test:e2e
 ```
 
-Expected: one passing Chromium smoke test.
+如果失败，优先修复 Vue 组件的可访问标签或按钮文案，不通过脆弱的 CSS 选择器绕过。
 
-- [ ] **Step 6: Commit**
+- [ ] **步骤 6：提交**
 
 ```bash
 git add client server
@@ -5352,26 +2008,25 @@ git commit -m "test: add end-to-end smoke test"
 
 ---
 
-### Task 18: Logging, Rate Limiting, Complete Documentation, and Final Verification
+## 任务 18：日志、限流、完整文档和最终验证
 
-**Files:**
+**目标：** 完成可运行项目最后的工程化收尾。
 
-- Create: `server/src/config/logger.ts`
-- Modify: `server/src/app.ts`
-- Modify: `server/src/routes/auth.route.ts`
-- Modify: `README.md`
-- Modify: `.gitignore`
-- Modify: `server/.env.example`
-- Conditional modify: any implementation file whose verification command fails during this task
+**涉及文件：**
 
-**Interfaces:**
+- 新建：`server/src/config/logger.ts`
+- 修改：`server/src/app.ts`
+- 修改：`server/src/routes/auth.route.ts`
+- 修改：`README.md`
+- 修改：`.gitignore`
+- 修改：`server/.env.example`
+- 根据最终验证结果修改失败实现文件
 
-- Consumes: all previous tasks.
-- Produces: structured request logging, login throttling, complete setup documentation, and a fully verified repository.
+**接口：**
 
-- [ ] **Step 1: Install logging and rate-limit dependencies**
+- 产出：结构化请求日志、登录限流、完整 README、全量验证结果。
 
-Run:
+- [ ] **步骤 1：安装日志和限流依赖**
 
 ```bash
 cd server
@@ -5379,138 +2034,49 @@ npm install pino pino-http express-rate-limit
 npm install -D @types/pino-http
 ```
 
-- [ ] **Step 2: Implement structured logging**
+- [ ] **步骤 2：实现日志**
 
-Create `server/src/config/logger.ts`:
+测试环境日志级别为 `silent`，其他环境为 `info`。
 
-```ts
-import pino from 'pino'
-import { env } from './env.js'
-
-export const logger = pino({
-  level: env.NODE_ENV === 'test' ? 'silent' : 'info',
-  base: null,
-})
-```
-
-Modify `server/src/app.ts` before route registration:
+`pino-http` 必须在 `requestContext` 之后注册，并使用：
 
 ```ts
-import pinoHttp from 'pino-http'
-import { logger } from './config/logger.js'
-
-app.use(
-  pinoHttp({
-    logger,
-    genReqId: (_request, response) => response.locals.requestId,
-  }),
-)
+genReqId: (_request, response) => response.locals.requestId
 ```
 
-Keep `requestContext` before `pinoHttp`.
+- [ ] **步骤 3：实现登录限流**
 
-- [ ] **Step 3: Add login rate limiting**
+规则：
 
-Modify `server/src/routes/auth.route.ts`:
-
-```ts
-import rateLimit from 'express-rate-limit'
-
-const loginLimiter = rateLimit({
-  windowMs: 60_000,
-  limit: 10,
-  standardHeaders: true,
-  legacyHeaders: false,
-  handler: (_request, response) => {
-    response.status(429).json({
-      code: 'RATE_LIMITED',
-      message: '登录尝试过于频繁，请稍后再试',
-      details: null,
-      requestId: response.locals.requestId,
-    })
-  },
-})
-
-authRouter.post('/login', loginLimiter, authController.login)
+```text
+窗口：60 秒
+最多：10 次
 ```
 
-Update the error middleware only if the installed `express-rate-limit` version does not use the configured JSON message directly.
+超过限制返回：
 
-- [ ] **Step 4: Replace the initial README with complete operating instructions**
-
-Write `README.md` with:
-
-```markdown
-# TaskFlow
-
-Vue 3 + Element Plus + Express + Prisma 全栈任务管理系统。
-
-## 环境要求
-
-- Node.js 20+
-- npm 10+
-- Git
-
-## 后端
-
-```bash
-cd server
-npm install
-cp .env.example .env
-npx prisma generate
-npx prisma migrate dev
-npm run db:seed
-npm run dev
+```json
+{
+  "code": "RATE_LIMITED",
+  "message": "登录尝试过于频繁，请稍后再试",
+  "details": null,
+  "requestId": "..."
+}
 ```
 
-接口地址：`http://localhost:3000/api/v1`
+- [ ] **步骤 4：完成 README**
 
-种子账号：
+README 必须写明：
 
-- `owner@example.com` / `password123`
-- `member@example.com` / `password123`
+- Node.js 和 npm 要求。
+- 后端安装、环境变量、Prisma 生成、迁移和种子数据。
+- 前端安装和启动。
+- 后端测试和类型检查。
+- 前端测试、类型检查、构建和 E2E。
+- 种子账号。
+- `localStorage + JWT` 的安全限制。
 
-## 前端
-
-```bash
-cd client
-npm install
-npm run dev
-```
-
-访问：`http://localhost:5173`
-
-## 测试
-
-```bash
-cd server
-DATABASE_URL=file:./test.db npm test
-npm run typecheck
-
-cd ../client
-npm test
-npm run typecheck
-npm run build
-npm run test:e2e
-```
-
-## 项目功能
-
-- 注册、登录和 JWT 鉴权
-- 项目与成员管理
-- 任务创建、筛选、分页和状态流转
-- 评论
-- 附件上传、下载和删除
-- 看板统计
-
-## 安全说明
-
-本项目使用 JWT 和 `localStorage` 作为学习用认证方案。生产环境应进一步评估 Refresh Token、HttpOnly Cookie、CSRF 和密钥轮换。
-```
-
-- [ ] **Step 5: Run the complete verification suite**
-
-Run:
+- [ ] **步骤 5：执行全量验证**
 
 ```bash
 cd server
@@ -5525,33 +2091,18 @@ npm run build
 npm run test:e2e
 ```
 
-Expected:
+全部命令必须通过。
 
-- Server type check passes.
-- All server tests pass.
-- Server build passes.
-- Client type check passes.
-- All client tests pass.
-- Client build passes.
-- Chromium smoke test passes.
-
-If any command fails, fix the implementation and re-run that command before continuing.
-
-- [ ] **Step 6: Verify repository cleanliness and ignore rules**
-
-Run:
+- [ ] **步骤 6：确认忽略规则**
 
 ```bash
 git status --short
 git check-ignore server/uploads server/prisma/dev.db server/.env client/dist server/dist
 ```
 
-Expected:
+环境文件、数据库、上传文件和构建产物不能进入 Git。
 
-- `.env`, database files, upload files, and build directories are ignored.
-- Only intended source and documentation files are tracked.
-
-- [ ] **Step 7: Commit**
+- [ ] **步骤 7：提交**
 
 ```bash
 git add .
@@ -5560,17 +2111,30 @@ git commit -m "chore: complete TaskFlow documentation and hardening"
 
 ---
 
-## Final Acceptance Checklist
+## 最终验收清单
 
-- [ ] Backend registration, login, and JWT-protected routes work.
-- [ ] Project owner and member rules are enforced in services and verified by tests.
-- [ ] Task assignment rejects non-members.
-- [ ] Task filters and pagination match the spec.
-- [ ] Comments enforce author-or-owner deletion rules.
-- [ ] Attachments are size/type limited, authorization checked, and not publicly served.
-- [ ] Deleting a project or task cleans attachment records and best-effort removes files.
-- [ ] Dashboard counts are scoped to the current user's projects.
-- [ ] Client route guards restore and validate authentication.
-- [ ] Element Plus UI covers loading, empty, error, and success states.
-- [ ] Server integration tests, client unit tests, and the Playwright smoke test pass.
-- [ ] README supports a clean checkout on a new machine.
+- [ ] 注册、登录和 JWT 鉴权正常。
+- [ ] 项目 `OWNER` 和 `MEMBER` 权限由后端严格执行。
+- [ ] 非项目成员不能成为任务负责人。
+- [ ] 任务筛选和分页符合设计。
+- [ ] 评论删除权限符合设计要求。
+- [ ] 附件有大小、类型、数量和下载权限校验。
+- [ ] 删除项目或任务后，数据库记录和附件文件按设计处理。
+- [ ] 看板统计只包含当前用户可访问的项目。
+- [ ] 前端路由守卫能够恢复和验证登录状态。
+- [ ] 页面覆盖加载中、空状态、错误重试和成功反馈。
+- [ ] 后端测试、前端测试和 Playwright 冒烟测试全部通过。
+- [ ] README 可以让新环境从零启动项目。
+
+## 执行顺序
+
+严格按照任务 1 到任务 18 执行。每次只打开当前任务，完成：
+
+1. 写测试。
+2. 运行并确认失败。
+3. 编写最小实现。
+4. 运行并确认通过。
+5. 类型检查。
+6. 提交。
+
+超出当前任务范围的优化不要顺手加入，统一留到后续任务或项目完成后讨论。
