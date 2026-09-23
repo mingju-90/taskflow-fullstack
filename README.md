@@ -78,4 +78,4 @@ pnpm typecheck
 pnpm build
 ```
 
-项目协作规范见 `AGENTS.md`，当前进度见 `docs/PROGRESS.md`。
+项目协作规范见 `AGENTS.md`，当前进度见 `docs/PROGRESS.md`，框架建设待办见 `docs/architecture/framework-roadmap.md`。
