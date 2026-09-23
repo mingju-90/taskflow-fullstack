@@ -86,14 +86,15 @@
 - `.github/pull_request_template.md`：中文 Pull Request 检查模板。
 - `.githooks/pre-commit`：提交前暂存区校验。
 - `.githooks/commit-msg`：中文提交信息校验。
-- `package.json`：根目录格式化脚本和 Prettier 开发依赖。
-- `package-lock.json`：锁定根目录格式化工具版本。
+- `package.json`：根目录联调、格式化和提交校验脚本。
+- `pnpm-lock.yaml`：锁定根目录开发工具版本。
 - `.prettierrc.json`：全仓统一 Prettier 规则。
 - `.prettierignore`：排除依赖、构建产物、数据库和上传文件。
 - `.editorconfig`：统一字符集、换行和缩进。
 - `.vscode/settings.json`：保存时使用 Prettier 自动格式化。
 - `.vscode/extensions.json`：推荐 Prettier VS Code 扩展。
 - `.cspell.json`：代码与配置文件的拼写词典和忽略范围。
+- `scripts/dev.mjs`：同时启动前端和后端开发服务。
 - `scripts/setup-git-hooks.mjs`：启用仓库本地 Git 钩子。
 - `scripts/validate-staged.mjs`：校验暂存区内容。
 - `scripts/validate-commit-message.mjs`：校验中文提交信息。
