@@ -18,11 +18,11 @@
 | ------------ | --------------------------------------------------------- |
 | 日期         | 2026-09-23                                                |
 | Git 分支     | `main`                                                    |
-| 最新提交     | `12e52e0 docs: 增加项目进度与恢复说明`                    |
-| 远端状态     | `main` 与 `origin/main` 同步                              |
-| 工作区       | 任务 1 变更待提交，依赖锁文件迁移状态待整理               |
+| 最新提交     | `3a10d7e feat: 增加统一错误处理和请求 ID`                 |
+| 远端状态     | `main` 领先 `origin/main` 2 个提交                        |
+| 工作区       | 无任务相关未提交改动                                      |
 | 根目录工具链 | 已启用 Prettier、cspell、EditorConfig、Git hooks          |
-| 后端         | 基础工程和健康检查已完成，业务 API 尚未实现               |
+| 后端         | 基础工程、健康检查、统一错误处理和请求 ID 已完成          |
 | 前端         | 已初始化，可开发、测试、类型检查和构建                    |
 | 需求与设计   | 已完成第一版基线                                          |
 | 交互原型     | 已完成 HTML 原型和桌面截图                                |
@@ -215,6 +215,37 @@
 - Vitest 配置使用 `.mts`，兼容 CommonJS 生产构建和 ESM 配置加载。
 - 任务 1 只实现健康检查，不提前引入 Prisma、认证或业务 API。
 
+### 8. 统一错误处理和请求 ID
+
+已完成：
+
+- `AppError` 业务错误类型和统一成功响应工具。
+- 每个请求通过 `randomUUID()` 生成唯一 `requestId`。
+- `ROUTE_NOT_FOUND`、`VALIDATION_ERROR`、`INTERNAL_SERVER_ERROR` 统一响应。
+- Zod 校验错误转换为字段级 `details`。
+- 未知异常只记录服务端日志，不向客户端泄露堆栈或内部路径。
+- 健康检查改用统一成功响应，错误处理和请求 ID 集成测试。
+
+关键文件：
+
+- `server/src/lib/app-error.ts`
+- `server/src/lib/response.ts`
+- `server/src/middlewares/error-handler.ts`
+- `server/src/middlewares/not-found.ts`
+- `server/src/middlewares/request-context.ts`
+- `server/src/types/express.d.ts`
+- `server/src/app.ts`
+- `server/src/routes/health.route.ts`
+- `server/tests/error-handling.test.ts`
+- `server/tests/health.test.ts`
+
+为什么这样做：
+
+- 业务错误在 Service 层抛出 `AppError`，HTTP 序列化只由全局错误中间件处理。
+- `requestId` 由请求上下文生成，可以在成功响应、错误响应和日志之间关联同一次请求。
+- 未知异常响应不包含堆栈和内部路径，避免把服务端实现细节暴露给客户端。
+- 当前日志使用临时 `console.error` 记录未知异常，任务 18 再替换为结构化日志。
+
 ## 当前可运行命令
 
 ### 根目录
@@ -265,6 +296,7 @@ pnpm build
 - Vite 生产构建通过。
 - 无头浏览器可以渲染 `TaskFlow` 和“前端基础工程已就绪”。
 - 后端健康检查测试通过。
+- 后端错误处理和请求 ID 测试通过。
 - 后端 TypeScript 类型检查通过。
 - 后端生产构建通过。
 - Prettier、cspell 和暂存区校验通过。
@@ -272,7 +304,8 @@ pnpm build
 
 ## 已知限制与风险
 
-- 后端目前只有健康检查，数据库、认证和业务 API 尚未实现。
+- 后端目前只有健康检查、统一错误处理和请求 ID，数据库、认证和业务 API 尚未实现。
+- 结构化 HTTP 日志尚未实现，未知异常暂由 `console.error` 记录。
 - 根目录和 `client` 同时保留 npm 锁文件与 pnpm 锁文件，需要统一到 pnpm 后再提交。
 - 实施计划和 GitHub Actions 章节仍包含 npm 命令，需要迁移到 pnpm。
 - Element Plus 当前在入口全量安装，生产构建有单个 JS 包超过 500 kB 的提示；后续可按路由和组件做按需加载。
@@ -281,13 +314,13 @@ pnpm build
 
 ## 下一阶段推荐顺序
 
-任务 1 和前端任务 5 已完成。下一步继续实现后端基础设施：
+任务 1、任务 2 和前端任务 5 已完成。下一步继续实现后端基础设施：
 
-1. 任务 2：统一错误处理、请求 ID 和日志。
-2. 任务 3：Prisma 数据模型、迁移、测试数据库和种子数据。
-3. 任务 4：注册、登录和 JWT 鉴权 API。
-4. 任务 6：登录、注册、Token 和路由守卫。
-5. 任务 7 及后续：项目、任务、评论、附件和看板功能。
+1. 任务 3：Prisma 数据模型、迁移、测试数据库和种子数据。
+2. 任务 4：注册、登录和 JWT 鉴权 API。
+3. 任务 6：登录、注册、Token 和路由守卫。
+4. 任务 7 及后续：项目、任务、评论、附件和看板功能。
+5. 任务 18：结构化日志、限流、完整文档和最终验证。
 
 每个任务继续按以下顺序推进：
 
@@ -308,12 +341,12 @@ pnpm build
 ```text
 请先阅读 AGENTS.md、docs/PROGRESS.md、docs/requirements/README.md、
 docs/superpowers/specs/2026-09-23-taskflow-design.md，
-以及 docs/superpowers/plans/2026-09-23-taskflow-implementation.md 中“任务 2”的内容。
+以及 docs/superpowers/plans/2026-09-23-taskflow-implementation.md 中“任务 3”的内容。
 
-检查 git status 和最近提交，确认工作区状态。当前任务 1 和前端任务 5 已完成，
-请从实施计划任务 2 开始，先写失败测试，再实现最小代码，
+检查 git status 和最近提交，确认工作区状态。当前任务 1、任务 2 和前端任务 5 已完成，
+请从实施计划任务 3 开始，先写失败测试，再实现最小代码，
 遵守中文 JSDoc、Vue 模板注释、业务注释和中文提交规范。
-不要重复已完成的设计、需求、原型、前端初始化和后端健康检查工作。
+不要重复已完成的设计、需求、原型、前端初始化、后端健康检查和错误处理工作。
 ```
 
 ## 恢复时先做检查

@@ -447,22 +447,22 @@ git commit -m "chore: 搭建 TaskFlow 后端基础"
 
 - 产出：`AppError`、`sendSuccess()`、`errorHandler`、`notFoundHandler`、`requestContext`。
 
-- [ ] **步骤 1：写失败测试**
+- [x] **步骤 1：写失败测试**
 
 测试必须覆盖：
 
 - `AppError` 返回指定状态码、业务码和消息。
-- 未知错误返回 `500 INTERNAL_ERROR`，不能泄露堆栈。
+- 未知错误返回 `500 INTERNAL_SERVER_ERROR`，不能泄露堆栈。
 - 所有错误响应包含字符串 `requestId`。
 
-- [ ] **步骤 2：运行测试并确认失败**
+- [x] **步骤 2：运行测试并确认失败**
 
 ```bash
 cd server
-npm test -- --run tests/error-handling.test.ts
+pnpm exec vitest run tests/error-handling.test.ts
 ```
 
-- [ ] **步骤 3：实现错误基础设施**
+- [x] **步骤 3：实现错误基础设施**
 
 `AppError` 构造函数固定为：
 
@@ -495,20 +495,21 @@ new AppError(404, 'ROUTE_NOT_FOUND', '接口不存在')
 
 - `AppError`
 - `ZodError`，返回 `VALIDATION_ERROR` 和字段级 `details`
-- 未知错误，返回 `INTERNAL_ERROR`
+- 未知错误，返回 `INTERNAL_SERVER_ERROR`
 
-- [ ] **步骤 4：完成验证**
+- [x] **步骤 4：完成验证**
 
 ```bash
-npm test -- --run tests/health.test.ts tests/error-handling.test.ts
-npm run typecheck
+pnpm exec vitest run
+pnpm typecheck
+pnpm build
 ```
 
-- [ ] **步骤 5：提交**
+- [x] **步骤 5：提交**
 
 ```bash
 git add server
-git commit -m "feat: add API error handling foundation"
+git commit -m "feat: 增加统一错误处理和请求 ID"
 ```
 
 ---
