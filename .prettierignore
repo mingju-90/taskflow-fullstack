@@ -1,0 +1,14 @@
+node_modules/
+dist/
+coverage/
+playwright-report/
+test-results/
+server/uploads/
+server/prisma/*.db
+*.db
+package-lock.json
+.env
+.env.*
+!.env.example
+docs/product/screenshots/
+.DS_Store

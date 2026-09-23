@@ -45,78 +45,78 @@
 
 ### 2.1 User
 
-| 字段 | 类型 | 约束 |
-| --- | --- | --- |
-| `id` | string | 主键 |
-| `username` | string | 唯一，3 到 20 字符 |
-| `email` | string | 唯一，合法邮箱，最多 254 字符 |
-| `passwordHash` | string | 仅服务端使用 |
-| `createdAt` | DateTime | 自动创建 |
-| `updatedAt` | DateTime | 自动更新 |
+| 字段           | 类型     | 约束                          |
+| -------------- | -------- | ----------------------------- |
+| `id`           | string   | 主键                          |
+| `username`     | string   | 唯一，3 到 20 字符            |
+| `email`        | string   | 唯一，合法邮箱，最多 254 字符 |
+| `passwordHash` | string   | 仅服务端使用                  |
+| `createdAt`    | DateTime | 自动创建                      |
+| `updatedAt`    | DateTime | 自动更新                      |
 
 公开用户对象不包含 `passwordHash`。
 
 ### 2.2 Project
 
-| 字段 | 类型 | 约束 |
-| --- | --- | --- |
-| `id` | string | 主键 |
-| `name` | string | 1 到 80 字符 |
-| `description` | string | 0 到 1000 字符 |
-| `createdAt` | DateTime | 自动创建 |
-| `updatedAt` | DateTime | 自动更新 |
+| 字段          | 类型     | 约束           |
+| ------------- | -------- | -------------- |
+| `id`          | string   | 主键           |
+| `name`        | string   | 1 到 80 字符   |
+| `description` | string   | 0 到 1000 字符 |
+| `createdAt`   | DateTime | 自动创建       |
+| `updatedAt`   | DateTime | 自动更新       |
 
 ### 2.3 ProjectMember
 
-| 字段 | 类型 | 约束 |
-| --- | --- | --- |
-| `id` | string | 主键 |
-| `projectId` | string | 外键 |
-| `userId` | string | 外键 |
-| `role` | `OWNER \| MEMBER` | 固定角色 |
-| `createdAt` | DateTime | 自动创建 |
+| 字段        | 类型              | 约束     |
+| ----------- | ----------------- | -------- |
+| `id`        | string            | 主键     |
+| `projectId` | string            | 外键     |
+| `userId`    | string            | 外键     |
+| `role`      | `OWNER \| MEMBER` | 固定角色 |
+| `createdAt` | DateTime          | 自动创建 |
 
 `projectId + userId` 为组合唯一约束。
 
 ### 2.4 Task
 
-| 字段 | 类型 | 约束 |
-| --- | --- | --- |
-| `id` | string | 主键 |
-| `projectId` | string | 外键 |
-| `title` | string | 1 到 120 字符 |
-| `description` | string | 0 到 5000 字符 |
-| `status` | `TODO \| IN_PROGRESS \| DONE` | 默认 `TODO` |
-| `priority` | `LOW \| MEDIUM \| HIGH` | 默认 `MEDIUM` |
-| `assigneeId` | string \| null | 必须是项目成员 |
-| `creatorId` | string | 外键 |
-| `dueDate` | DateTime \| null | 可为空 |
-| `createdAt` | DateTime | 自动创建 |
-| `updatedAt` | DateTime | 自动更新 |
+| 字段          | 类型                          | 约束           |
+| ------------- | ----------------------------- | -------------- |
+| `id`          | string                        | 主键           |
+| `projectId`   | string                        | 外键           |
+| `title`       | string                        | 1 到 120 字符  |
+| `description` | string                        | 0 到 5000 字符 |
+| `status`      | `TODO \| IN_PROGRESS \| DONE` | 默认 `TODO`    |
+| `priority`    | `LOW \| MEDIUM \| HIGH`       | 默认 `MEDIUM`  |
+| `assigneeId`  | string \| null                | 必须是项目成员 |
+| `creatorId`   | string                        | 外键           |
+| `dueDate`     | DateTime \| null              | 可为空         |
+| `createdAt`   | DateTime                      | 自动创建       |
+| `updatedAt`   | DateTime                      | 自动更新       |
 
 ### 2.5 Comment
 
-| 字段 | 类型 | 约束 |
-| --- | --- | --- |
-| `id` | string | 主键 |
-| `taskId` | string | 外键 |
-| `authorId` | string | 外键 |
-| `content` | string | 1 到 2000 字符 |
-| `createdAt` | DateTime | 自动创建 |
-| `updatedAt` | DateTime | 自动更新 |
+| 字段        | 类型     | 约束           |
+| ----------- | -------- | -------------- |
+| `id`        | string   | 主键           |
+| `taskId`    | string   | 外键           |
+| `authorId`  | string   | 外键           |
+| `content`   | string   | 1 到 2000 字符 |
+| `createdAt` | DateTime | 自动创建       |
+| `updatedAt` | DateTime | 自动更新       |
 
 ### 2.6 Attachment
 
-| 字段 | 类型 | 约束 |
-| --- | --- | --- |
-| `id` | string | 主键 |
-| `taskId` | string | 外键 |
-| `uploaderId` | string | 外键 |
-| `originalName` | string | 原始文件名 |
-| `storedName` | string | 随机文件名 |
-| `mimeType` | string | 允许列表内 MIME |
-| `size` | number | 0 到 5 MB |
-| `createdAt` | DateTime | 自动创建 |
+| 字段           | 类型     | 约束            |
+| -------------- | -------- | --------------- |
+| `id`           | string   | 主键            |
+| `taskId`       | string   | 外键            |
+| `uploaderId`   | string   | 外键            |
+| `originalName` | string   | 原始文件名      |
+| `storedName`   | string   | 随机文件名      |
+| `mimeType`     | string   | 允许列表内 MIME |
+| `size`         | number   | 0 到 5 MB       |
+| `createdAt`    | DateTime | 自动创建        |
 
 ### 2.7 删除关系
 
@@ -187,12 +187,12 @@
 
 查询参数：
 
-| 参数 | 类型 | 默认值 | 说明 |
-| --- | --- | --- | --- |
-| `keyword` | string | 空 | 匹配项目名称或描述 |
-| `role` | `OWNER \| MEMBER` | 空 | 按当前用户角色筛选 |
-| `page` | number | 1 | 从 1 开始 |
-| `pageSize` | number | 20 | 最大 100 |
+| 参数       | 类型              | 默认值 | 说明               |
+| ---------- | ----------------- | ------ | ------------------ |
+| `keyword`  | string            | 空     | 匹配项目名称或描述 |
+| `role`     | `OWNER \| MEMBER` | 空     | 按当前用户角色筛选 |
+| `page`     | number            | 1      | 从 1 开始          |
+| `pageSize` | number            | 20     | 最大 100           |
 
 列表中每项包含项目公开字段、当前用户角色和成员数量。
 
@@ -251,15 +251,15 @@
 
 查询参数：
 
-| 参数 | 类型 | 默认值 | 说明 |
-| --- | --- | --- | --- |
-| `keyword` | string | 空 | 匹配任务标题或描述 |
-| `status` | `TODO \| IN_PROGRESS \| DONE` | 空 | 状态筛选 |
-| `priority` | `LOW \| MEDIUM \| HIGH` | 空 | 优先级筛选 |
-| `assigneeId` | string | 空 | 负责人筛选 |
-| `dueBefore` | ISO date | 空 | 截止时间早于或等于该时间 |
-| `page` | number | 1 | 从 1 开始 |
-| `pageSize` | number | 20 | 最大 100 |
+| 参数         | 类型                          | 默认值 | 说明                     |
+| ------------ | ----------------------------- | ------ | ------------------------ |
+| `keyword`    | string                        | 空     | 匹配任务标题或描述       |
+| `status`     | `TODO \| IN_PROGRESS \| DONE` | 空     | 状态筛选                 |
+| `priority`   | `LOW \| MEDIUM \| HIGH`       | 空     | 优先级筛选               |
+| `assigneeId` | string                        | 空     | 负责人筛选               |
+| `dueBefore`  | ISO date                      | 空     | 截止时间早于或等于该时间 |
+| `page`       | number                        | 1      | 从 1 开始                |
+| `pageSize`   | number                        | 20     | 最大 100                 |
 
 列表项至少包含任务核心字段、负责人摘要、创建人摘要和附件数量。
 
@@ -370,33 +370,33 @@ Content-Disposition: attachment; filename="<sanitized original name>"
 
 ## 9. 错误码
 
-| HTTP | `code` | 场景 |
-| --- | --- | --- |
-| 400 | `VALIDATION_ERROR` | Zod 参数校验失败 |
-| 400 | `ASSIGNEE_NOT_PROJECT_MEMBER` | 任务负责人不是项目成员 |
-| 400 | `FILE_TOO_LARGE` | 附件超过 5 MB |
-| 400 | `FILE_TYPE_NOT_ALLOWED` | 附件类型不允许 |
-| 400 | `ATTACHMENT_LIMIT_REACHED` | 任务已有 20 个附件 |
-| 401 | `UNAUTHORIZED` | 未提供或无法解析 Token |
-| 401 | `TOKEN_EXPIRED` | Token 已过期 |
-| 401 | `INVALID_CREDENTIALS` | 登录邮箱或密码错误 |
-| 403 | `FORBIDDEN` | 通用无权操作 |
-| 403 | `PROJECT_MEMBER_REQUIRED` | 当前用户不是项目成员 |
-| 403 | `PROJECT_OWNER_REQUIRED` | 需要项目负责人 |
-| 403 | `TASK_DELETE_FORBIDDEN` | 不能删除该任务 |
-| 403 | `COMMENT_DELETE_FORBIDDEN` | 不能删除该评论 |
-| 403 | `ATTACHMENT_DELETE_FORBIDDEN` | 不能删除该附件 |
-| 404 | `PROJECT_NOT_FOUND` | 项目不存在 |
-| 404 | `TASK_NOT_FOUND` | 任务不存在 |
-| 404 | `COMMENT_NOT_FOUND` | 评论不存在 |
-| 404 | `ATTACHMENT_NOT_FOUND` | 附件不存在 |
-| 404 | `ROUTE_NOT_FOUND` | 路由不存在 |
-| 409 | `EMAIL_ALREADY_EXISTS` | 邮箱已注册 |
-| 409 | `USERNAME_ALREADY_EXISTS` | 用户名已注册 |
-| 409 | `MEMBER_ALREADY_EXISTS` | 用户已在项目中 |
-| 409 | `OWNER_CANNOT_BE_REMOVED` | 尝试移除项目负责人 |
-| 429 | `RATE_LIMITED` | 登录尝试过于频繁 |
-| 500 | `INTERNAL_SERVER_ERROR` | 未处理异常 |
+| HTTP | `code`                        | 场景                   |
+| ---- | ----------------------------- | ---------------------- |
+| 400  | `VALIDATION_ERROR`            | Zod 参数校验失败       |
+| 400  | `ASSIGNEE_NOT_PROJECT_MEMBER` | 任务负责人不是项目成员 |
+| 400  | `FILE_TOO_LARGE`              | 附件超过 5 MB          |
+| 400  | `FILE_TYPE_NOT_ALLOWED`       | 附件类型不允许         |
+| 400  | `ATTACHMENT_LIMIT_REACHED`    | 任务已有 20 个附件     |
+| 401  | `UNAUTHORIZED`                | 未提供或无法解析 Token |
+| 401  | `TOKEN_EXPIRED`               | Token 已过期           |
+| 401  | `INVALID_CREDENTIALS`         | 登录邮箱或密码错误     |
+| 403  | `FORBIDDEN`                   | 通用无权操作           |
+| 403  | `PROJECT_MEMBER_REQUIRED`     | 当前用户不是项目成员   |
+| 403  | `PROJECT_OWNER_REQUIRED`      | 需要项目负责人         |
+| 403  | `TASK_DELETE_FORBIDDEN`       | 不能删除该任务         |
+| 403  | `COMMENT_DELETE_FORBIDDEN`    | 不能删除该评论         |
+| 403  | `ATTACHMENT_DELETE_FORBIDDEN` | 不能删除该附件         |
+| 404  | `PROJECT_NOT_FOUND`           | 项目不存在             |
+| 404  | `TASK_NOT_FOUND`              | 任务不存在             |
+| 404  | `COMMENT_NOT_FOUND`           | 评论不存在             |
+| 404  | `ATTACHMENT_NOT_FOUND`        | 附件不存在             |
+| 404  | `ROUTE_NOT_FOUND`             | 路由不存在             |
+| 409  | `EMAIL_ALREADY_EXISTS`        | 邮箱已注册             |
+| 409  | `USERNAME_ALREADY_EXISTS`     | 用户名已注册           |
+| 409  | `MEMBER_ALREADY_EXISTS`       | 用户已在项目中         |
+| 409  | `OWNER_CANNOT_BE_REMOVED`     | 尝试移除项目负责人     |
+| 429  | `RATE_LIMITED`                | 登录尝试过于频繁       |
+| 500  | `INTERNAL_SERVER_ERROR`       | 未处理异常             |
 
 ## 10. 错误与日志要求
 

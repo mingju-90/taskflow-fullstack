@@ -33,8 +33,8 @@
         --sidebar-width: 232px;
         --topbar-height: 64px;
         font-family:
-          -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
-          "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
+          'Microsoft YaHei', sans-serif;
       }
 
       * {
@@ -333,7 +333,7 @@
         height: 460px;
         border: 1px solid rgba(255, 255, 255, 0.12);
         border-radius: 50%;
-        content: "";
+        content: '';
         box-shadow:
           0 0 0 58px rgba(255, 255, 255, 0.025),
           0 0 0 116px rgba(255, 255, 255, 0.018);
@@ -847,7 +847,7 @@
         height: 96px;
         border-radius: 50%;
         background: #fff;
-        content: "";
+        content: '';
       }
 
       .progress-value {
@@ -1291,7 +1291,7 @@
         left: 0;
         height: 2px;
         background: var(--primary);
-        content: "";
+        content: '';
       }
 
       .tab-panel {
@@ -1796,7 +1796,9 @@
   <body>
     <svg aria-hidden="true" style="position: absolute; width: 0; height: 0">
       <symbol id="i-layers" viewBox="0 0 24 24">
-        <path d="m12.83 2.18 8.34 4.17a1 1 0 0 1 0 1.79l-8.34 4.17a2 2 0 0 1-1.66 0L2.83 8.14a1 1 0 0 1 0-1.79l8.34-4.17a2 2 0 0 1 1.66 0Z" />
+        <path
+          d="m12.83 2.18 8.34 4.17a1 1 0 0 1 0 1.79l-8.34 4.17a2 2 0 0 1-1.66 0L2.83 8.14a1 1 0 0 1 0-1.79l8.34-4.17a2 2 0 0 1 1.66 0Z"
+        />
         <path d="m2 12 8.83 4.41a2 2 0 0 0 1.66 0L21.32 12" />
         <path d="m2 16 8.83 4.41a2 2 0 0 0 1.66 0L21.32 16" />
       </symbol>
@@ -1807,7 +1809,9 @@
         <rect width="7" height="5" x="3" y="16" rx="1" />
       </symbol>
       <symbol id="i-folder" viewBox="0 0 24 24">
-        <path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" />
+        <path
+          d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"
+        />
       </symbol>
       <symbol id="i-check-square" viewBox="0 0 24 24">
         <path d="m9 11 3 3L22 4" />
@@ -1864,7 +1868,9 @@
         <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4Z" />
       </symbol>
       <symbol id="i-paperclip" viewBox="0 0 24 24">
-        <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+        <path
+          d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"
+        />
       </symbol>
       <symbol id="i-upload" viewBox="0 0 24 24">
         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
@@ -1885,7 +1891,9 @@
         <polyline points="12 6 12 12 16 14" />
       </symbol>
       <symbol id="i-alert" viewBox="0 0 24 24">
-        <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z" />
+        <path
+          d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"
+        />
         <line x1="12" x2="12" y1="9" y2="13" />
         <line x1="12" x2="12.01" y1="17" y2="17" />
       </symbol>
@@ -1933,12 +1941,7 @@
             </label>
             <label class="field">
               <span>密码</span>
-              <input
-                class="input"
-                type="password"
-                value="password123"
-                aria-label="密码"
-              />
+              <input class="input" type="password" value="password123" aria-label="密码" />
             </label>
             <button class="button primary block" type="submit">登录</button>
           </form>
@@ -1997,21 +2000,11 @@
             <svg class="icon"><use href="#i-folder"></use></svg>
             <span>项目</span>
           </button>
-          <button
-            class="nav-item"
-            data-page="project"
-            data-nav="tasks"
-            data-open-tab="tasks"
-          >
+          <button class="nav-item" data-page="project" data-nav="tasks" data-open-tab="tasks">
             <svg class="icon"><use href="#i-check-square"></use></svg>
             <span>任务</span>
           </button>
-          <button
-            class="nav-item"
-            data-page="project"
-            data-nav="members"
-            data-open-tab="members"
-          >
+          <button class="nav-item" data-page="project" data-nav="members" data-open-tab="members">
             <svg class="icon"><use href="#i-users"></use></svg>
             <span>成员</span>
           </button>
@@ -2019,27 +2012,15 @@
         <div class="sidebar-projects">
           <div class="nav-label">我的项目</div>
           <div class="project-nav">
-            <button
-              class="project-nav-item active"
-              data-page="project"
-              data-project="product"
-            >
+            <button class="project-nav-item active" data-page="project" data-project="product">
               <span class="project-dot"></span>
               <span class="project-nav-text">产品重构</span>
             </button>
-            <button
-              class="project-nav-item"
-              data-page="project"
-              data-project="website"
-            >
+            <button class="project-nav-item" data-page="project" data-project="website">
               <span class="project-dot" style="background: #f7b955"></span>
               <span class="project-nav-text">官网改版</span>
             </button>
-            <button
-              class="project-nav-item"
-              data-page="project"
-              data-project="mobile"
-            >
+            <button class="project-nav-item" data-page="project" data-project="mobile">
               <span class="project-dot" style="background: #6dd3a8"></span>
               <span class="project-nav-text">移动端体验优化</span>
             </button>
@@ -2663,7 +2644,12 @@
                       </tr>
                     </thead>
                     <tbody id="task-table-body">
-                      <tr class="row-link" data-status="IN_PROGRESS" data-priority="HIGH" data-page-target="task">
+                      <tr
+                        class="row-link"
+                        data-status="IN_PROGRESS"
+                        data-priority="HIGH"
+                        data-page-target="task"
+                      >
                         <td class="cell-padding">
                           <div class="task-title">
                             <span class="task-title-icon">
@@ -2693,7 +2679,12 @@
                           </button>
                         </td>
                       </tr>
-                      <tr class="row-link" data-status="TODO" data-priority="MEDIUM" data-page-target="task">
+                      <tr
+                        class="row-link"
+                        data-status="TODO"
+                        data-priority="MEDIUM"
+                        data-page-target="task"
+                      >
                         <td class="cell-padding">
                           <div class="task-title">
                             <span class="task-title-icon">
@@ -2723,7 +2714,12 @@
                           </button>
                         </td>
                       </tr>
-                      <tr class="row-link" data-status="DONE" data-priority="LOW" data-page-target="task">
+                      <tr
+                        class="row-link"
+                        data-status="DONE"
+                        data-priority="LOW"
+                        data-page-target="task"
+                      >
                         <td class="cell-padding">
                           <div class="task-title">
                             <span class="task-title-icon">
@@ -2753,7 +2749,12 @@
                           </button>
                         </td>
                       </tr>
-                      <tr class="row-link" data-status="IN_PROGRESS" data-priority="HIGH" data-page-target="task">
+                      <tr
+                        class="row-link"
+                        data-status="IN_PROGRESS"
+                        data-priority="HIGH"
+                        data-page-target="task"
+                      >
                         <td class="cell-padding">
                           <div class="task-title">
                             <span class="task-title-icon">
@@ -2873,9 +2874,8 @@
                     </label>
                     <label class="field">
                       <span>项目描述</span>
-                      <textarea class="textarea"
-                        >统一任务流转、项目权限和团队协作，形成可复用的全栈工程基线。</textarea
-                      >
+                      <!-- prettier-ignore -->
+                      <textarea class="textarea">统一任务流转、项目权限和团队协作，形成可复用的全栈工程基线。</textarea>
                     </label>
                     <button class="button primary">保存设置</button>
                   </div>
@@ -2922,7 +2922,6 @@
                   <div class="card-body">
                     <p class="description">
                       实现任务列表的筛选与分页查询，支持关键字、状态、优先级、负责人和截止时间组合筛选。
-
                       需要保证任务只能返回当前项目数据，并继续使用项目成员权限校验。分页参数缺失时使用默认值，非法值返回字段级校验错误。
                     </p>
                   </div>
@@ -3081,9 +3080,7 @@
             </label>
             <label class="field">
               <span>项目描述</span>
-              <textarea class="textarea" maxlength="1000"
-                >描述项目目标和协作范围。</textarea
-              >
+              <textarea class="textarea" maxlength="1000">描述项目目标和协作范围。</textarea>
             </label>
           </div>
           <div class="modal-footer">
@@ -3110,9 +3107,8 @@
             </label>
             <label class="field">
               <span>项目描述</span>
-              <textarea class="textarea" maxlength="1000"
-                >统一任务流转、项目权限和团队协作，形成可复用的全栈工程基线。</textarea
-              >
+              <!-- prettier-ignore -->
+              <textarea class="textarea" maxlength="1000">统一任务流转、项目权限和团队协作，形成可复用的全栈工程基线。</textarea>
             </label>
           </div>
           <div class="modal-footer">
@@ -3167,9 +3163,8 @@
             </label>
             <label class="field">
               <span>任务描述</span>
-              <textarea class="textarea" maxlength="5000"
-                >覆盖无任务和筛选无结果两种空状态。</textarea
-              >
+              <!-- prettier-ignore -->
+              <textarea class="textarea" maxlength="5000">覆盖无任务和筛选无结果两种空状态。</textarea>
             </label>
             <div class="form-row">
               <label class="field">
@@ -3224,12 +3219,7 @@
           <div class="modal-body">
             <label class="field">
               <span>任务标题</span>
-              <input
-                class="input"
-                required
-                maxlength="120"
-                value="完成任务筛选与分页接口"
-              />
+              <input class="input" required maxlength="120" value="完成任务筛选与分页接口" />
             </label>
             <div class="form-row">
               <label class="field">
@@ -3266,349 +3256,343 @@
     <script>
       const projectCatalog = {
         product: {
-          name: "产品重构",
-          description: "统一任务流转、项目权限和团队协作，形成可复用的全栈工程基线。",
+          name: '产品重构',
+          description: '统一任务流转、项目权限和团队协作，形成可复用的全栈工程基线。',
         },
         website: {
-          name: "官网改版",
-          description: "升级首页信息架构、内容表达和转化路径，统一品牌体验。",
+          name: '官网改版',
+          description: '升级首页信息架构、内容表达和转化路径，统一品牌体验。',
         },
         mobile: {
-          name: "移动端体验优化",
-          description: "改善核心流程可用性与性能，让移动端操作更简单高效。",
+          name: '移动端体验优化',
+          description: '改善核心流程可用性与性能，让移动端操作更简单高效。',
         },
-      };
+      }
 
       const routeMeta = {
-        dashboard: ["看板", "全部工作区"],
-        projects: ["项目", "全部工作区"],
-        project: ["产品重构", "项目详情"],
-        task: ["任务详情", "产品重构"],
-      };
+        dashboard: ['看板', '全部工作区'],
+        projects: ['项目', '全部工作区'],
+        project: ['产品重构', '项目详情'],
+        task: ['任务详情', '产品重构'],
+      }
 
-      const loginShell = document.getElementById("login-shell");
-      const workspace = document.getElementById("workspace");
-      const pages = [...document.querySelectorAll("[data-page-view]")];
-      const navItems = [...document.querySelectorAll(".nav-item")];
-      const toast = document.getElementById("toast");
-      const toastText = document.getElementById("toast-text");
-      let toastTimer;
-      let currentProjectId = "product";
+      const loginShell = document.getElementById('login-shell')
+      const workspace = document.getElementById('workspace')
+      const pages = [...document.querySelectorAll('[data-page-view]')]
+      const navItems = [...document.querySelectorAll('.nav-item')]
+      const toast = document.getElementById('toast')
+      const toastText = document.getElementById('toast-text')
+      let toastTimer
+      let currentProjectId = 'product'
 
       function showToast(message) {
-        toastText.textContent = message;
-        toast.classList.add("show");
-        clearTimeout(toastTimer);
-        toastTimer = setTimeout(() => toast.classList.remove("show"), 2200);
+        toastText.textContent = message
+        toast.classList.add('show')
+        clearTimeout(toastTimer)
+        toastTimer = setTimeout(() => toast.classList.remove('show'), 2200)
       }
 
       function selectProject(projectId) {
-        const project = projectCatalog[projectId];
+        const project = projectCatalog[projectId]
         if (!project) {
-          return;
+          return
         }
-        currentProjectId = projectId;
-        document.querySelectorAll("[data-project-name]").forEach((element) => {
-          element.textContent = project.name;
-        });
-        document.querySelectorAll("[data-project-description]").forEach((element) => {
-          element.textContent = project.description;
-        });
-        document.querySelectorAll("[data-project-breadcrumb]").forEach((element) => {
-          element.textContent = project.name;
-        });
-        document.querySelectorAll(".project-nav-item").forEach((item) => {
-          item.classList.toggle("active", item.dataset.project === projectId);
-        });
+        currentProjectId = projectId
+        document.querySelectorAll('[data-project-name]').forEach((element) => {
+          element.textContent = project.name
+        })
+        document.querySelectorAll('[data-project-description]').forEach((element) => {
+          element.textContent = project.description
+        })
+        document.querySelectorAll('[data-project-breadcrumb]').forEach((element) => {
+          element.textContent = project.name
+        })
+        document.querySelectorAll('.project-nav-item').forEach((item) => {
+          item.classList.toggle('active', item.dataset.project === projectId)
+        })
       }
 
       function switchPage(page, options = {}) {
-        const validPage = routeMeta[page] ? page : "dashboard";
+        const validPage = routeMeta[page] ? page : 'dashboard'
         if (options.project) {
-          selectProject(options.project);
+          selectProject(options.project)
         }
-        const activeTab =
-          validPage === "project" ? options.tab ?? "tasks" : options.tab;
-        const activeNav =
-          validPage === "project" ? activeTab : validPage;
+        const activeTab = validPage === 'project' ? (options.tab ?? 'tasks') : options.tab
+        const activeNav = validPage === 'project' ? activeTab : validPage
         pages.forEach((view) => {
-          view.classList.toggle("active", view.dataset.pageView === validPage);
-        });
+          view.classList.toggle('active', view.dataset.pageView === validPage)
+        })
         navItems.forEach((item) => {
-          const isActive = item.dataset.nav === activeNav;
-          item.classList.toggle("active", isActive);
+          const isActive = item.dataset.nav === activeNav
+          item.classList.toggle('active', isActive)
           if (isActive) {
-            item.setAttribute("aria-current", "page");
+            item.setAttribute('aria-current', 'page')
           } else {
-            item.removeAttribute("aria-current");
+            item.removeAttribute('aria-current')
           }
-        });
-        const [title, context] = routeMeta[validPage];
-        const project = projectCatalog[currentProjectId];
+        })
+        const [title, context] = routeMeta[validPage]
+        const project = projectCatalog[currentProjectId]
         const projectPageTitle =
-          activeTab === "members" ? "成员" : activeTab === "tasks" ? "任务" : title;
-        document.getElementById("topbar-title").textContent =
-          validPage === "project" ? projectPageTitle : title;
-        document.getElementById("topbar-context").textContent =
-          validPage === "project" || validPage === "task" ? project.name : context;
+          activeTab === 'members' ? '成员' : activeTab === 'tasks' ? '任务' : title
+        document.getElementById('topbar-title').textContent =
+          validPage === 'project' ? projectPageTitle : title
+        document.getElementById('topbar-context').textContent =
+          validPage === 'project' || validPage === 'task' ? project.name : context
         if (activeTab) {
-          activateTab(activeTab);
+          activateTab(activeTab)
         }
-        document.querySelector(".content").scrollTop = 0;
-        window.location.hash = `#${validPage}${activeTab ? `/${activeTab}` : ""}`;
+        document.querySelector('.content').scrollTop = 0
+        window.location.hash = `#${validPage}${activeTab ? `/${activeTab}` : ''}`
       }
 
       function activateTab(tabName) {
-        document.querySelectorAll("[data-tab]").forEach((tab) => {
-          tab.classList.toggle("active", tab.dataset.tab === tabName);
-        });
-        document.querySelectorAll("[data-tab-panel]").forEach((panel) => {
-          panel.classList.toggle("active", panel.dataset.tabPanel === tabName);
-        });
+        document.querySelectorAll('[data-tab]').forEach((tab) => {
+          tab.classList.toggle('active', tab.dataset.tab === tabName)
+        })
+        document.querySelectorAll('[data-tab-panel]').forEach((panel) => {
+          panel.classList.toggle('active', panel.dataset.tabPanel === tabName)
+        })
       }
 
       function openModal(id) {
-        const modal = document.getElementById(id);
+        const modal = document.getElementById(id)
         if (modal) {
-          modal.classList.add("open");
+          modal.classList.add('open')
         }
       }
 
       function closeModal(modal) {
-        modal.classList.remove("open");
+        modal.classList.remove('open')
       }
 
-      document.getElementById("login-form").addEventListener("submit", (event) => {
-        event.preventDefault();
-        loginShell.classList.add("hidden");
-        workspace.classList.remove("hidden");
-        switchPage("dashboard");
-      });
+      document.getElementById('login-form').addEventListener('submit', (event) => {
+        event.preventDefault()
+        loginShell.classList.add('hidden')
+        workspace.classList.remove('hidden')
+        switchPage('dashboard')
+      })
 
-      document.getElementById("register-link").addEventListener("click", () => {
-        showToast("原型中已保留注册页入口");
-      });
+      document.getElementById('register-link').addEventListener('click', () => {
+        showToast('原型中已保留注册页入口')
+      })
 
-      document.getElementById("logout-button").addEventListener("click", () => {
-        workspace.classList.add("hidden");
-        loginShell.classList.remove("hidden");
-      });
+      document.getElementById('logout-button').addEventListener('click', () => {
+        workspace.classList.add('hidden')
+        loginShell.classList.remove('hidden')
+      })
 
-      document.querySelectorAll("[data-page]").forEach((item) => {
-        item.addEventListener("click", () => {
+      document.querySelectorAll('[data-page]').forEach((item) => {
+        item.addEventListener('click', () => {
           if (item.dataset.project) {
             switchPage(item.dataset.page, {
-              tab: "tasks",
+              tab: 'tasks',
               project: item.dataset.project,
-            });
-            return;
+            })
+            return
           }
           if (item.dataset.openTab) {
-            switchPage(item.dataset.page, { tab: item.dataset.openTab });
-            return;
+            switchPage(item.dataset.page, { tab: item.dataset.openTab })
+            return
           }
-          switchPage(item.dataset.page);
-        });
-      });
+          switchPage(item.dataset.page)
+        })
+      })
 
-      document.querySelectorAll("[data-page-target]").forEach((item) => {
-        item.addEventListener("click", (event) => {
-          event.stopPropagation();
+      document.querySelectorAll('[data-page-target]').forEach((item) => {
+        item.addEventListener('click', (event) => {
+          event.stopPropagation()
           switchPage(item.dataset.pageTarget, {
             project: item.dataset.project,
-            tab: item.dataset.pageTarget === "project" ? "tasks" : undefined,
-          });
-        });
-      });
+            tab: item.dataset.pageTarget === 'project' ? 'tasks' : undefined,
+          })
+        })
+      })
 
-      document.querySelectorAll("[data-tab]").forEach((tab) => {
-        tab.addEventListener("click", () => activateTab(tab.dataset.tab));
-      });
+      document.querySelectorAll('[data-tab]').forEach((tab) => {
+        tab.addEventListener('click', () => activateTab(tab.dataset.tab))
+      })
 
-      document.querySelectorAll("[data-open-modal]").forEach((button) => {
-        button.addEventListener("click", (event) => {
-          event.stopPropagation();
-          openModal(button.dataset.openModal);
-        });
-      });
+      document.querySelectorAll('[data-open-modal]').forEach((button) => {
+        button.addEventListener('click', (event) => {
+          event.stopPropagation()
+          openModal(button.dataset.openModal)
+        })
+      })
 
-      document.querySelectorAll("[data-close-modal]").forEach((button) => {
-        button.addEventListener("click", () => closeModal(button.closest(".modal-layer")));
-      });
+      document.querySelectorAll('[data-close-modal]').forEach((button) => {
+        button.addEventListener('click', () => closeModal(button.closest('.modal-layer')))
+      })
 
-      document.querySelectorAll(".modal-layer").forEach((layer) => {
-        layer.addEventListener("click", (event) => {
+      document.querySelectorAll('.modal-layer').forEach((layer) => {
+        layer.addEventListener('click', (event) => {
           if (event.target === layer) {
-            closeModal(layer);
+            closeModal(layer)
           }
-        });
-      });
+        })
+      })
 
-      document.querySelectorAll(".modal-form").forEach((form) => {
-        form.addEventListener("submit", (event) => {
-          event.preventDefault();
-          const layer = form.closest(".modal-layer");
-          closeModal(layer);
-          showToast(form.dataset.successMessage);
-        });
-      });
+      document.querySelectorAll('.modal-form').forEach((form) => {
+        form.addEventListener('submit', (event) => {
+          event.preventDefault()
+          const layer = form.closest('.modal-layer')
+          closeModal(layer)
+          showToast(form.dataset.successMessage)
+        })
+      })
 
-      document.getElementById("project-search").addEventListener("input", (event) => {
-        const keyword = event.target.value.trim().toLowerCase();
-        document.querySelectorAll("#project-table-body tr").forEach((row) => {
-          row.style.display = row.textContent.toLowerCase().includes(keyword) ? "" : "none";
-        });
-      });
+      document.getElementById('project-search').addEventListener('input', (event) => {
+        const keyword = event.target.value.trim().toLowerCase()
+        document.querySelectorAll('#project-table-body tr').forEach((row) => {
+          row.style.display = row.textContent.toLowerCase().includes(keyword) ? '' : 'none'
+        })
+      })
 
-      document.querySelectorAll("#project-role-filter .segment").forEach((button) => {
-        button.addEventListener("click", () => {
+      document.querySelectorAll('#project-role-filter .segment').forEach((button) => {
+        button.addEventListener('click', () => {
           document
-            .querySelectorAll("#project-role-filter .segment")
-            .forEach((item) => item.classList.remove("active"));
-          button.classList.add("active");
-          const role = button.dataset.role;
-          document.querySelectorAll("#project-table-body tr").forEach((row) => {
-            row.style.display = role === "all" || row.dataset.role === role ? "" : "none";
-          });
-        });
-      });
+            .querySelectorAll('#project-role-filter .segment')
+            .forEach((item) => item.classList.remove('active'))
+          button.classList.add('active')
+          const role = button.dataset.role
+          document.querySelectorAll('#project-table-body tr').forEach((row) => {
+            row.style.display = role === 'all' || row.dataset.role === role ? '' : 'none'
+          })
+        })
+      })
 
-      document.getElementById("task-search").addEventListener("input", (event) => {
-        const keyword = event.target.value.trim().toLowerCase();
-        document.querySelectorAll("#task-table-body tr").forEach((row) => {
-          row.style.display = row.textContent.toLowerCase().includes(keyword) ? "" : "none";
-        });
-      });
+      document.getElementById('task-search').addEventListener('input', (event) => {
+        const keyword = event.target.value.trim().toLowerCase()
+        document.querySelectorAll('#task-table-body tr').forEach((row) => {
+          row.style.display = row.textContent.toLowerCase().includes(keyword) ? '' : 'none'
+        })
+      })
 
-      document.getElementById("task-status-filter").addEventListener("change", (event) => {
-        const value = event.target.value;
-        document.querySelectorAll("#task-table-body tr").forEach((row) => {
-          row.style.display = value === "all" || row.dataset.status === value ? "" : "none";
-        });
-      });
+      document.getElementById('task-status-filter').addEventListener('change', (event) => {
+        const value = event.target.value
+        document.querySelectorAll('#task-table-body tr').forEach((row) => {
+          row.style.display = value === 'all' || row.dataset.status === value ? '' : 'none'
+        })
+      })
 
-      document
-        .getElementById("task-priority-filter")
-        .addEventListener("change", (event) => {
-          const value = event.target.value;
-          document.querySelectorAll("#task-table-body tr").forEach((row) => {
-            row.style.display =
-              value === "all" || row.dataset.priority === value ? "" : "none";
-          });
-        });
+      document.getElementById('task-priority-filter').addEventListener('change', (event) => {
+        const value = event.target.value
+        document.querySelectorAll('#task-table-body tr').forEach((row) => {
+          row.style.display = value === 'all' || row.dataset.priority === value ? '' : 'none'
+        })
+      })
 
-      document.getElementById("publish-comment").addEventListener("click", () => {
-        const input = document.getElementById("comment-input");
+      document.getElementById('publish-comment').addEventListener('click', () => {
+        const input = document.getElementById('comment-input')
         if (!input.value.trim()) {
-          showToast("请先输入评论内容");
-          return;
+          showToast('请先输入评论内容')
+          return
         }
-        input.value = "";
-        showToast("评论发布成功");
-      });
+        input.value = ''
+        showToast('评论发布成功')
+      })
 
-      document.getElementById("fake-upload").addEventListener("click", () => {
-        showToast("已打开附件选择器");
-      });
+      document.getElementById('fake-upload').addEventListener('click', () => {
+        showToast('已打开附件选择器')
+      })
 
-      document.getElementById("global-search").addEventListener("click", () => {
-        showToast("全局搜索为后续扩展能力");
-      });
+      document.getElementById('global-search').addEventListener('click', () => {
+        showToast('全局搜索为后续扩展能力')
+      })
 
-      const initialParts = window.location.hash.replace("#", "").split("/");
-      const initialRoute = initialParts[0];
-      const initialTab = initialParts[1];
+      const initialParts = window.location.hash.replace('#', '').split('/')
+      const initialRoute = initialParts[0]
+      const initialTab = initialParts[1]
       if (initialRoute && routeMeta[initialRoute]) {
-        loginShell.classList.add("hidden");
-        workspace.classList.remove("hidden");
-        switchPage(initialRoute, { tab: initialTab });
+        loginShell.classList.add('hidden')
+        workspace.classList.remove('hidden')
+        switchPage(initialRoute, { tab: initialTab })
       }
 
-      const auditParams = new URLSearchParams(window.location.search);
+      const auditParams = new URLSearchParams(window.location.search)
 
-      if (auditParams.get("audit") === "nav") {
-        loginShell.classList.add("hidden");
-        workspace.classList.remove("hidden");
+      if (auditParams.get('audit') === 'nav') {
+        loginShell.classList.add('hidden')
+        workspace.classList.remove('hidden')
         const checks = [
-          ["任务", '.nav-item[data-nav="tasks"]'],
-          ["成员", '.nav-item[data-nav="members"]'],
-          ["官网改版", '.project-nav-item[data-project="website"]'],
-          ["移动端体验优化", '.project-nav-item[data-project="mobile"]'],
-        ];
+          ['任务', '.nav-item[data-nav="tasks"]'],
+          ['成员', '.nav-item[data-nav="members"]'],
+          ['官网改版', '.project-nav-item[data-project="website"]'],
+          ['移动端体验优化', '.project-nav-item[data-project="mobile"]'],
+        ]
         const results = checks.map(([label, selector]) => {
-          document.querySelector(selector).click();
+          document.querySelector(selector).click()
           return {
             label,
-            activePage: document.querySelector(".page.active")?.dataset.pageView,
-            activeTab: document.querySelector("[data-tab].active")?.dataset.tab,
-            activeNav: document.querySelector(".nav-item.active")?.dataset.nav,
-            activeProject: document.querySelector(".project-nav-item.active")?.dataset
-              .project,
-            projectName: document.querySelector("[data-project-name]")?.textContent,
-            title: document.getElementById("topbar-title").textContent,
-            context: document.getElementById("topbar-context").textContent,
-          };
-        });
-        document.body.dataset.navAudit = JSON.stringify(results);
+            activePage: document.querySelector('.page.active')?.dataset.pageView,
+            activeTab: document.querySelector('[data-tab].active')?.dataset.tab,
+            activeNav: document.querySelector('.nav-item.active')?.dataset.nav,
+            activeProject: document.querySelector('.project-nav-item.active')?.dataset.project,
+            projectName: document.querySelector('[data-project-name]')?.textContent,
+            title: document.getElementById('topbar-title').textContent,
+            context: document.getElementById('topbar-context').textContent,
+          }
+        })
+        document.body.dataset.navAudit = JSON.stringify(results)
       }
 
-      if (auditParams.has("audit")) {
+      if (auditParams.has('audit')) {
         requestAnimationFrame(() => {
-          const content = document.querySelector(".content");
-          const activePage = document.querySelector(".page.active");
+          const content = document.querySelector('.content')
+          const activePage = document.querySelector('.page.active')
           const visibleElements = [
             ...document.querySelectorAll(
-              ".page.active .card, .page.active .stat-card, .page.active .summary-cell, .page.active .button, .page.active .tag",
+              '.page.active .card, .page.active .stat-card, .page.active .summary-cell, .page.active .button, .page.active .tag',
             ),
           ].filter((element) => {
-            const style = getComputedStyle(element);
-            const rect = element.getBoundingClientRect();
+            const style = getComputedStyle(element)
+            const rect = element.getBoundingClientRect()
             return (
-              style.display !== "none" &&
-              style.visibility !== "hidden" &&
+              style.display !== 'none' &&
+              style.visibility !== 'hidden' &&
               rect.width > 0 &&
               rect.height > 0
-            );
-          });
+            )
+          })
 
           const overflow = visibleElements
             .map((element) => {
-              const rect = element.getBoundingClientRect();
+              const rect = element.getBoundingClientRect()
               return {
-                selector:
-                  element.className ||
-                  element.tagName.toLowerCase(),
+                selector: element.className || element.tagName.toLowerCase(),
                 left: Number(rect.left.toFixed(1)),
                 right: Number(rect.right.toFixed(1)),
                 width: Number(rect.width.toFixed(1)),
-              };
+              }
             })
-            .filter((item) => item.left < -0.5 || item.right > window.innerWidth + 0.5);
+            .filter((item) => item.left < -0.5 || item.right > window.innerWidth + 0.5)
 
-          const overlaps = [];
+          const overlaps = []
           for (let index = 0; index < visibleElements.length; index += 1) {
             for (
               let compareIndex = index + 1;
               compareIndex < visibleElements.length;
               compareIndex += 1
             ) {
-              const first = visibleElements[index];
-              const second = visibleElements[compareIndex];
+              const first = visibleElements[index]
+              const second = visibleElements[compareIndex]
               if (first.contains(second) || second.contains(first)) {
-                continue;
+                continue
               }
-              const firstRect = first.getBoundingClientRect();
-              const secondRect = second.getBoundingClientRect();
-              const width = Math.min(firstRect.right, secondRect.right) -
-                Math.max(firstRect.left, secondRect.left);
-              const height = Math.min(firstRect.bottom, secondRect.bottom) -
-                Math.max(firstRect.top, secondRect.top);
+              const firstRect = first.getBoundingClientRect()
+              const secondRect = second.getBoundingClientRect()
+              const width =
+                Math.min(firstRect.right, secondRect.right) -
+                Math.max(firstRect.left, secondRect.left)
+              const height =
+                Math.min(firstRect.bottom, secondRect.bottom) -
+                Math.max(firstRect.top, secondRect.top)
               if (width > 2 && height > 2) {
                 overlaps.push({
                   first: first.className,
                   second: second.className,
                   area: Number((width * height).toFixed(1)),
-                });
+                })
               }
             }
           }
@@ -3625,8 +3609,8 @@
             activePageWidth: activePage?.getBoundingClientRect().width,
             overflow,
             overlaps,
-          });
-        });
+          })
+        })
       }
     </script>
   </body>

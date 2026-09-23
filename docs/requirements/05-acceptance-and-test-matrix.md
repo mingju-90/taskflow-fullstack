@@ -2,13 +2,13 @@
 
 ## 1. 验收层级
 
-| 层级 | 工具 | 目标 | 执行时机 |
-| --- | --- | --- | --- |
-| 静态检查 | TypeScript、Vue TSC | 类型、导入和构建配置正确 | 每次提交、CI |
-| 后端集成测试 | Vitest、Supertest、临时 SQLite | 验证 HTTP、Service、Prisma、权限和文件规则 | 每次提交、CI |
-| 前端单元测试 | Vitest、Vue Test Utils | 验证 Store、Axios、权限、查询转换和关键表单 | 每次提交、CI |
-| 端到端冒烟测试 | Playwright、Chromium | 验证真实浏览器和真实前后端核心链路 | CI、合并前 |
-| 手工视觉验收 | 浏览器、截图 | 验证桌面尺寸、信息层级、状态和可访问性 | 原型评审、UI 完成后 |
+| 层级           | 工具                           | 目标                                        | 执行时机            |
+| -------------- | ------------------------------ | ------------------------------------------- | ------------------- |
+| 静态检查       | TypeScript、Vue TSC            | 类型、导入和构建配置正确                    | 每次提交、CI        |
+| 后端集成测试   | Vitest、Supertest、临时 SQLite | 验证 HTTP、Service、Prisma、权限和文件规则  | 每次提交、CI        |
+| 前端单元测试   | Vitest、Vue Test Utils         | 验证 Store、Axios、权限、查询转换和关键表单 | 每次提交、CI        |
+| 端到端冒烟测试 | Playwright、Chromium           | 验证真实浏览器和真实前后端核心链路          | CI、合并前          |
+| 手工视觉验收   | 浏览器、截图                   | 验证桌面尺寸、信息层级、状态和可访问性      | 原型评审、UI 完成后 |
 
 ## 2. 测试命名
 
@@ -21,19 +21,19 @@
 
 表中的 `FR-XXX-001 到 FR-XXX-010` 表示包含首尾编号的连续覆盖范围。
 
-| 需求 | 后端集成测试 | 前端测试 | E2E / 手工验收 |
-| --- | --- | --- | --- |
-| FR-AUTH-001 到 FR-AUTH-006 | `auth.test.ts`：注册、重复账号、登录、密码错误、`/me`、无 Token | `http.test.ts`、`auth.test.ts`：Token、拦截器、Store | 注册、登录、刷新恢复、退出 |
-| FR-AUTH-007 到 FR-AUTH-008 | `auth.test.ts`：限流 | `auth.test.ts`：退出清理 | 登录页跳转和消息反馈 |
-| FR-PROJ-001 到 FR-PROJ-005 | `projects.test.ts`：创建事务、列表、详情、编辑权限 | `project-store.test.ts`、`permissions.test.ts` | 创建项目、进入详情、编辑项目 |
-| FR-PROJ-006 到 FR-PROJ-012 | `projects.test.ts`：添加、重复、移除、负责人保护、删除级联 | 成员面板行为、权限组合函数 | 添加成员、移除成员、删除项目 |
-| FR-TASK-001 到 FR-TASK-008 | `tasks.test.ts`：创建、枚举校验、负责人校验、筛选、分页 | `task-filters.test.ts`：参数转换、空值处理 | 新建任务、筛选任务、分页 |
-| FR-TASK-009 到 FR-TASK-014 | `tasks.test.ts`：详情、编辑、删除权限 | 表单和权限测试 | 修改状态、删除任务 |
-| FR-COMM-001 到 FR-COMM-006 | `comments.test.ts`：列表顺序、发布、删除权限 | `comments.test.ts`：API 调用 | 发布评论、删除评论 |
-| FR-ATT-001 到 FR-ATT-009 | `attachments.test.ts`：上传、大小、类型、数量、下载和删除权限 | `attachments.test.ts`：`FormData`、下载 Blob | 上传和下载附件 |
-| FR-ATT-010 | 任务详情包含附件 | 附件面板显示和权限 | 列表刷新与视觉状态 |
-| FR-DASH-001 到 FR-DASH-005 | `dashboard.test.ts`：统计归属、逾期、最近项目 | `dashboard.test.ts`：API 调用 | 看板统计与最近项目跳转 |
-| FR-UX-001 到 FR-UX-005 | 错误响应结构测试 | 组件加载、空态、错误和提交状态 | 桌面截图、交互检查 |
+| 需求                       | 后端集成测试                                                    | 前端测试                                             | E2E / 手工验收               |
+| -------------------------- | --------------------------------------------------------------- | ---------------------------------------------------- | ---------------------------- |
+| FR-AUTH-001 到 FR-AUTH-006 | `auth.test.ts`：注册、重复账号、登录、密码错误、`/me`、无 Token | `http.test.ts`、`auth.test.ts`：Token、拦截器、Store | 注册、登录、刷新恢复、退出   |
+| FR-AUTH-007 到 FR-AUTH-008 | `auth.test.ts`：限流                                            | `auth.test.ts`：退出清理                             | 登录页跳转和消息反馈         |
+| FR-PROJ-001 到 FR-PROJ-005 | `projects.test.ts`：创建事务、列表、详情、编辑权限              | `project-store.test.ts`、`permissions.test.ts`       | 创建项目、进入详情、编辑项目 |
+| FR-PROJ-006 到 FR-PROJ-012 | `projects.test.ts`：添加、重复、移除、负责人保护、删除级联      | 成员面板行为、权限组合函数                           | 添加成员、移除成员、删除项目 |
+| FR-TASK-001 到 FR-TASK-008 | `tasks.test.ts`：创建、枚举校验、负责人校验、筛选、分页         | `task-filters.test.ts`：参数转换、空值处理           | 新建任务、筛选任务、分页     |
+| FR-TASK-009 到 FR-TASK-014 | `tasks.test.ts`：详情、编辑、删除权限                           | 表单和权限测试                                       | 修改状态、删除任务           |
+| FR-COMM-001 到 FR-COMM-006 | `comments.test.ts`：列表顺序、发布、删除权限                    | `comments.test.ts`：API 调用                         | 发布评论、删除评论           |
+| FR-ATT-001 到 FR-ATT-009   | `attachments.test.ts`：上传、大小、类型、数量、下载和删除权限   | `attachments.test.ts`：`FormData`、下载 Blob         | 上传和下载附件               |
+| FR-ATT-010                 | 任务详情包含附件                                                | 附件面板显示和权限                                   | 列表刷新与视觉状态           |
+| FR-DASH-001 到 FR-DASH-005 | `dashboard.test.ts`：统计归属、逾期、最近项目                   | `dashboard.test.ts`：API 调用                        | 看板统计与最近项目跳转       |
+| FR-UX-001 到 FR-UX-005     | 错误响应结构测试                                                | 组件加载、空态、错误和提交状态                       | 桌面截图、交互检查           |
 
 ## 4. 后端必测场景
 

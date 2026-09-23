@@ -21,13 +21,13 @@
 
 ## 文档导航
 
-| 文档 | 内容 | 主要读者 |
-| --- | --- | --- |
-| [01-product-requirements.md](./01-product-requirements.md) | 产品目标、范围、用户角色、用户故事和成功标准 | 产品、开发、测试 |
-| [02-user-flows-and-permissions.md](./02-user-flows-and-permissions.md) | 核心流程、权限矩阵、页面状态和导航 | 产品、前端、后端、测试 |
-| [03-functional-specification.md](./03-functional-specification.md) | 带编号的功能需求、校验规则和验收条件 | 开发、测试 |
-| [04-api-and-data-contracts.md](./04-api-and-data-contracts.md) | 数据模型、API 契约、分页、错误码和文件规则 | 前后端、测试 |
-| [05-acceptance-and-test-matrix.md](./05-acceptance-and-test-matrix.md) | 验收层级、测试追踪矩阵和发布门禁 | 开发、测试、维护者 |
+| 文档                                                                   | 内容                                         | 主要读者               |
+| ---------------------------------------------------------------------- | -------------------------------------------- | ---------------------- |
+| [01-product-requirements.md](./01-product-requirements.md)             | 产品目标、范围、用户角色、用户故事和成功标准 | 产品、开发、测试       |
+| [02-user-flows-and-permissions.md](./02-user-flows-and-permissions.md) | 核心流程、权限矩阵、页面状态和导航           | 产品、前端、后端、测试 |
+| [03-functional-specification.md](./03-functional-specification.md)     | 带编号的功能需求、校验规则和验收条件         | 开发、测试             |
+| [04-api-and-data-contracts.md](./04-api-and-data-contracts.md)         | 数据模型、API 契约、分页、错误码和文件规则   | 前后端、测试           |
+| [05-acceptance-and-test-matrix.md](./05-acceptance-and-test-matrix.md) | 验收层级、测试追踪矩阵和发布门禁             | 开发、测试、维护者     |
 
 设计与原型：
 
@@ -41,15 +41,15 @@
 
 需求编号格式为 `FR-<领域>-<三位序号>`：
 
-| 前缀 | 领域 |
-| --- | --- |
+| 前缀   | 领域                       |
+| ------ | -------------------------- |
 | `AUTH` | 注册、登录、会话和当前用户 |
-| `PROJ` | 项目和项目成员 |
-| `TASK` | 任务管理和任务筛选 |
-| `COMM` | 评论 |
-| `ATT` | 附件 |
-| `DASH` | 看板 |
-| `UX` | 全局交互与反馈 |
+| `PROJ` | 项目和项目成员             |
+| `TASK` | 任务管理和任务筛选         |
+| `COMM` | 评论                       |
+| `ATT`  | 附件                       |
+| `DASH` | 看板                       |
+| `UX`   | 全局交互与反馈             |
 
 每个功能需求必须满足：
 

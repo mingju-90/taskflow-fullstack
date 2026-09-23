@@ -1,0 +1,17 @@
+{
+  "name": "taskflow-fullstack",
+  "version": "0.0.0",
+  "private": true,
+  "description": "TaskFlow full-stack learning project",
+  "scripts": {
+    "prepare": "node scripts/setup-git-hooks.mjs",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "commit:check": "node scripts/validate-staged.mjs",
+    "commit:message": "node scripts/validate-commit-message.mjs"
+  },
+  "devDependencies": {
+    "cspell": "^8.19.4",
+    "prettier": "^3.9.9"
+  }
+}

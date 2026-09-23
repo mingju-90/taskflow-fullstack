@@ -18,6 +18,7 @@
 - 验收与测试矩阵：`docs/requirements/05-acceptance-and-test-matrix.md`
 - 可交互桌面原型：`docs/product/prototypes/taskflow-prototype.html`
 - 桌面截图：`docs/product/screenshots/`
+- 项目 AI 协作规范：`AGENTS.md`
 
 需求编号用于连接功能、权限、接口、测试和验收。原型用于确认桌面端信息层级和交互，不作为绕过 Vue 组件拆分的纯图片交付物。
 
@@ -135,12 +136,35 @@
 - Vitest + Vue Test Utils：前端关键逻辑与组件测试
 - Playwright：一条完整用户流程的冒烟测试
 
+### 工程化
+
+- Prettier：全仓统一格式化
+- cspell：暂存代码和配置的英文拼写检查
+- EditorConfig：统一字符集、换行和缩进
+- VS Code：保存时自动格式化并推荐 Prettier 扩展
+- Git hooks：提交前检查暂存区，提交信息使用中文规范
+
+### AI 协作
+
+- `AGENTS.md`：项目级 AI 注释、JSDoc、模板注释、业务注释和中文协作规范
+- `.gitmessage`：中文提交模板
+- GitHub Pull Request 模板：中文需求、权限、验证、截图和回滚说明
+
 ## 仓库结构
 
 仓库根目录下只有两个独立应用目录。前后端分别拥有自己的 `package.json`、依赖、脚本、环境变量和构建配置。
 
 ```text
 taskflow-fullstack/
+├── .github/
+│   ├── pull_request_template.md
+│   └── workflows/ci.yml
+├── .githooks/
+│   ├── commit-msg
+│   └── pre-commit
+├── .vscode/
+│   ├── extensions.json
+│   └── settings.json
 ├── client/
 │   ├── src/
 │   ├── tests/
@@ -156,11 +180,23 @@ taskflow-fullstack/
 │   ├── tsconfig.json
 │   └── .env.example
 ├── docs/
+├── scripts/
+│   ├── setup-git-hooks.mjs
+│   ├── validate-commit-message.mjs
+│   └── validate-staged.mjs
+├── .cspell.json
+├── .editorconfig
 ├── .gitignore
+├── .gitmessage
+├── .prettierignore
+├── .prettierrc.json
+├── AGENTS.md
+├── package-lock.json
+├── package.json
 └── README.md
 ```
 
-第一版不使用 npm workspace。开发时需要分别启动前端和后端进程：
+第一版不使用 npm workspace。根目录的 `package.json` 只管理 Prettier 等跨仓库开发工具，不参与应用运行。开发时需要分别启动前端和后端进程：
 
 - `client` 默认运行在 Vite 开发端口
 - `server` 默认监听 `http://localhost:3000`
@@ -566,6 +602,7 @@ VITE_API_BASE_URL=http://localhost:3000/api/v1
 GitHub Actions 在 `push` 和 `pull_request` 时执行质量门禁：
 
 - 使用 Node.js 20 和 `npm ci` 安装锁定依赖。
+- 根目录运行 Prettier 格式检查。
 - 后端执行 Prisma Client 生成、类型检查、集成测试和构建。
 - 前端执行类型检查、组件测试和构建。
 - Playwright 安装 Chromium 后执行真实前后端冒烟流程。
@@ -619,6 +656,7 @@ Seed 使用幂等写入方式，重复执行不会产生重复数据。
 - 前端关键逻辑测试通过
 - Playwright 冒烟测试通过
 - GitHub Actions 的全部质量门禁通过
+- `npm run format:check` 通过
 - `.env.example` 和启动文档齐全
 - 未登录、越权、参数错误、文件错误和资源不存在都有明确处理
 - UI 覆盖加载中、空状态、错误重试和操作成功反馈

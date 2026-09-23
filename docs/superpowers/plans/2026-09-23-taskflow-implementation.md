@@ -6,7 +6,7 @@
 
 **架构：** 仓库包含彼此独立的 `client` 和 `server` 目录。后端采用 `route -> controller -> service -> Prisma` 分层；前端采用 Vue 3、Vite、Pinia、Vue Router、Axios 和 Element Plus。
 
-**技术栈：** Vue 3、TypeScript、Vite、Vue Router、Pinia、Axios、Element Plus、Node.js、Express、Prisma、SQLite、JWT、Zod、Multer、Vitest、Supertest、Vue Test Utils、Playwright。
+**技术栈：** Vue 3、TypeScript、Vite、Vue Router、Pinia、Axios、Element Plus、Node.js、Express、Prisma、SQLite、JWT、Zod、Multer、Vitest、Supertest、Vue Test Utils、Playwright、Prettier、EditorConfig。
 
 **设计文档：** `docs/superpowers/specs/2026-09-23-taskflow-design.md`
 
@@ -34,6 +34,8 @@
 - Node.js：20 或更高版本
 - 包管理器：npm
 - 不使用 npm workspace
+- 根目录只用于跨仓库开发工具，不参与应用运行
+- 根目录负责 Prettier、EditorConfig 和全仓格式检查
 - `client` 和 `server` 分别拥有自己的 `package.json`、锁文件、脚本和环境变量
 - 所有应用代码使用严格模式 TypeScript
 - API 前缀：`/api/v1`
@@ -53,15 +55,25 @@
 - 不实现设计文档中明确排除的功能
 - 需求编号和验收口径以 `docs/requirements/` 为准
 - 原型只用于确认信息层级和交互，不作为最终 Vue 组件实现
+- 所有 Codex 协作必须遵循根目录 `AGENTS.md`
+- 新增和修改业务代码时同步补充中文 JSDoc、模板注释和业务规则注释
+- 提交摘要、提交正文、Pull Request 和协作说明使用中文
+- 提交前必须通过 `.githooks/pre-commit` 和 `.githooks/commit-msg`
 
 ## 质量门禁
 
+- 权限、事务、校验、文件生命周期和异常恢复必须有中文业务注释。
+- 导出函数和公共类型必须有必要的中文 JSDoc。
+- Vue 页面主要区块和权限分支必须有中文模板注释。
 - 后端集成测试使用独立临时 SQLite 数据库，测试之间不能依赖执行顺序。
 - 前端组件测试不能依赖真实网络，API 行为使用适配器或 Mock 固定。
 - 端到端测试必须启动真实前后端和独立 E2E 数据库。
 - CI 不在监听模式下运行 Vitest，所有测试命令都必须显式退出。
 - CI 使用 Node.js 20、`npm ci` 和锁定后的 `package-lock.json`。
-- `server` 与 `client` 的快速检查可以并行，E2E 必须等待两者成功。
+- 提交和 CI 必须运行 `npm run format:check`，格式不一致时任务失败。
+- `npm run commit:check` 必须检查暂存内容、格式、拼写、冲突标记、调试残留和敏感信息。
+- 提交信息必须满足 `<type>: <中文简述>`。
+- `format-checks`、`server-checks` 与 `client-checks` 可以并行，E2E 必须等待三者成功。
 - 任一步骤失败时工作流失败，不允许通过跳过测试或无断言命令绕过门禁。
 
 ## 文件结构
@@ -71,6 +83,22 @@
 - `.gitignore`：忽略依赖、构建产物、本地数据库、环境文件、测试产物和上传文件。
 - `README.md`：安装、环境、迁移、种子数据、开发、测试和构建说明。
 - `.github/workflows/ci.yml`：后端、前端和 Playwright 持续集成门禁。
+- `.github/pull_request_template.md`：中文 Pull Request 检查模板。
+- `.githooks/pre-commit`：提交前暂存区校验。
+- `.githooks/commit-msg`：中文提交信息校验。
+- `package.json`：根目录格式化脚本和 Prettier 开发依赖。
+- `package-lock.json`：锁定根目录格式化工具版本。
+- `.prettierrc.json`：全仓统一 Prettier 规则。
+- `.prettierignore`：排除依赖、构建产物、数据库和上传文件。
+- `.editorconfig`：统一字符集、换行和缩进。
+- `.vscode/settings.json`：保存时使用 Prettier 自动格式化。
+- `.vscode/extensions.json`：推荐 Prettier VS Code 扩展。
+- `.cspell.json`：代码与配置文件的拼写词典和忽略范围。
+- `scripts/setup-git-hooks.mjs`：启用仓库本地 Git 钩子。
+- `scripts/validate-staged.mjs`：校验暂存区内容。
+- `scripts/validate-commit-message.mjs`：校验中文提交信息。
+- `AGENTS.md`：项目级 Codex 注释、JSDoc、模板注释和中文协作规范。
+- `.gitmessage`：中文提交模板。
 - `docs/`：设计文档和本实施计划。
 
 ### 后端
@@ -901,8 +929,12 @@ logout
 路由元数据：
 
 ```ts
-meta: { requiresAuth: true }
-meta: { guestOnly: true }
+meta: {
+  requiresAuth: true
+}
+meta: {
+  guestOnly: true
+}
 ```
 
 守卫先执行 `auth.bootstrap()`：
@@ -1813,7 +1845,9 @@ DATABASE_URL=file:./test.db npm test -- --run tests/dashboard.test.ts
 {
   project: {
     members: {
-      some: { userId }
+      some: {
+        userId
+      }
     }
   }
 }
@@ -2003,8 +2037,7 @@ npm install -D cross-env
 ```ts
 webServer: [
   {
-    command:
-      'npm --prefix ../server run e2e:prepare && npm --prefix ../server run dev:e2e',
+    command: 'npm --prefix ../server run e2e:prepare && npm --prefix ../server run dev:e2e',
     url: 'http://127.0.0.1:3000/api/v1/health',
     reuseExistingServer: !process.env.CI,
   },
@@ -2141,7 +2174,7 @@ git commit -m "chore: complete TaskFlow documentation and hardening"
 
 ## 任务 19：GitHub Actions 持续集成与质量门禁
 
-**目标：** 每次推送和合并请求自动运行类型检查、后端测试、前端测试、构建和 Playwright 冒烟流程。
+**目标：** 每次推送和合并请求自动运行格式检查、类型检查、后端测试、前端测试、构建和 Playwright 冒烟流程。
 
 **涉及文件：**
 
@@ -2152,12 +2185,15 @@ git commit -m "chore: complete TaskFlow documentation and hardening"
 **接口：**
 
 - 产出：GitHub Actions 工作流 `CI`。
-- 产出：工作流任务 `server-checks`、`client-checks`、`e2e-smoke`。
+- 产出：工作流任务 `format-checks`、`server-checks`、`client-checks`、`e2e-smoke`。
 - 产出：失败时上传 `client/playwright-report/` 和 `client/test-results/`。
 
 - [ ] **步骤 1：确认本地命令可以非交互运行**
 
 ```bash
+npm ci
+npm run format:check
+
 cd server
 npm run typecheck
 DATABASE_URL=file:./test.db JWT_SECRET=test-secret-with-at-least-16-characters npm test -- --run
@@ -2202,8 +2238,7 @@ export default defineConfig({
   ],
   webServer: [
     {
-      command:
-        'npm --prefix ../server run e2e:prepare && npm --prefix ../server run dev:e2e',
+      command: 'npm --prefix ../server run e2e:prepare && npm --prefix ../server run dev:e2e',
       url: 'http://127.0.0.1:3000/api/v1/health',
       reuseExistingServer: !process.env.CI,
       timeout: 120_000,
@@ -2237,6 +2272,25 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  format-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install root tooling
+        run: npm ci
+
+      - name: Check formatting
+        run: npm run format:check
+
   server-checks:
     runs-on: ubuntu-latest
     defaults:
@@ -2304,6 +2358,7 @@ jobs:
 
   e2e-smoke:
     needs:
+      - format-checks
       - server-checks
       - client-checks
     runs-on: ubuntu-latest
@@ -2352,6 +2407,9 @@ jobs:
 - [ ] **步骤 4：本地验证工作流对应的命令**
 
 ```bash
+npm ci
+npm run format:check
+
 cd server
 npm ci
 npx prisma generate
@@ -2375,7 +2433,8 @@ npm run test:e2e
 README 增加：
 
 - CI 工作流名称和触发条件。
-- 本地复现三个 CI 任务的方法。
+- 本地运行 `npm run format` 和 `npm run format:check` 的方法。
+- 本地复现四个 CI 任务的方法。
 - Playwright 报告和失败产物的位置。
 - 合并前必须通过的工作流。
 
@@ -2392,7 +2451,7 @@ git commit -m "ci: add quality gates for TaskFlow"
 git push origin main
 ```
 
-在 GitHub 的 Actions 页面确认 `server-checks`、`client-checks` 和 `e2e-smoke` 全部为绿色。失败时下载 Playwright 报告，修复后重新提交。
+在 GitHub 的 Actions 页面确认 `format-checks`、`server-checks`、`client-checks` 和 `e2e-smoke` 全部为绿色。失败时下载 Playwright 报告，修复后重新提交。
 
 ---
 
@@ -2409,7 +2468,12 @@ git push origin main
 - [ ] 前端路由守卫能够恢复和验证登录状态。
 - [ ] 页面覆盖加载中、空状态、错误重试和成功反馈。
 - [ ] 后端测试、前端测试和 Playwright 冒烟测试全部通过。
-- [ ] GitHub Actions 的 `server-checks`、`client-checks` 和 `e2e-smoke` 全部通过。
+- [ ] `npm run format:check` 在本地和 CI 中通过。
+- [ ] `npm run commit:check` 能拦截暂存代码中的格式、拼写、调试残留和敏感信息问题。
+- [ ] `commit-msg` 能拦截缺少中文摘要或类型前缀错误的提交信息。
+- [ ] 新增和修改的业务代码具有必要的中文注释、JSDoc 和模板结构注释。
+- [ ] 提交信息、Pull Request 和协作说明使用中文。
+- [ ] GitHub Actions 的 `format-checks`、`server-checks`、`client-checks` 和 `e2e-smoke` 全部通过。
 - [ ] 失败时 Playwright 报告与 trace 可作为 CI 产物下载。
 - [ ] README 可以让新环境从零启动项目。
 
