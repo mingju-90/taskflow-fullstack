@@ -14,21 +14,21 @@
 
 ## 当前快照
 
-| 项目         | 当前状态                                          |
-| ------------ | ------------------------------------------------- |
-| 日期         | 2026-09-23                                        |
-| Git 分支     | `main`                                            |
-| 最新提交     | `956df91 chore: 初始化 TaskFlow 前端工程`         |
-| 远端状态     | `main` 领先 `origin/main` 1 个提交                |
-| 工作区       | 干净                                              |
-| 根目录工具链 | 已启用 Prettier、cspell、EditorConfig、Git hooks  |
-| 后端         | 尚未初始化，`server/` 目录不存在                  |
-| 前端         | 已初始化，可开发、测试、类型检查和构建            |
-| 需求与设计   | 已完成第一版基线                                  |
-| 交互原型     | 已完成 HTML 原型和桌面截图                        |
-| CI 实施计划  | 已写入任务 19，尚未创建真实 GitHub Actions 工作流 |
+| 项目         | 当前状态                                                  |
+| ------------ | --------------------------------------------------------- |
+| 日期         | 2026-09-23                                                |
+| Git 分支     | `main`                                                    |
+| 最新提交     | `12e52e0 docs: 增加项目进度与恢复说明`                    |
+| 远端状态     | `main` 与 `origin/main` 同步                              |
+| 工作区       | 任务 1 变更待提交，依赖锁文件迁移状态待整理               |
+| 根目录工具链 | 已启用 Prettier、cspell、EditorConfig、Git hooks          |
+| 后端         | 基础工程和健康检查已完成，业务 API 尚未实现               |
+| 前端         | 已初始化，可开发、测试、类型检查和构建                    |
+| 需求与设计   | 已完成第一版基线                                          |
+| 交互原型     | 已完成 HTML 原型和桌面截图                                |
+| CI 实施计划  | 已写入任务 19，npm 命令和锁文件配置需迁移到 pnpm 后再实施 |
 
-当前本地 Node.js 为 `v18.20.8`，项目计划要求 Node.js 20 或更高版本。当前前端依赖选择同时兼容 Node.js 18 和 20，最终 CI 仍应使用 Node.js 20。
+当前本地 Node.js 为 `v22.19.0`，pnpm 为 `v10.17.0`，满足 Node.js 20 或更高版本的运行要求。
 
 ## 已完成内容
 
@@ -185,35 +185,78 @@
 - Element Plus 固定为 `2.11.8`，Vite 使用 5.x，避免初始化阶段引入 Node.js 版本不兼容。
 - 任务 5 已先完成，但没有加入依赖后端 API 的认证和业务逻辑。
 
+### 7. 后端基础与健康检查
+
+已完成：
+
+- 独立 `server` 项目和 pnpm 锁文件。
+- TypeScript 开发、构建、测试和类型检查脚本。
+- 环境变量校验、Express 基础中间件和统一应用工厂。
+- `GET /api/v1/health` 健康检查接口。
+- 健康检查集成测试、类型检查和生产构建验证。
+
+关键文件：
+
+- `server/package.json`
+- `server/tsconfig.json`
+- `server/tsconfig.build.json`
+- `server/vitest.config.mts`
+- `server/.env.example`
+- `server/src/config/env.ts`
+- `server/src/app.ts`
+- `server/src/server.ts`
+- `server/src/routes/health.route.ts`
+- `server/tests/health.test.ts`
+
+为什么这样做：
+
+- 先建立可独立启动、可测试的后端入口，后续错误处理、数据库和认证功能可以直接挂接。
+- 环境变量在进程启动阶段完成校验，避免配置错误延迟到具体请求才暴露。
+- Vitest 配置使用 `.mts`，兼容 CommonJS 生产构建和 ESM 配置加载。
+- 任务 1 只实现健康检查，不提前引入 Prisma、认证或业务 API。
+
 ## 当前可运行命令
 
 ### 根目录
 
 ```bash
-npm install
-npm run format
-npm run format:check
-npm run commit:check
+pnpm install
+pnpm format
+pnpm format:check
+pnpm commit:check
 ```
 
 提交信息检查：
 
 ```bash
-printf 'feat: 增加示例功能\n' | npm run commit:message
+printf 'feat: 增加示例功能\n' | pnpm commit:message
 ```
 
 ### 前端
 
 ```bash
 cd client
-npm install
-npm run dev
-npm run test:run
-npm run typecheck
-npm run build
+pnpm install
+pnpm dev
+pnpm test:run
+pnpm typecheck
+pnpm build
 ```
 
 默认开发地址为 `http://127.0.0.1:5173/`。如果端口被占用，Vite 会自动选择下一个可用端口。
+
+### 后端
+
+```bash
+cd server
+pnpm install
+pnpm dev
+pnpm test
+pnpm typecheck
+pnpm build
+```
+
+默认健康检查地址为 `http://127.0.0.1:3000/api/v1/health`。首次启动前需要根据 `server/.env.example` 创建本地 `server/.env`。
 
 ## 已验证结果
 
@@ -221,27 +264,30 @@ npm run build
 - `vue-tsc` 类型检查通过。
 - Vite 生产构建通过。
 - 无头浏览器可以渲染 `TaskFlow` 和“前端基础工程已就绪”。
+- 后端健康检查测试通过。
+- 后端 TypeScript 类型检查通过。
+- 后端生产构建通过。
 - Prettier、cspell 和暂存区校验通过。
 - `pre-commit` 和 `commit-msg` 已在真实提交中执行。
 
 ## 已知限制与风险
 
-- `server/` 尚未创建，真实 API 不存在。
-- 根目录构建工具与前端依赖均兼容当前 Node.js 18，但最终 CI 仍按计划使用 Node.js 20。
+- 后端目前只有健康检查，数据库、认证和业务 API 尚未实现。
+- 根目录和 `client` 同时保留 npm 锁文件与 pnpm 锁文件，需要统一到 pnpm 后再提交。
+- 实施计划和 GitHub Actions 章节仍包含 npm 命令，需要迁移到 pnpm。
 - Element Plus 当前在入口全量安装，生产构建有单个 JS 包超过 500 kB 的提示；后续可按路由和组件做按需加载。
 - GitHub Actions 目前只有实施计划中的任务 19，真实 `.github/workflows/ci.yml` 尚未创建。
 - 原型 HTML 与 Vue 页面是两个阶段，原型不是最终组件实现。
-- 当前 `main` 尚未推送。
 
 ## 下一阶段推荐顺序
 
-前端任务 5 已完成，但后端尚未开始。为避免认证页面依赖不存在的 API，下一步仍应回到实施计划任务 1：
+任务 1 和前端任务 5 已完成。下一步继续实现后端基础设施：
 
-1. 任务 1：搭建后端基础与健康检查。
-2. 任务 2：统一错误处理、请求 ID 和日志。
-3. 任务 3：Prisma 数据模型、迁移、测试数据库和种子数据。
-4. 任务 4：注册、登录和 JWT 鉴权 API。
-5. 任务 6：登录、注册、Token 和路由守卫。
+1. 任务 2：统一错误处理、请求 ID 和日志。
+2. 任务 3：Prisma 数据模型、迁移、测试数据库和种子数据。
+3. 任务 4：注册、登录和 JWT 鉴权 API。
+4. 任务 6：登录、注册、Token 和路由守卫。
+5. 任务 7 及后续：项目、任务、评论、附件和看板功能。
 
 每个任务继续按以下顺序推进：
 
@@ -250,8 +296,8 @@ npm run build
 3. 写最小实现。
 4. 确认测试通过。
 5. 运行类型检查。
-6. 运行 `npm run format`。
-7. 暂存后运行 `npm run commit:check`。
+6. 运行 `pnpm format`。
+7. 暂存后运行 `pnpm commit:check`。
 8. 阅读完整暂存差异，修正不合适的文案或注释。
 9. 使用中文提交信息提交。
 
@@ -262,12 +308,12 @@ npm run build
 ```text
 请先阅读 AGENTS.md、docs/PROGRESS.md、docs/requirements/README.md、
 docs/superpowers/specs/2026-09-23-taskflow-design.md，
-以及 docs/superpowers/plans/2026-09-23-taskflow-implementation.md 中“任务 1”的内容。
+以及 docs/superpowers/plans/2026-09-23-taskflow-implementation.md 中“任务 2”的内容。
 
-检查 git status 和最近提交，确认工作区状态。当前前端任务 5 已完成，
-但 server 尚未初始化。请从实施计划任务 1 开始，先写失败测试，再实现最小代码，
+检查 git status 和最近提交，确认工作区状态。当前任务 1 和前端任务 5 已完成，
+请从实施计划任务 2 开始，先写失败测试，再实现最小代码，
 遵守中文 JSDoc、Vue 模板注释、业务注释和中文提交规范。
-不要重复已完成的设计、需求、原型和前端初始化工作。
+不要重复已完成的设计、需求、原型、前端初始化和后端健康检查工作。
 ```
 
 ## 恢复时先做检查
@@ -275,10 +321,10 @@ docs/superpowers/specs/2026-09-23-taskflow-design.md，
 ```bash
 git status --short --branch
 git log -3 --oneline
-npm run format:check
+pnpm format:check
 cd client
-npm run test:run
-npm run typecheck
+pnpm test:run
+pnpm typecheck
 ```
 
 若上述状态与本文档不一致，以仓库实际状态为准，并先更新本文档再继续开发。

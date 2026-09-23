@@ -107,7 +107,7 @@
 - `server/package.json`：后端脚本和依赖。
 - `server/tsconfig.json`：后端严格 TypeScript 配置。
 - `server/tsconfig.build.json`：只编译 `src` 的生产构建配置。
-- `server/vitest.config.ts`：后端测试配置。
+- `server/vitest.config.mts`：后端测试配置。
 - `server/.env.example`：后端环境变量模板。
 - `server/prisma/schema.prisma`：数据模型。
 - `server/prisma/seed.ts`：幂等开发数据。
@@ -161,35 +161,36 @@
 
 **涉及文件：**
 
-- 新建：`.gitignore`
+- 修改：`.gitignore`
 - 新建：`README.md`
 - 新建：`server/package.json`
 - 新建：`server/tsconfig.json`
 - 新建：`server/tsconfig.build.json`
-- 新建：`server/vitest.config.ts`
+- 新建：`server/vitest.config.mts`
 - 新建：`server/.env.example`
 - 新建：`server/src/config/env.ts`
 - 新建：`server/src/app.ts`
 - 新建：`server/src/server.ts`
 - 新建：`server/src/routes/health.route.ts`
 - 新建：`server/tests/health.test.ts`
+- 新建：`server/pnpm-lock.yaml`
 
 **接口：**
 
 - 依赖：无。
 - 产出：`createApp(): Express`、`env`、`GET /api/v1/health`。
 
-- [ ] **步骤 1：安装后端基础依赖**
+- [x] **步骤 1：安装后端基础依赖**
 
 ```bash
 mkdir -p server/src/config server/src/routes server/tests
 cd server
-npm init -y
-npm install express cors helmet dotenv zod
-npm install -D typescript tsx vitest supertest @types/node @types/express @types/cors @types/supertest
+pnpm init
+pnpm add express cors helmet dotenv zod
+pnpm add -D typescript tsx vitest supertest @types/node @types/express @types/cors @types/supertest
 ```
 
-- [ ] **步骤 2：先写失败的接口测试**
+- [x] **步骤 2：先写失败的接口测试**
 
 创建 `server/tests/health.test.ts`：
 
@@ -199,7 +200,7 @@ import { describe, expect, it } from 'vitest'
 import { createApp } from '../src/app'
 
 describe('GET /api/v1/health', () => {
-  it('returns the service status', async () => {
+  it('返回服务健康状态', async () => {
     const response = await request(createApp()).get('/api/v1/health')
 
     expect(response.status).toBe(200)
@@ -209,15 +210,15 @@ describe('GET /api/v1/health', () => {
 })
 ```
 
-- [ ] **步骤 3：运行测试并确认失败**
+- [x] **步骤 3：运行测试并确认失败**
 
 ```bash
-npm test -- --run tests/health.test.ts
+pnpm exec vitest run tests/health.test.ts
 ```
 
 预期：因为 `src/app.ts` 不存在而失败。
 
-- [ ] **步骤 4：创建后端配置和健康接口**
+- [x] **步骤 4：创建后端配置和健康接口**
 
 `server/package.json` 脚本：
 
@@ -239,8 +240,8 @@ npm test -- --run tests/health.test.ts
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "CommonJS",
-    "moduleResolution": "Node",
+    "module": "Node16",
+    "moduleResolution": "Node16",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -249,7 +250,7 @@ npm test -- --run tests/health.test.ts
     "rootDir": ".",
     "types": ["node"]
   },
-  "include": ["src", "tests", "prisma", "scripts", "vitest.config.ts"]
+  "include": ["src", "tests", "prisma", "scripts", "vitest.config.mts"]
 }
 ```
 
@@ -269,7 +270,7 @@ npm test -- --run tests/health.test.ts
 }
 ```
 
-`server/vitest.config.ts`：
+`server/vitest.config.mts`：
 
 ```ts
 import { defineConfig } from 'vitest/config'
@@ -324,6 +325,9 @@ if (!result.success) {
   throw new Error(`Invalid environment configuration: ${result.error.message}`)
 }
 
+/**
+ * 已完成类型转换和业务边界校验的后端环境配置。
+ */
 export const env = result.data
 ```
 
@@ -332,6 +336,9 @@ export const env = result.data
 ```ts
 import { Router } from 'express'
 
+/**
+ * 健康检查路由，用于确认服务进程和 HTTP 入口可用。
+ */
 export const healthRouter = Router()
 
 healthRouter.get('/health', (_request, response) => {
@@ -353,6 +360,11 @@ import helmet from 'helmet'
 import { env } from './config/env'
 import { healthRouter } from './routes/health.route'
 
+/**
+ * 创建并配置 TaskFlow 后端 Express 应用。
+ *
+ * @returns 已完成基础中间件和 API 路由注册的 Express 应用
+ */
 export function createApp() {
   const app = express()
 
@@ -374,19 +386,18 @@ import { env } from './config/env'
 
 const server = createServer(createApp())
 
-server.listen(env.PORT, '127.0.0.1', () => {
-  console.log(`API listening on http://127.0.0.1:${env.PORT}`)
-})
+server.listen(env.PORT, '127.0.0.1')
 ```
 
-- [ ] **步骤 5：验证**
+- [x] **步骤 5：验证**
 
 ```bash
-npm test -- --run tests/health.test.ts
-npm run typecheck
+pnpm exec vitest run tests/health.test.ts
+pnpm typecheck
+pnpm build
 ```
 
-预期：测试通过，类型检查无错误。
+预期：测试、类型检查和生产构建全部通过。
 
 - [ ] **步骤 6：添加基础忽略文件和 README，并提交**
 
@@ -394,10 +405,12 @@ npm run typecheck
 
 ```gitignore
 node_modules/
+.pnpm-store/
 dist/
 coverage/
 playwright-report/
 test-results/
+pnpm-debug.log*
 .env
 .env.*
 !.env.example
@@ -409,7 +422,7 @@ server/uploads/
 
 ```bash
 git add .gitignore README.md server
-git commit -m "chore: scaffold TaskFlow server"
+git commit -m "chore: 搭建 TaskFlow 后端基础"
 ```
 
 ---
