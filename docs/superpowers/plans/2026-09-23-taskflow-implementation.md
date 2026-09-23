@@ -10,6 +10,10 @@
 
 **设计文档：** `docs/superpowers/specs/2026-09-23-taskflow-design.md`
 
+**需求基线：** `docs/requirements/README.md`
+
+**交互原型：** `docs/product/prototypes/taskflow-prototype.html`
+
 > 本文档正文使用中文。代码、命令、包名、接口字段和错误码保留英文，执行时以这些标识符的准确拼写为准。
 
 ## 学习执行方式
@@ -47,6 +51,18 @@
 - UI 文案使用中文
 - 每个任务结束后必须有通过的测试、类型检查和一次 Git 提交
 - 不实现设计文档中明确排除的功能
+- 需求编号和验收口径以 `docs/requirements/` 为准
+- 原型只用于确认信息层级和交互，不作为最终 Vue 组件实现
+
+## 质量门禁
+
+- 后端集成测试使用独立临时 SQLite 数据库，测试之间不能依赖执行顺序。
+- 前端组件测试不能依赖真实网络，API 行为使用适配器或 Mock 固定。
+- 端到端测试必须启动真实前后端和独立 E2E 数据库。
+- CI 不在监听模式下运行 Vitest，所有测试命令都必须显式退出。
+- CI 使用 Node.js 20、`npm ci` 和锁定后的 `package-lock.json`。
+- `server` 与 `client` 的快速检查可以并行，E2E 必须等待两者成功。
+- 任一步骤失败时工作流失败，不允许通过跳过测试或无断言命令绕过门禁。
 
 ## 文件结构
 
@@ -54,6 +70,7 @@
 
 - `.gitignore`：忽略依赖、构建产物、本地数据库、环境文件、测试产物和上传文件。
 - `README.md`：安装、环境、迁移、种子数据、开发、测试和构建说明。
+- `.github/workflows/ci.yml`：后端、前端和 Playwright 持续集成门禁。
 - `docs/`：设计文档和本实施计划。
 
 ### 后端
@@ -1983,9 +2000,20 @@ npm install -D cross-env
 
 `playwright.config.ts` 配置两个 `webServer`：
 
-```text
-server: npm run e2e:prepare && npm run dev:e2e
-client: npm run dev -- --host 127.0.0.1
+```ts
+webServer: [
+  {
+    command:
+      'npm --prefix ../server run e2e:prepare && npm --prefix ../server run dev:e2e',
+    url: 'http://127.0.0.1:3000/api/v1/health',
+    reuseExistingServer: !process.env.CI,
+  },
+  {
+    command: 'npm run dev -- --host 127.0.0.1',
+    url: 'http://127.0.0.1:5173',
+    reuseExistingServer: !process.env.CI,
+  },
+]
 ```
 
 后端 `NODE_ENV=test` 时监听 `0.0.0.0`。
@@ -2081,12 +2109,12 @@ README 必须写明：
 ```bash
 cd server
 npm run typecheck
-DATABASE_URL=file:./test.db npm test
+DATABASE_URL=file:./test.db npm test -- --run
 npm run build
 
 cd ../client
 npm run typecheck
-npm test
+npm test -- --run
 npm run build
 npm run test:e2e
 ```
@@ -2111,6 +2139,263 @@ git commit -m "chore: complete TaskFlow documentation and hardening"
 
 ---
 
+## 任务 19：GitHub Actions 持续集成与质量门禁
+
+**目标：** 每次推送和合并请求自动运行类型检查、后端测试、前端测试、构建和 Playwright 冒烟流程。
+
+**涉及文件：**
+
+- 新建：`.github/workflows/ci.yml`
+- 修改：`client/playwright.config.ts`
+- 修改：`README.md`
+
+**接口：**
+
+- 产出：GitHub Actions 工作流 `CI`。
+- 产出：工作流任务 `server-checks`、`client-checks`、`e2e-smoke`。
+- 产出：失败时上传 `client/playwright-report/` 和 `client/test-results/`。
+
+- [ ] **步骤 1：确认本地命令可以非交互运行**
+
+```bash
+cd server
+npm run typecheck
+DATABASE_URL=file:./test.db JWT_SECRET=test-secret-with-at-least-16-characters npm test -- --run
+npm run build
+
+cd ../client
+npm run typecheck
+npm test -- --run
+npm run build
+npm run test:e2e
+```
+
+所有命令必须退出，不能进入 watch 模式。Vitest 在 CI 中固定使用 `--run`。
+
+- [ ] **步骤 2：确认 Playwright 配置支持 CI**
+
+`client/playwright.config.ts` 必须包含：
+
+```ts
+import { defineConfig, devices } from '@playwright/test'
+
+export default defineConfig({
+  testDir: './e2e',
+  fullyParallel: false,
+  forbidOnly: Boolean(process.env.CI),
+  retries: process.env.CI ? 1 : 0,
+  workers: process.env.CI ? 1 : undefined,
+  reporter: process.env.CI
+    ? [['line'], ['html', { open: 'never' }]]
+    : [['list'], ['html', { open: 'never' }]],
+  use: {
+    baseURL: 'http://127.0.0.1:5173',
+    trace: 'retain-on-failure',
+    screenshot: 'only-on-failure',
+    video: 'retain-on-failure',
+  },
+  projects: [
+    {
+      name: 'chromium',
+      use: { ...devices['Desktop Chrome'] },
+    },
+  ],
+  webServer: [
+    {
+      command:
+        'npm --prefix ../server run e2e:prepare && npm --prefix ../server run dev:e2e',
+      url: 'http://127.0.0.1:3000/api/v1/health',
+      reuseExistingServer: !process.env.CI,
+      timeout: 120_000,
+    },
+    {
+      command: 'npm run dev -- --host 127.0.0.1',
+      url: 'http://127.0.0.1:5173',
+      reuseExistingServer: !process.env.CI,
+      timeout: 120_000,
+    },
+  ],
+})
+```
+
+- [ ] **步骤 3：创建 GitHub Actions 工作流**
+
+创建 `.github/workflows/ci.yml`：
+
+```yaml
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  server-checks:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server
+    env:
+      NODE_ENV: test
+      DATABASE_URL: file:./ci.db
+      JWT_SECRET: test-secret-with-at-least-16-characters
+      UPLOAD_DIR: ./uploads/ci
+      CLIENT_ORIGIN: http://127.0.0.1:5173
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: server/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Integration tests
+        run: npm test -- --run
+
+      - name: Build
+        run: npm run build
+
+  client-checks:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: client
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Unit and component tests
+        run: npm test -- --run
+
+      - name: Build
+        run: npm run build
+
+  e2e-smoke:
+    needs:
+      - server-checks
+      - client-checks
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: client
+    env:
+      CI: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: |
+            client/package-lock.json
+            server/package-lock.json
+
+      - name: Install server dependencies
+        working-directory: server
+        run: npm ci
+
+      - name: Install client dependencies
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run E2E smoke test
+        run: npm run test:e2e
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            client/playwright-report/
+            client/test-results/
+          if-no-files-found: ignore
+```
+
+- [ ] **步骤 4：本地验证工作流对应的命令**
+
+```bash
+cd server
+npm ci
+npx prisma generate
+npm run typecheck
+npm test -- --run
+npm run build
+
+cd ../client
+npm ci
+npm run typecheck
+npm test -- --run
+npm run build
+npx playwright install chromium
+npm run test:e2e
+```
+
+全部命令必须通过，且 `client/playwright-report/` 不应出现失败用例。
+
+- [ ] **步骤 5：更新 README**
+
+README 增加：
+
+- CI 工作流名称和触发条件。
+- 本地复现三个 CI 任务的方法。
+- Playwright 报告和失败产物的位置。
+- 合并前必须通过的工作流。
+
+- [ ] **步骤 6：提交**
+
+```bash
+git add .github client/playwright.config.ts README.md
+git commit -m "ci: add quality gates for TaskFlow"
+```
+
+- [ ] **步骤 7：推送并确认远端门禁**
+
+```bash
+git push origin main
+```
+
+在 GitHub 的 Actions 页面确认 `server-checks`、`client-checks` 和 `e2e-smoke` 全部为绿色。失败时下载 Playwright 报告，修复后重新提交。
+
+---
+
 ## 最终验收清单
 
 - [ ] 注册、登录和 JWT 鉴权正常。
@@ -2124,11 +2409,13 @@ git commit -m "chore: complete TaskFlow documentation and hardening"
 - [ ] 前端路由守卫能够恢复和验证登录状态。
 - [ ] 页面覆盖加载中、空状态、错误重试和成功反馈。
 - [ ] 后端测试、前端测试和 Playwright 冒烟测试全部通过。
+- [ ] GitHub Actions 的 `server-checks`、`client-checks` 和 `e2e-smoke` 全部通过。
+- [ ] 失败时 Playwright 报告与 trace 可作为 CI 产物下载。
 - [ ] README 可以让新环境从零启动项目。
 
 ## 执行顺序
 
-严格按照任务 1 到任务 18 执行。每次只打开当前任务，完成：
+严格按照任务 1 到任务 19 执行。每次只打开当前任务，完成：
 
 1. 写测试。
 2. 运行并确认失败。

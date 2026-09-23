@@ -3,10 +3,23 @@
 ## 文档状态
 
 - 日期：2026-09-23
-- 状态：各设计部分已确认，等待用户复核完整文档
+- 状态：第一版基线已确认
 - 项目形态：单仓库，前后端两个独立目录
 - 学习方式：用户主写，Codex 提供更多 Node.js 和后端支持
 - 项目工作名：TaskFlow
+
+## 配套交付物
+
+- 需求文档入口：`docs/requirements/README.md`
+- 产品需求：`docs/requirements/01-product-requirements.md`
+- 用户流程与权限：`docs/requirements/02-user-flows-and-permissions.md`
+- 功能规格：`docs/requirements/03-functional-specification.md`
+- API 与数据契约：`docs/requirements/04-api-and-data-contracts.md`
+- 验收与测试矩阵：`docs/requirements/05-acceptance-and-test-matrix.md`
+- 可交互桌面原型：`docs/product/prototypes/taskflow-prototype.html`
+- 桌面截图：`docs/product/screenshots/`
+
+需求编号用于连接功能、权限、接口、测试和验收。原型用于确认桌面端信息层级和交互，不作为绕过 Vue 组件拆分的纯图片交付物。
 
 ## 目标
 
@@ -55,6 +68,9 @@
 - 负责人可以为空
 - 负责人必须是当前项目成员
 - 任务列表支持搜索、状态筛选、优先级筛选、负责人筛选、截止时间筛选和分页
+- 项目名称长度为 1 到 80 个字符，项目描述最多 1000 个字符
+- 任务标题长度为 1 到 120 个字符，任务描述最多 5000 个字符
+- 评论内容长度为 1 到 2000 个字符
 
 ### 评论与附件
 
@@ -477,6 +493,29 @@ VITE_API_BASE_URL=http://localhost:3000/api/v1
 - `project` Store：当前项目详情和成员，用于项目内页面
 - 列表、筛选和表单数据尽量留在对应页面或组合函数中
 
+### 桌面原型
+
+可交互原型覆盖以下路由，并直接映射未来 Vue 页面：
+
+- `/login`：登录
+- `/dashboard`：统计卡片、完成进度和最近项目
+- `/projects`：项目搜索、角色筛选、分页和项目表格
+- `/projects/:projectId`：任务列表、成员管理、项目设置和任务表单
+- `/projects/:projectId/tasks/:taskId`：任务信息、评论和附件
+
+原型视觉遵循 Element Plus 的桌面端密度、主色和状态色，不引入图表库。截图固定检查：
+
+- `1440 x 900`
+- `1920 x 1080`
+
+原型和截图路径：
+
+- `docs/product/prototypes/taskflow-prototype.html`
+- `docs/product/screenshots/dashboard-1440x900.png`
+- `docs/product/screenshots/dashboard-1920x1080.png`
+- `docs/product/screenshots/project-detail-1440x900.png`
+- `docs/product/screenshots/project-detail-1920x1080.png`
+
 ## 测试策略
 
 ### 后端集成测试
@@ -521,6 +560,17 @@ VITE_API_BASE_URL=http://localhost:3000/api/v1
 5. 修改任务状态
 6. 添加评论
 7. 退出登录
+
+### 持续集成
+
+GitHub Actions 在 `push` 和 `pull_request` 时执行质量门禁：
+
+- 使用 Node.js 20 和 `npm ci` 安装锁定依赖。
+- 后端执行 Prisma Client 生成、类型检查、集成测试和构建。
+- 前端执行类型检查、组件测试和构建。
+- Playwright 安装 Chromium 后执行真实前后端冒烟流程。
+- 静态检查和单元测试可以并行，端到端测试依赖前后端构建通过。
+- 任一类型检查、测试、构建或 E2E 失败时，工作流整体失败。
 
 ## 开发数据
 
@@ -568,9 +618,11 @@ Seed 使用幂等写入方式，重复执行不会产生重复数据。
 - 后端集成测试通过
 - 前端关键逻辑测试通过
 - Playwright 冒烟测试通过
+- GitHub Actions 的全部质量门禁通过
 - `.env.example` 和启动文档齐全
 - 未登录、越权、参数错误、文件错误和资源不存在都有明确处理
 - UI 覆盖加载中、空状态、错误重试和操作成功反馈
+- 1440 x 900 和 1920 x 1080 下核心页面无横向溢出或控件重叠
 - 删除项目后关联数据和附件按设计处理
 - 用户能够根据 README 从零启动项目
 

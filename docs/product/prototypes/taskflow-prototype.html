@@ -1,0 +1,3633 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TaskFlow 高保真桌面原型</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --primary: #1677ff;
+        --primary-hover: #4096ff;
+        --primary-soft: #eaf3ff;
+        --success: #16a34a;
+        --success-soft: #eaf8ef;
+        --warning: #d97706;
+        --warning-soft: #fff7e8;
+        --danger: #dc2626;
+        --danger-soft: #fff1f0;
+        --text: #172033;
+        --text-secondary: #5b667a;
+        --text-muted: #8b95a7;
+        --border: #e5eaf1;
+        --border-strong: #d5dce7;
+        --surface: #ffffff;
+        --surface-subtle: #f6f8fb;
+        --canvas: #f3f6fa;
+        --sidebar: #10223d;
+        --sidebar-muted: #8da0bd;
+        --sidebar-hover: #1b3458;
+        --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04);
+        --shadow-md: 0 10px 30px rgba(15, 23, 42, 0.08);
+        --radius: 8px;
+        --sidebar-width: 232px;
+        --topbar-height: 64px;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+          "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        width: 100%;
+        min-width: 1180px;
+        height: 100%;
+        margin: 0;
+        overflow: hidden;
+        background: var(--canvas);
+        color: var(--text);
+      }
+
+      button,
+      input,
+      textarea,
+      select {
+        font: inherit;
+      }
+
+      button {
+        cursor: pointer;
+      }
+
+      svg.icon {
+        width: 18px;
+        height: 18px;
+        flex: 0 0 auto;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      .login-shell {
+        position: fixed;
+        inset: 0;
+        z-index: 100;
+        display: grid;
+        grid-template-columns: minmax(430px, 0.9fr) minmax(620px, 1.1fr);
+        background: #f4f7fb;
+      }
+
+      .login-panel {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background: var(--surface);
+        border-right: 1px solid var(--border);
+      }
+
+      .login-card {
+        width: 380px;
+      }
+
+      .brand-lockup {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 42px;
+      }
+
+      .brand-mark {
+        display: grid;
+        width: 40px;
+        height: 40px;
+        place-items: center;
+        border-radius: 10px;
+        background: var(--primary);
+        color: #fff;
+        box-shadow: 0 8px 20px rgba(22, 119, 255, 0.2);
+      }
+
+      .brand-mark svg {
+        width: 22px;
+        height: 22px;
+      }
+
+      .brand-name {
+        font-size: 21px;
+        font-weight: 700;
+        letter-spacing: 0;
+      }
+
+      .brand-subtitle {
+        margin-top: 2px;
+        color: var(--text-muted);
+        font-size: 12px;
+      }
+
+      .login-heading {
+        margin: 0 0 8px;
+        font-size: 28px;
+        line-height: 1.25;
+      }
+
+      .login-copy {
+        margin: 0 0 30px;
+        color: var(--text-secondary);
+        font-size: 14px;
+        line-height: 1.7;
+      }
+
+      .field {
+        display: grid;
+        gap: 8px;
+        margin-bottom: 18px;
+      }
+
+      .field > span,
+      .field > label {
+        color: #344054;
+        font-size: 13px;
+        font-weight: 600;
+      }
+
+      .input,
+      .select,
+      .textarea {
+        width: 100%;
+        border: 1px solid var(--border-strong);
+        border-radius: 6px;
+        outline: none;
+        background: #fff;
+        color: var(--text);
+        font-size: 14px;
+        transition:
+          border-color 0.18s ease,
+          box-shadow 0.18s ease;
+      }
+
+      .input,
+      .select {
+        height: 40px;
+        padding: 0 12px;
+      }
+
+      .textarea {
+        min-height: 108px;
+        resize: vertical;
+        padding: 10px 12px;
+        line-height: 1.6;
+      }
+
+      .input:focus,
+      .select:focus,
+      .textarea:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(22, 119, 255, 0.1);
+      }
+
+      .input-wrap {
+        position: relative;
+      }
+
+      .input-wrap svg {
+        position: absolute;
+        top: 11px;
+        left: 12px;
+        width: 18px;
+        height: 18px;
+        color: var(--text-muted);
+      }
+
+      .input-wrap .input {
+        padding-left: 38px;
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+
+      .form-row .field {
+        min-width: 0;
+      }
+
+      .button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        min-height: 38px;
+        border: 1px solid transparent;
+        border-radius: 6px;
+        padding: 0 15px;
+        background: #fff;
+        color: #344054;
+        font-size: 14px;
+        font-weight: 600;
+        white-space: nowrap;
+        transition:
+          background 0.18s ease,
+          border-color 0.18s ease,
+          color 0.18s ease,
+          box-shadow 0.18s ease;
+      }
+
+      .button:hover {
+        border-color: var(--border-strong);
+        background: var(--surface-subtle);
+      }
+
+      .button.primary {
+        border-color: var(--primary);
+        background: var(--primary);
+        color: #fff;
+      }
+
+      .button.primary:hover {
+        border-color: var(--primary-hover);
+        background: var(--primary-hover);
+      }
+
+      .button.danger {
+        border-color: #ffccc7;
+        background: #fff;
+        color: var(--danger);
+      }
+
+      .button.ghost {
+        border-color: transparent;
+        background: transparent;
+      }
+
+      .button.block {
+        width: 100%;
+      }
+
+      .button.icon-only {
+        width: 36px;
+        min-height: 36px;
+        padding: 0;
+      }
+
+      .button[disabled] {
+        cursor: not-allowed;
+        opacity: 0.55;
+      }
+
+      .text-link {
+        border: 0;
+        padding: 0;
+        background: transparent;
+        color: var(--primary);
+        font-weight: 600;
+      }
+
+      .login-switch {
+        margin-top: 20px;
+        color: var(--text-secondary);
+        font-size: 13px;
+        text-align: center;
+      }
+
+      .login-visual {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 80px 9%;
+        overflow: hidden;
+        background:
+          linear-gradient(rgba(16, 34, 61, 0.94), rgba(16, 34, 61, 0.94)),
+          repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 39px,
+            rgba(255, 255, 255, 0.08) 40px
+          ),
+          repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 39px,
+            rgba(255, 255, 255, 0.08) 40px
+          );
+        color: #fff;
+      }
+
+      .login-visual::after {
+        position: absolute;
+        right: -120px;
+        bottom: -120px;
+        width: 460px;
+        height: 460px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 50%;
+        content: "";
+        box-shadow:
+          0 0 0 58px rgba(255, 255, 255, 0.025),
+          0 0 0 116px rgba(255, 255, 255, 0.018);
+      }
+
+      .visual-kicker {
+        margin-bottom: 18px;
+        color: #8ebcff;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+      }
+
+      .visual-title {
+        max-width: 650px;
+        margin: 0;
+        font-size: 42px;
+        line-height: 1.22;
+        letter-spacing: 0;
+      }
+
+      .visual-copy {
+        max-width: 600px;
+        margin: 22px 0 38px;
+        color: #b9c7da;
+        font-size: 16px;
+        line-height: 1.8;
+      }
+
+      .visual-board {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 14px;
+        max-width: 650px;
+      }
+
+      .visual-card {
+        min-height: 126px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 8px;
+        padding: 18px;
+        background: rgba(255, 255, 255, 0.07);
+        backdrop-filter: blur(8px);
+      }
+
+      .visual-card.large {
+        grid-row: span 2;
+      }
+
+      .visual-label {
+        color: #9fb1c9;
+        font-size: 12px;
+      }
+
+      .visual-number {
+        margin: 12px 0 18px;
+        font-size: 32px;
+        font-weight: 700;
+      }
+
+      .visual-lines {
+        display: grid;
+        gap: 9px;
+      }
+
+      .visual-line {
+        height: 7px;
+        border-radius: 99px;
+        background: rgba(255, 255, 255, 0.12);
+      }
+
+      .visual-line.short {
+        width: 62%;
+      }
+
+      .workspace {
+        display: grid;
+        grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+        width: 100%;
+        height: 100%;
+      }
+
+      .sidebar {
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        padding: 18px 14px 14px;
+        background: var(--sidebar);
+        color: #fff;
+      }
+
+      .sidebar .brand-lockup {
+        margin: 0 8px 26px;
+      }
+
+      .sidebar .brand-mark {
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+        background: #2f7df6;
+      }
+
+      .sidebar .brand-name {
+        font-size: 18px;
+      }
+
+      .sidebar .brand-subtitle {
+        color: var(--sidebar-muted);
+      }
+
+      .nav-label {
+        margin: 4px 10px 9px;
+        color: #6f86a7;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+      }
+
+      .nav {
+        display: grid;
+        gap: 5px;
+      }
+
+      .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        width: 100%;
+        min-height: 42px;
+        border: 0;
+        border-radius: 7px;
+        padding: 0 11px;
+        background: transparent;
+        color: #c8d4e6;
+        font-size: 14px;
+        text-align: left;
+      }
+
+      .nav-item:hover {
+        background: var(--sidebar-hover);
+        color: #fff;
+      }
+
+      .nav-item.active {
+        background: #245fba;
+        color: #fff;
+        box-shadow: inset 3px 0 0 #7db4ff;
+      }
+
+      .sidebar-projects {
+        min-height: 0;
+        margin-top: 24px;
+      }
+
+      .project-nav {
+        display: grid;
+        gap: 2px;
+        max-height: 210px;
+        overflow: auto;
+      }
+
+      .project-nav-item {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        width: 100%;
+        min-height: 36px;
+        border: 0;
+        border-radius: 6px;
+        padding: 0 11px;
+        overflow: hidden;
+        background: transparent;
+        color: #aebed3;
+        cursor: pointer;
+        font-size: 13px;
+        text-align: left;
+      }
+
+      .project-nav-item:hover,
+      .project-nav-item.active {
+        background: var(--sidebar-hover);
+        color: #fff;
+      }
+
+      .project-dot {
+        width: 7px;
+        height: 7px;
+        flex: 0 0 auto;
+        border-radius: 50%;
+        background: #6faaff;
+      }
+
+      .project-nav-text {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .sidebar-footer {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: auto;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 15px 8px 3px;
+      }
+
+      .avatar {
+        display: grid;
+        width: 34px;
+        height: 34px;
+        flex: 0 0 auto;
+        place-items: center;
+        border-radius: 50%;
+        background: #dbeafe;
+        color: #1d4ed8;
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .avatar.small {
+        width: 26px;
+        height: 26px;
+        font-size: 11px;
+      }
+
+      .avatar.green {
+        background: #dcfce7;
+        color: #15803d;
+      }
+
+      .avatar.orange {
+        background: #ffedd5;
+        color: #c2410c;
+      }
+
+      .sidebar-user {
+        min-width: 0;
+      }
+
+      .sidebar-user strong,
+      .sidebar-user span {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .sidebar-user strong {
+        color: #fff;
+        font-size: 13px;
+      }
+
+      .sidebar-user span {
+        margin-top: 2px;
+        color: var(--sidebar-muted);
+        font-size: 11px;
+      }
+
+      .sidebar-footer .button {
+        margin-left: auto;
+        color: #9fb2ca;
+      }
+
+      .sidebar-footer .button:hover {
+        border-color: rgba(255, 255, 255, 0.12);
+        background: var(--sidebar-hover);
+        color: #fff;
+      }
+
+      .app-main {
+        display: grid;
+        grid-template-rows: var(--topbar-height) minmax(0, 1fr);
+        min-width: 0;
+        height: 100%;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-width: 0;
+        border-bottom: 1px solid var(--border);
+        padding: 0 28px;
+        background: rgba(255, 255, 255, 0.96);
+      }
+
+      .topbar-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 0;
+      }
+
+      .topbar-title {
+        font-size: 16px;
+        font-weight: 700;
+      }
+
+      .topbar-divider {
+        width: 1px;
+        height: 18px;
+        background: var(--border);
+      }
+
+      .topbar-context {
+        overflow: hidden;
+        color: var(--text-muted);
+        font-size: 13px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .topbar-actions {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+      }
+
+      .search-button {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        width: 220px;
+        height: 36px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 0 12px;
+        background: var(--surface-subtle);
+        color: var(--text-muted);
+        font-size: 13px;
+        text-align: left;
+      }
+
+      .search-button kbd {
+        margin-left: auto;
+        border: 1px solid var(--border-strong);
+        border-radius: 4px;
+        padding: 1px 5px;
+        background: #fff;
+        color: #778196;
+        font-family: inherit;
+        font-size: 10px;
+      }
+
+      .content {
+        min-width: 0;
+        min-height: 0;
+        overflow: auto;
+        scrollbar-gutter: stable;
+      }
+
+      .page {
+        display: none;
+        width: min(1560px, calc(100% - 48px));
+        margin: 0 auto;
+        padding: 28px 0 36px;
+      }
+
+      .page.active {
+        display: block;
+      }
+
+      .page-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 24px;
+        margin-bottom: 22px;
+      }
+
+      .page-title {
+        margin: 0;
+        font-size: 25px;
+        line-height: 1.3;
+      }
+
+      .page-description {
+        margin: 7px 0 0;
+        color: var(--text-secondary);
+        font-size: 13px;
+        line-height: 1.6;
+      }
+
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(150px, 1fr));
+        gap: 14px;
+        margin-bottom: 18px;
+      }
+
+      .stat-card {
+        min-height: 132px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 17px 18px;
+        background: var(--surface);
+        box-shadow: var(--shadow-sm);
+      }
+
+      .stat-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .stat-label {
+        color: var(--text-secondary);
+        font-size: 13px;
+      }
+
+      .stat-icon {
+        display: grid;
+        width: 32px;
+        height: 32px;
+        place-items: center;
+        border-radius: 7px;
+        background: var(--primary-soft);
+        color: var(--primary);
+      }
+
+      .stat-icon.success {
+        background: var(--success-soft);
+        color: var(--success);
+      }
+
+      .stat-icon.warning {
+        background: var(--warning-soft);
+        color: var(--warning);
+      }
+
+      .stat-icon.danger {
+        background: var(--danger-soft);
+        color: var(--danger);
+      }
+
+      .stat-value {
+        margin-top: 16px;
+        font-size: 28px;
+        font-weight: 750;
+        line-height: 1;
+      }
+
+      .stat-foot {
+        margin-top: 12px;
+        color: var(--text-muted);
+        font-size: 12px;
+      }
+
+      .dashboard-grid {
+        display: grid;
+        grid-template-columns: minmax(380px, 0.78fr) minmax(580px, 1.22fr);
+        gap: 18px;
+      }
+
+      .card {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--surface);
+        box-shadow: var(--shadow-sm);
+      }
+
+      .card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        min-height: 56px;
+        border-bottom: 1px solid var(--border);
+        padding: 0 18px;
+      }
+
+      .card-title {
+        margin: 0;
+        font-size: 15px;
+      }
+
+      .card-body {
+        padding: 18px;
+      }
+
+      .progress-layout {
+        display: flex;
+        align-items: center;
+        gap: 25px;
+      }
+
+      .progress-ring {
+        position: relative;
+        display: grid;
+        width: 132px;
+        height: 132px;
+        flex: 0 0 auto;
+        place-items: center;
+        border-radius: 50%;
+        background: conic-gradient(var(--primary) 0 63%, #e9eef6 63% 100%);
+      }
+
+      .progress-ring::before {
+        position: absolute;
+        width: 96px;
+        height: 96px;
+        border-radius: 50%;
+        background: #fff;
+        content: "";
+      }
+
+      .progress-value {
+        position: relative;
+        text-align: center;
+      }
+
+      .progress-value strong {
+        display: block;
+        font-size: 25px;
+      }
+
+      .progress-value span {
+        color: var(--text-muted);
+        font-size: 11px;
+      }
+
+      .progress-copy {
+        min-width: 0;
+        flex: 1;
+      }
+
+      .progress-copy h3 {
+        margin: 0 0 8px;
+        font-size: 17px;
+      }
+
+      .progress-copy p {
+        margin: 0 0 18px;
+        color: var(--text-secondary);
+        font-size: 13px;
+        line-height: 1.65;
+      }
+
+      .mini-stat {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-top: 1px solid var(--border);
+        padding-top: 11px;
+        color: var(--text-secondary);
+        font-size: 12px;
+      }
+
+      .mini-stat strong {
+        color: var(--text);
+        font-size: 14px;
+      }
+
+      .bar-list {
+        display: grid;
+        gap: 15px;
+      }
+
+      .bar-row {
+        display: grid;
+        grid-template-columns: 64px minmax(0, 1fr) 28px;
+        align-items: center;
+        gap: 11px;
+        font-size: 12px;
+      }
+
+      .bar-track {
+        height: 8px;
+        overflow: hidden;
+        border-radius: 99px;
+        background: #edf1f6;
+      }
+
+      .bar-fill {
+        height: 100%;
+        border-radius: inherit;
+        background: var(--primary);
+      }
+
+      .bar-fill.success {
+        background: var(--success);
+      }
+
+      .bar-fill.warning {
+        background: var(--warning);
+      }
+
+      .bar-fill.danger {
+        background: var(--danger);
+      }
+
+      .table-wrap {
+        width: 100%;
+        overflow: auto;
+      }
+
+      .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+        font-size: 13px;
+      }
+
+      .data-table th {
+        height: 42px;
+        border-bottom: 1px solid var(--border);
+        background: #f8fafc;
+        color: #627085;
+        font-size: 12px;
+        font-weight: 650;
+        text-align: left;
+      }
+
+      .data-table td {
+        height: 58px;
+        border-bottom: 1px solid var(--border);
+        color: #344054;
+        vertical-align: middle;
+      }
+
+      .data-table tr:last-child td {
+        border-bottom: 0;
+      }
+
+      .data-table tbody tr.row-link {
+        cursor: pointer;
+      }
+
+      .data-table tbody tr.row-link:hover {
+        background: #f8fbff;
+      }
+
+      .cell-padding {
+        padding: 0 14px;
+      }
+
+      .project-name-cell {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 0;
+      }
+
+      .project-name-cell strong,
+      .project-name-cell span {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .project-name-cell span {
+        margin-top: 2px;
+        color: var(--text-muted);
+        font-size: 11px;
+      }
+
+      .folder-chip {
+        display: grid;
+        width: 32px;
+        height: 32px;
+        flex: 0 0 auto;
+        place-items: center;
+        border-radius: 7px;
+        background: var(--primary-soft);
+        color: var(--primary);
+      }
+
+      .tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        min-height: 24px;
+        border: 1px solid transparent;
+        border-radius: 5px;
+        padding: 2px 8px;
+        font-size: 12px;
+        font-weight: 650;
+        white-space: nowrap;
+      }
+
+      .tag.owner {
+        border-color: #b9d6ff;
+        background: var(--primary-soft);
+        color: #0958d9;
+      }
+
+      .tag.member {
+        border-color: #d9e0ea;
+        background: #f7f9fc;
+        color: #526176;
+      }
+
+      .tag.todo {
+        border-color: #d8e0eb;
+        background: #f5f7fa;
+        color: #4b5b70;
+      }
+
+      .tag.progress {
+        border-color: #b9d6ff;
+        background: var(--primary-soft);
+        color: #0958d9;
+      }
+
+      .tag.done {
+        border-color: #b9ebc8;
+        background: var(--success-soft);
+        color: #15803d;
+      }
+
+      .tag.high {
+        border-color: #ffd0cc;
+        background: var(--danger-soft);
+        color: #c62828;
+      }
+
+      .tag.medium {
+        border-color: #fed7aa;
+        background: var(--warning-soft);
+        color: #b45309;
+      }
+
+      .tag.low {
+        border-color: #d8e0eb;
+        background: #f5f7fa;
+        color: #526176;
+      }
+
+      .tag.overdue {
+        border-color: #ffd0cc;
+        background: var(--danger-soft);
+        color: var(--danger);
+      }
+
+      .member-stack {
+        display: flex;
+        align-items: center;
+      }
+
+      .member-stack .avatar {
+        margin-left: -7px;
+        border: 2px solid #fff;
+      }
+
+      .member-stack .avatar:first-child {
+        margin-left: 0;
+      }
+
+      .member-stack .more {
+        display: grid;
+        width: 26px;
+        height: 26px;
+        margin-left: -7px;
+        place-items: center;
+        border: 2px solid #fff;
+        border-radius: 50%;
+        background: #eef2f7;
+        color: #667085;
+        font-size: 10px;
+      }
+
+      .toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        margin-bottom: 16px;
+      }
+
+      .toolbar-left,
+      .toolbar-right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .toolbar-search {
+        width: 270px;
+      }
+
+      .segmented {
+        display: inline-flex;
+        align-items: center;
+        padding: 3px;
+        border: 1px solid var(--border);
+        border-radius: 7px;
+        background: var(--surface-subtle);
+      }
+
+      .segment {
+        min-height: 30px;
+        border: 0;
+        border-radius: 5px;
+        padding: 0 12px;
+        background: transparent;
+        color: var(--text-secondary);
+        font-size: 12px;
+      }
+
+      .segment.active {
+        background: #fff;
+        color: var(--text);
+        box-shadow: var(--shadow-sm);
+        font-weight: 650;
+      }
+
+      .pagination {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 16px;
+        color: var(--text-muted);
+        font-size: 12px;
+      }
+
+      .pagination-pages {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .page-button {
+        display: grid;
+        width: 30px;
+        height: 30px;
+        place-items: center;
+        border: 1px solid var(--border);
+        border-radius: 5px;
+        background: #fff;
+        color: var(--text-secondary);
+        font-size: 12px;
+      }
+
+      .page-button.active {
+        border-color: var(--primary);
+        background: var(--primary);
+        color: #fff;
+      }
+
+      .breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        margin-bottom: 17px;
+        color: var(--text-muted);
+        font-size: 12px;
+      }
+
+      .breadcrumb button {
+        border: 0;
+        padding: 0;
+        background: transparent;
+        color: var(--text-secondary);
+      }
+
+      .project-hero {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        margin-bottom: 18px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 22px 24px;
+        background: #fff;
+        box-shadow: var(--shadow-sm);
+      }
+
+      .project-hero-main {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        min-width: 0;
+      }
+
+      .project-hero-icon {
+        display: grid;
+        width: 52px;
+        height: 52px;
+        flex: 0 0 auto;
+        place-items: center;
+        border-radius: 10px;
+        background: var(--primary-soft);
+        color: var(--primary);
+      }
+
+      .project-hero h1 {
+        margin: 0;
+        font-size: 23px;
+      }
+
+      .project-hero p {
+        max-width: 720px;
+        margin: 7px 0 0;
+        overflow: hidden;
+        color: var(--text-secondary);
+        font-size: 13px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .project-meta {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-top: 10px;
+        color: var(--text-muted);
+        font-size: 12px;
+      }
+
+      .project-meta span {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .tabs {
+        display: flex;
+        align-items: center;
+        gap: 28px;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 18px;
+      }
+
+      .tab {
+        position: relative;
+        min-height: 42px;
+        border: 0;
+        padding: 0 2px;
+        background: transparent;
+        color: var(--text-secondary);
+        font-size: 14px;
+      }
+
+      .tab.active {
+        color: var(--primary);
+        font-weight: 700;
+      }
+
+      .tab.active::after {
+        position: absolute;
+        right: 0;
+        bottom: -1px;
+        left: 0;
+        height: 2px;
+        background: var(--primary);
+        content: "";
+      }
+
+      .tab-panel {
+        display: none;
+      }
+
+      .tab-panel.active {
+        display: block;
+      }
+
+      .task-summary-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+
+      .summary-cell {
+        border: 1px solid var(--border);
+        border-radius: 7px;
+        padding: 14px;
+        background: #fff;
+      }
+
+      .summary-cell span {
+        display: block;
+        color: var(--text-muted);
+        font-size: 12px;
+      }
+
+      .summary-cell strong {
+        display: block;
+        margin-top: 8px;
+        font-size: 20px;
+      }
+
+      .filter-grid {
+        display: grid;
+        grid-template-columns: minmax(220px, 1.3fr) repeat(3, minmax(130px, 0.7fr)) auto;
+        gap: 10px;
+        width: 100%;
+      }
+
+      .task-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 0;
+      }
+
+      .task-title-icon {
+        display: grid;
+        width: 28px;
+        height: 28px;
+        flex: 0 0 auto;
+        place-items: center;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        background: #fff;
+        color: var(--text-secondary);
+      }
+
+      .task-title strong {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .task-title span {
+        display: block;
+        margin-top: 2px;
+        color: var(--text-muted);
+        font-size: 11px;
+      }
+
+      .assignee-cell {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+      }
+
+      .assignee-cell span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .icon-actions {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+      }
+
+      .icon-button {
+        display: grid;
+        width: 30px;
+        height: 30px;
+        place-items: center;
+        border: 0;
+        border-radius: 5px;
+        background: transparent;
+        color: #667085;
+      }
+
+      .icon-button:hover {
+        background: var(--surface-subtle);
+        color: var(--primary);
+      }
+
+      .member-table-user {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .member-table-user strong,
+      .member-table-user span {
+        display: block;
+      }
+
+      .member-table-user span {
+        margin-top: 2px;
+        color: var(--text-muted);
+        font-size: 11px;
+      }
+
+      .settings-form {
+        max-width: 680px;
+      }
+
+      .task-detail-grid {
+        display: grid;
+        grid-template-columns: minmax(620px, 1fr) 330px;
+        align-items: start;
+        gap: 18px;
+      }
+
+      .task-detail-main {
+        display: grid;
+        gap: 18px;
+      }
+
+      .task-detail-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 20px;
+      }
+
+      .task-detail-head h1 {
+        margin: 8px 0 0;
+        font-size: 24px;
+        line-height: 1.4;
+      }
+
+      .task-tags {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+      }
+
+      .description {
+        margin: 0;
+        color: #475467;
+        font-size: 14px;
+        line-height: 1.8;
+        white-space: pre-line;
+      }
+
+      .property-list {
+        display: grid;
+        gap: 0;
+      }
+
+      .property-row {
+        display: grid;
+        grid-template-columns: 90px minmax(0, 1fr);
+        align-items: center;
+        gap: 12px;
+        min-height: 48px;
+        border-bottom: 1px solid var(--border);
+        font-size: 13px;
+      }
+
+      .property-row:last-child {
+        border-bottom: 0;
+      }
+
+      .property-label {
+        color: var(--text-muted);
+      }
+
+      .property-value {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+      }
+
+      .comment {
+        display: grid;
+        grid-template-columns: 34px minmax(0, 1fr);
+        gap: 11px;
+        padding: 15px 0;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .comment:first-child {
+        padding-top: 0;
+      }
+
+      .comment:last-child {
+        border-bottom: 0;
+      }
+
+      .comment-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .comment-author {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+      }
+
+      .comment-author time {
+        color: var(--text-muted);
+        font-size: 11px;
+      }
+
+      .comment-content {
+        margin: 8px 0 0;
+        color: #475467;
+        font-size: 13px;
+        line-height: 1.7;
+      }
+
+      .comment-compose {
+        display: grid;
+        gap: 10px;
+        margin-bottom: 18px;
+        border: 1px solid var(--border);
+        border-radius: 7px;
+        padding: 12px;
+        background: #fafcff;
+      }
+
+      .comment-compose .textarea {
+        min-height: 82px;
+        background: #fff;
+      }
+
+      .compose-actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .compose-hint {
+        color: var(--text-muted);
+        font-size: 11px;
+      }
+
+      .attachment-list {
+        display: grid;
+        gap: 9px;
+      }
+
+      .attachment-item {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        border: 1px solid var(--border);
+        border-radius: 7px;
+        padding: 11px 12px;
+        background: #fff;
+      }
+
+      .file-icon {
+        display: grid;
+        width: 32px;
+        height: 32px;
+        flex: 0 0 auto;
+        place-items: center;
+        border-radius: 7px;
+        background: var(--danger-soft);
+        color: var(--danger);
+      }
+
+      .file-icon.image {
+        background: var(--success-soft);
+        color: var(--success);
+      }
+
+      .attachment-meta {
+        min-width: 0;
+        flex: 1;
+      }
+
+      .attachment-meta strong,
+      .attachment-meta span {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .attachment-meta strong {
+        font-size: 13px;
+      }
+
+      .attachment-meta span {
+        margin-top: 3px;
+        color: var(--text-muted);
+        font-size: 11px;
+      }
+
+      .modal-layer {
+        position: fixed;
+        inset: 0;
+        z-index: 200;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        background: rgba(15, 23, 42, 0.38);
+      }
+
+      .modal-layer.open {
+        display: flex;
+      }
+
+      .modal {
+        width: 520px;
+        max-height: calc(100vh - 60px);
+        overflow: auto;
+        border-radius: 9px;
+        background: #fff;
+        box-shadow: 0 24px 70px rgba(15, 23, 42, 0.24);
+      }
+
+      .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 60px;
+        border-bottom: 1px solid var(--border);
+        padding: 0 20px;
+      }
+
+      .modal-header h2 {
+        margin: 0;
+        font-size: 17px;
+      }
+
+      .modal-body {
+        padding: 20px;
+      }
+
+      .modal-footer {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 9px;
+        border-top: 1px solid var(--border);
+        padding: 14px 20px;
+      }
+
+      .toast {
+        position: fixed;
+        top: 22px;
+        left: 50%;
+        z-index: 300;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        min-height: 42px;
+        border: 1px solid #b9ebc8;
+        border-radius: 7px;
+        padding: 0 15px;
+        background: #f0fdf4;
+        color: #166534;
+        font-size: 13px;
+        font-weight: 600;
+        opacity: 0;
+        pointer-events: none;
+        transform: translate(-50%, -14px);
+        transition:
+          opacity 0.22s ease,
+          transform 0.22s ease;
+        box-shadow: var(--shadow-md);
+      }
+
+      .toast.show {
+        opacity: 1;
+        transform: translate(-50%, 0);
+      }
+
+      @media (max-width: 1360px) {
+        :root {
+          --sidebar-width: 210px;
+        }
+
+        .page {
+          width: calc(100% - 36px);
+        }
+
+        .stats-grid {
+          grid-template-columns: repeat(5, minmax(128px, 1fr));
+        }
+
+        .dashboard-grid {
+          grid-template-columns: minmax(330px, 0.72fr) minmax(520px, 1.28fr);
+        }
+
+        .progress-ring {
+          width: 112px;
+          height: 112px;
+        }
+
+        .progress-ring::before {
+          width: 80px;
+          height: 80px;
+        }
+      }
+
+      @media (min-width: 1800px) {
+        :root {
+          --sidebar-width: 252px;
+        }
+
+        .page {
+          padding-top: 34px;
+        }
+
+        .stat-card {
+          min-height: 142px;
+        }
+      }
+
+      @media (max-width: 1180px) {
+        html,
+        body {
+          min-width: 1024px;
+        }
+
+        .workspace {
+          grid-template-columns: 78px minmax(0, 1fr);
+        }
+
+        .sidebar {
+          padding-right: 10px;
+          padding-left: 10px;
+        }
+
+        .sidebar .brand-lockup {
+          justify-content: center;
+          margin-right: 0;
+          margin-left: 0;
+        }
+
+        .sidebar .brand-copy,
+        .nav-item span,
+        .nav-label,
+        .sidebar-projects,
+        .sidebar-user {
+          display: none;
+        }
+
+        .nav-item {
+          justify-content: center;
+        }
+
+        .sidebar-footer {
+          justify-content: center;
+        }
+
+        .sidebar-footer .button {
+          display: none;
+        }
+
+        .topbar {
+          padding: 0 20px;
+        }
+
+        .search-button {
+          width: 180px;
+        }
+
+        .dashboard-grid,
+        .task-detail-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <svg aria-hidden="true" style="position: absolute; width: 0; height: 0">
+      <symbol id="i-layers" viewBox="0 0 24 24">
+        <path d="m12.83 2.18 8.34 4.17a1 1 0 0 1 0 1.79l-8.34 4.17a2 2 0 0 1-1.66 0L2.83 8.14a1 1 0 0 1 0-1.79l8.34-4.17a2 2 0 0 1 1.66 0Z" />
+        <path d="m2 12 8.83 4.41a2 2 0 0 0 1.66 0L21.32 12" />
+        <path d="m2 16 8.83 4.41a2 2 0 0 0 1.66 0L21.32 16" />
+      </symbol>
+      <symbol id="i-dashboard" viewBox="0 0 24 24">
+        <rect width="7" height="9" x="3" y="3" rx="1" />
+        <rect width="7" height="5" x="14" y="3" rx="1" />
+        <rect width="7" height="9" x="14" y="12" rx="1" />
+        <rect width="7" height="5" x="3" y="16" rx="1" />
+      </symbol>
+      <symbol id="i-folder" viewBox="0 0 24 24">
+        <path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" />
+      </symbol>
+      <symbol id="i-check-square" viewBox="0 0 24 24">
+        <path d="m9 11 3 3L22 4" />
+        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+      </symbol>
+      <symbol id="i-users" viewBox="0 0 24 24">
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+        <circle cx="9" cy="7" r="4" />
+        <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+      </symbol>
+      <symbol id="i-search" viewBox="0 0 24 24">
+        <circle cx="11" cy="11" r="8" />
+        <path d="m21 21-4.3-4.3" />
+      </symbol>
+      <symbol id="i-plus" viewBox="0 0 24 24">
+        <path d="M5 12h14" />
+        <path d="M12 5v14" />
+      </symbol>
+      <symbol id="i-arrow-right" viewBox="0 0 24 24">
+        <path d="M5 12h14" />
+        <path d="m12 5 7 7-7 7" />
+      </symbol>
+      <symbol id="i-chevron-down" viewBox="0 0 24 24">
+        <path d="m6 9 6 6 6-6" />
+      </symbol>
+      <symbol id="i-log-out" viewBox="0 0 24 24">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+        <polyline points="16 17 21 12 16 7" />
+        <line x1="21" x2="9" y1="12" y2="12" />
+      </symbol>
+      <symbol id="i-edit" viewBox="0 0 24 24">
+        <path d="M12 20h9" />
+        <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+      </symbol>
+      <symbol id="i-trash" viewBox="0 0 24 24">
+        <path d="M3 6h18" />
+        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
+        <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+      </symbol>
+      <symbol id="i-user-plus" viewBox="0 0 24 24">
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+        <circle cx="9" cy="7" r="4" />
+        <line x1="19" x2="19" y1="8" y2="14" />
+        <line x1="22" x2="16" y1="11" y2="11" />
+      </symbol>
+      <symbol id="i-calendar" viewBox="0 0 24 24">
+        <path d="M8 2v4" />
+        <path d="M16 2v4" />
+        <rect width="18" height="18" x="3" y="4" rx="2" />
+        <path d="M3 10h18" />
+      </symbol>
+      <symbol id="i-message" viewBox="0 0 24 24">
+        <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4Z" />
+      </symbol>
+      <symbol id="i-paperclip" viewBox="0 0 24 24">
+        <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+      </symbol>
+      <symbol id="i-upload" viewBox="0 0 24 24">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+        <polyline points="17 8 12 3 7 8" />
+        <line x1="12" x2="12" y1="3" y2="15" />
+      </symbol>
+      <symbol id="i-download" viewBox="0 0 24 24">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+        <polyline points="7 10 12 15 17 10" />
+        <line x1="12" x2="12" y1="15" y2="3" />
+      </symbol>
+      <symbol id="i-circle-check" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10" />
+        <path d="m9 12 2 2 4-4" />
+      </symbol>
+      <symbol id="i-clock" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10" />
+        <polyline points="12 6 12 12 16 14" />
+      </symbol>
+      <symbol id="i-alert" viewBox="0 0 24 24">
+        <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z" />
+        <line x1="12" x2="12" y1="9" y2="13" />
+        <line x1="12" x2="12.01" y1="17" y2="17" />
+      </symbol>
+      <symbol id="i-list" viewBox="0 0 24 24">
+        <path d="M8 6h13" />
+        <path d="M8 12h13" />
+        <path d="M8 18h13" />
+        <path d="M3 6h.01" />
+        <path d="M3 12h.01" />
+        <path d="M3 18h.01" />
+      </symbol>
+      <symbol id="i-file" viewBox="0 0 24 24">
+        <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
+        <path d="M14 2v4a2 2 0 0 0 2 2h4" />
+      </symbol>
+      <symbol id="i-image" viewBox="0 0 24 24">
+        <rect width="18" height="18" x="3" y="3" rx="2" />
+        <circle cx="9" cy="9" r="2" />
+        <path d="m21 15-5-5L5 21" />
+      </symbol>
+      <symbol id="i-x" viewBox="0 0 24 24">
+        <path d="M18 6 6 18" />
+        <path d="m6 6 12 12" />
+      </symbol>
+    </svg>
+
+    <section class="login-shell" id="login-shell">
+      <div class="login-panel">
+        <div class="login-card">
+          <div class="brand-lockup">
+            <div class="brand-mark">
+              <svg class="icon"><use href="#i-layers"></use></svg>
+            </div>
+            <div>
+              <div class="brand-name">TaskFlow</div>
+              <div class="brand-subtitle">让项目协作清晰而有序</div>
+            </div>
+          </div>
+          <h1 class="login-heading">欢迎回来</h1>
+          <p class="login-copy">登录后继续管理项目、任务和团队协作。</p>
+          <form id="login-form">
+            <label class="field">
+              <span>邮箱</span>
+              <input class="input" type="email" value="alice@example.com" aria-label="邮箱" />
+            </label>
+            <label class="field">
+              <span>密码</span>
+              <input
+                class="input"
+                type="password"
+                value="password123"
+                aria-label="密码"
+              />
+            </label>
+            <button class="button primary block" type="submit">登录</button>
+          </form>
+          <div class="login-switch">
+            还没有账号？
+            <button class="text-link" type="button" id="register-link">注册账号</button>
+          </div>
+        </div>
+      </div>
+      <div class="login-visual">
+        <div class="visual-kicker">PROJECT OPERATIONS</div>
+        <h2 class="visual-title">把任务、进度与协作放在同一个清晰的视图中。</h2>
+        <p class="visual-copy">
+          从项目创建到任务收尾，TaskFlow 帮助团队保持信息一致，让每一步都有明确归属。
+        </p>
+        <div class="visual-board">
+          <div class="visual-card large">
+            <div class="visual-label">本周完成度</div>
+            <div class="visual-number">63%</div>
+            <div class="visual-lines">
+              <div class="visual-line"></div>
+              <div class="visual-line short"></div>
+              <div class="visual-line"></div>
+            </div>
+          </div>
+          <div class="visual-card">
+            <div class="visual-label">活跃任务</div>
+            <div class="visual-number">18</div>
+          </div>
+          <div class="visual-card">
+            <div class="visual-label">项目成员</div>
+            <div class="visual-number">6</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="workspace hidden" id="workspace">
+      <aside class="sidebar">
+        <div class="brand-lockup">
+          <div class="brand-mark">
+            <svg class="icon"><use href="#i-layers"></use></svg>
+          </div>
+          <div class="brand-copy">
+            <div class="brand-name">TaskFlow</div>
+            <div class="brand-subtitle">项目管理</div>
+          </div>
+        </div>
+        <div class="nav-label">工作区</div>
+        <nav class="nav">
+          <button class="nav-item active" data-page="dashboard" data-nav="dashboard">
+            <svg class="icon"><use href="#i-dashboard"></use></svg>
+            <span>看板</span>
+          </button>
+          <button class="nav-item" data-page="projects" data-nav="projects">
+            <svg class="icon"><use href="#i-folder"></use></svg>
+            <span>项目</span>
+          </button>
+          <button
+            class="nav-item"
+            data-page="project"
+            data-nav="tasks"
+            data-open-tab="tasks"
+          >
+            <svg class="icon"><use href="#i-check-square"></use></svg>
+            <span>任务</span>
+          </button>
+          <button
+            class="nav-item"
+            data-page="project"
+            data-nav="members"
+            data-open-tab="members"
+          >
+            <svg class="icon"><use href="#i-users"></use></svg>
+            <span>成员</span>
+          </button>
+        </nav>
+        <div class="sidebar-projects">
+          <div class="nav-label">我的项目</div>
+          <div class="project-nav">
+            <button
+              class="project-nav-item active"
+              data-page="project"
+              data-project="product"
+            >
+              <span class="project-dot"></span>
+              <span class="project-nav-text">产品重构</span>
+            </button>
+            <button
+              class="project-nav-item"
+              data-page="project"
+              data-project="website"
+            >
+              <span class="project-dot" style="background: #f7b955"></span>
+              <span class="project-nav-text">官网改版</span>
+            </button>
+            <button
+              class="project-nav-item"
+              data-page="project"
+              data-project="mobile"
+            >
+              <span class="project-dot" style="background: #6dd3a8"></span>
+              <span class="project-nav-text">移动端体验优化</span>
+            </button>
+          </div>
+        </div>
+        <div class="sidebar-footer">
+          <div class="avatar">AL</div>
+          <div class="sidebar-user">
+            <strong>alice</strong>
+            <span>alice@example.com</span>
+          </div>
+          <button class="button icon-only ghost" id="logout-button" title="退出登录">
+            <svg class="icon"><use href="#i-log-out"></use></svg>
+          </button>
+        </div>
+      </aside>
+
+      <div class="app-main">
+        <header class="topbar">
+          <div class="topbar-left">
+            <span class="topbar-title" id="topbar-title">看板</span>
+            <span class="topbar-divider"></span>
+            <span class="topbar-context" id="topbar-context">全部工作区</span>
+          </div>
+          <div class="topbar-actions">
+            <button class="search-button" id="global-search" title="全局搜索">
+              <svg class="icon" style="width: 16px; height: 16px">
+                <use href="#i-search"></use>
+              </svg>
+              <span>搜索项目或任务</span>
+              <kbd>⌘ K</kbd>
+            </button>
+            <button class="button icon-only" data-open-modal="project-modal" title="新建项目">
+              <svg class="icon"><use href="#i-plus"></use></svg>
+            </button>
+          </div>
+        </header>
+
+        <main class="content">
+          <section class="page active" data-page-view="dashboard">
+            <div class="page-header">
+              <div>
+                <h1 class="page-title">早上好，Alice</h1>
+                <p class="page-description">这里是你在 TaskFlow 中的任务概览和近期项目。</p>
+              </div>
+              <div class="header-actions">
+                <button class="button" data-page-target="projects">
+                  <svg class="icon"><use href="#i-folder"></use></svg>
+                  查看全部项目
+                </button>
+                <button class="button primary" data-open-modal="project-modal">
+                  <svg class="icon"><use href="#i-plus"></use></svg>
+                  新建项目
+                </button>
+              </div>
+            </div>
+
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-head">
+                  <span class="stat-label">全部任务</span>
+                  <span class="stat-icon">
+                    <svg class="icon" style="width: 17px; height: 17px">
+                      <use href="#i-list"></use>
+                    </svg>
+                  </span>
+                </div>
+                <div class="stat-value">18</div>
+                <div class="stat-foot">覆盖 3 个活跃项目</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-head">
+                  <span class="stat-label">待处理</span>
+                  <span class="stat-icon">
+                    <svg class="icon" style="width: 17px; height: 17px">
+                      <use href="#i-clock"></use>
+                    </svg>
+                  </span>
+                </div>
+                <div class="stat-value">7</div>
+                <div class="stat-foot">其中 2 项本周到期</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-head">
+                  <span class="stat-label">进行中</span>
+                  <span class="stat-icon">
+                    <svg class="icon" style="width: 17px; height: 17px">
+                      <use href="#i-dashboard"></use>
+                    </svg>
+                  </span>
+                </div>
+                <div class="stat-value">6</div>
+                <div class="stat-foot">当前工作负载平稳</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-head">
+                  <span class="stat-label">已完成</span>
+                  <span class="stat-icon success">
+                    <svg class="icon" style="width: 17px; height: 17px">
+                      <use href="#i-circle-check"></use>
+                    </svg>
+                  </span>
+                </div>
+                <div class="stat-value">5</div>
+                <div class="stat-foot">本周新增完成 3 项</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-head">
+                  <span class="stat-label">逾期任务</span>
+                  <span class="stat-icon danger">
+                    <svg class="icon" style="width: 17px; height: 17px">
+                      <use href="#i-alert"></use>
+                    </svg>
+                  </span>
+                </div>
+                <div class="stat-value">3</div>
+                <div class="stat-foot">建议优先处理</div>
+              </div>
+            </div>
+
+            <div class="dashboard-grid">
+              <div class="card">
+                <div class="card-header">
+                  <h2 class="card-title">完成进度</h2>
+                  <span class="tag member">本周</span>
+                </div>
+                <div class="card-body">
+                  <div class="progress-layout">
+                    <div class="progress-ring">
+                      <div class="progress-value">
+                        <strong>63%</strong>
+                        <span>已完成</span>
+                      </div>
+                    </div>
+                    <div class="progress-copy">
+                      <h3>稳步推进</h3>
+                      <p>当前共有 18 项任务，其中 5 项已完成，3 项需要关注逾期风险。</p>
+                      <div class="mini-stat">
+                        <span>完成 5 / 18</span>
+                        <strong>+12%</strong>
+                      </div>
+                    </div>
+                  </div>
+                  <div style="height: 18px"></div>
+                  <div class="bar-list">
+                    <div class="bar-row">
+                      <span>待处理</span>
+                      <div class="bar-track"><div class="bar-fill" style="width: 78%"></div></div>
+                      <strong>7</strong>
+                    </div>
+                    <div class="bar-row">
+                      <span>进行中</span>
+                      <div class="bar-track">
+                        <div class="bar-fill warning" style="width: 67%"></div>
+                      </div>
+                      <strong>6</strong>
+                    </div>
+                    <div class="bar-row">
+                      <span>已完成</span>
+                      <div class="bar-track">
+                        <div class="bar-fill success" style="width: 56%"></div>
+                      </div>
+                      <strong>5</strong>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-header">
+                  <h2 class="card-title">最近项目</h2>
+                  <button class="text-link" data-page-target="projects">全部项目</button>
+                </div>
+                <div class="table-wrap">
+                  <table class="data-table">
+                    <colgroup>
+                      <col style="width: 42%" />
+                      <col style="width: 17%" />
+                      <col style="width: 24%" />
+                      <col style="width: 17%" />
+                    </colgroup>
+                    <thead>
+                      <tr>
+                        <th class="cell-padding">项目</th>
+                        <th>我的角色</th>
+                        <th>更新时间</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr class="row-link" data-page-target="project" data-project="product">
+                        <td class="cell-padding">
+                          <div class="project-name-cell">
+                            <span class="folder-chip">
+                              <svg class="icon" style="width: 16px; height: 16px">
+                                <use href="#i-folder"></use>
+                              </svg>
+                            </span>
+                            <div>
+                              <strong>产品重构</strong>
+                              <span>统一任务流转与团队协作</span>
+                            </div>
+                          </div>
+                        </td>
+                        <td><span class="tag owner">负责人</span></td>
+                        <td>今天 10:42</td>
+                        <td>
+                          <button class="icon-button" title="进入项目">
+                            <svg class="icon"><use href="#i-arrow-right"></use></svg>
+                          </button>
+                        </td>
+                      </tr>
+                      <tr class="row-link" data-page-target="project" data-project="website">
+                        <td class="cell-padding">
+                          <div class="project-name-cell">
+                            <span class="folder-chip">
+                              <svg class="icon" style="width: 16px; height: 16px">
+                                <use href="#i-folder"></use>
+                              </svg>
+                            </span>
+                            <div>
+                              <strong>官网改版</strong>
+                              <span>首页信息架构与内容升级</span>
+                            </div>
+                          </div>
+                        </td>
+                        <td><span class="tag member">成员</span></td>
+                        <td>昨天 16:20</td>
+                        <td>
+                          <button class="icon-button" title="进入项目">
+                            <svg class="icon"><use href="#i-arrow-right"></use></svg>
+                          </button>
+                        </td>
+                      </tr>
+                      <tr class="row-link" data-page-target="project" data-project="mobile">
+                        <td class="cell-padding">
+                          <div class="project-name-cell">
+                            <span class="folder-chip">
+                              <svg class="icon" style="width: 16px; height: 16px">
+                                <use href="#i-folder"></use>
+                              </svg>
+                            </span>
+                            <div>
+                              <strong>移动端体验优化</strong>
+                              <span>核心流程可用性与性能提升</span>
+                            </div>
+                          </div>
+                        </td>
+                        <td><span class="tag member">成员</span></td>
+                        <td>9 月 21 日</td>
+                        <td>
+                          <button class="icon-button" title="进入项目">
+                            <svg class="icon"><use href="#i-arrow-right"></use></svg>
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="page" data-page-view="projects">
+            <div class="page-header">
+              <div>
+                <h1 class="page-title">项目</h1>
+                <p class="page-description">查看你参与的项目，并按角色快速筛选。</p>
+              </div>
+              <button class="button primary" data-open-modal="project-modal">
+                <svg class="icon"><use href="#i-plus"></use></svg>
+                新建项目
+              </button>
+            </div>
+            <div class="card">
+              <div class="card-body" style="padding-bottom: 14px">
+                <div class="toolbar">
+                  <div class="toolbar-left">
+                    <div class="input-wrap toolbar-search">
+                      <svg class="icon"><use href="#i-search"></use></svg>
+                      <input
+                        class="input"
+                        id="project-search"
+                        type="search"
+                        placeholder="搜索项目名称或描述"
+                        aria-label="搜索项目"
+                      />
+                    </div>
+                    <div class="segmented" id="project-role-filter">
+                      <button class="segment active" data-role="all">全部角色</button>
+                      <button class="segment" data-role="owner">我负责的</button>
+                      <button class="segment" data-role="member">我参与的</button>
+                    </div>
+                  </div>
+                  <div class="toolbar-right">
+                    <span class="tag member">共 4 个项目</span>
+                  </div>
+                </div>
+              </div>
+              <div class="table-wrap">
+                <table class="data-table">
+                  <colgroup>
+                    <col style="width: 34%" />
+                    <col style="width: 13%" />
+                    <col style="width: 16%" />
+                    <col style="width: 18%" />
+                    <col style="width: 19%" />
+                  </colgroup>
+                  <thead>
+                    <tr>
+                      <th class="cell-padding">项目名称</th>
+                      <th>我的角色</th>
+                      <th>成员</th>
+                      <th>更新时间</th>
+                      <th>操作</th>
+                    </tr>
+                  </thead>
+                  <tbody id="project-table-body">
+                    <tr
+                      class="row-link"
+                      data-role="owner"
+                      data-page-target="project"
+                      data-project="product"
+                    >
+                      <td class="cell-padding">
+                        <div class="project-name-cell">
+                          <span class="folder-chip">
+                            <svg class="icon" style="width: 16px; height: 16px">
+                              <use href="#i-folder"></use>
+                            </svg>
+                          </span>
+                          <div>
+                            <strong>产品重构</strong>
+                            <span>统一任务流转与团队协作</span>
+                          </div>
+                        </div>
+                      </td>
+                      <td><span class="tag owner">负责人</span></td>
+                      <td>
+                        <div class="member-stack">
+                          <span class="avatar small">AL</span>
+                          <span class="avatar small green">BO</span>
+                          <span class="avatar small orange">CH</span>
+                          <span class="more">+2</span>
+                        </div>
+                      </td>
+                      <td>今天 10:42</td>
+                      <td>
+                        <div class="icon-actions">
+                          <button class="icon-button" title="编辑">
+                            <svg class="icon"><use href="#i-edit"></use></svg>
+                          </button>
+                          <button class="icon-button" title="删除">
+                            <svg class="icon"><use href="#i-trash"></use></svg>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr
+                      class="row-link"
+                      data-role="member"
+                      data-page-target="project"
+                      data-project="website"
+                    >
+                      <td class="cell-padding">
+                        <div class="project-name-cell">
+                          <span class="folder-chip">
+                            <svg class="icon" style="width: 16px; height: 16px">
+                              <use href="#i-folder"></use>
+                            </svg>
+                          </span>
+                          <div>
+                            <strong>官网改版</strong>
+                            <span>首页信息架构与内容升级</span>
+                          </div>
+                        </div>
+                      </td>
+                      <td><span class="tag member">成员</span></td>
+                      <td>
+                        <div class="member-stack">
+                          <span class="avatar small green">BO</span>
+                          <span class="avatar small">AL</span>
+                          <span class="avatar small orange">CH</span>
+                        </div>
+                      </td>
+                      <td>昨天 16:20</td>
+                      <td>
+                        <div class="icon-actions">
+                          <button class="icon-button" title="查看详情">
+                            <svg class="icon"><use href="#i-arrow-right"></use></svg>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr
+                      class="row-link"
+                      data-role="member"
+                      data-page-target="project"
+                      data-project="mobile"
+                    >
+                      <td class="cell-padding">
+                        <div class="project-name-cell">
+                          <span class="folder-chip">
+                            <svg class="icon" style="width: 16px; height: 16px">
+                              <use href="#i-folder"></use>
+                            </svg>
+                          </span>
+                          <div>
+                            <strong>移动端体验优化</strong>
+                            <span>核心流程可用性与性能提升</span>
+                          </div>
+                        </div>
+                      </td>
+                      <td><span class="tag member">成员</span></td>
+                      <td>
+                        <div class="member-stack">
+                          <span class="avatar small orange">CH</span>
+                          <span class="avatar small">AL</span>
+                        </div>
+                      </td>
+                      <td>9 月 21 日</td>
+                      <td>
+                        <div class="icon-actions">
+                          <button class="icon-button" title="查看详情">
+                            <svg class="icon"><use href="#i-arrow-right"></use></svg>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr
+                      class="row-link"
+                      data-role="owner"
+                      data-page-target="project"
+                      data-project="product"
+                    >
+                      <td class="cell-padding">
+                        <div class="project-name-cell">
+                          <span class="folder-chip">
+                            <svg class="icon" style="width: 16px; height: 16px">
+                              <use href="#i-folder"></use>
+                            </svg>
+                          </span>
+                          <div>
+                            <strong>API 稳定性专项</strong>
+                            <span>错误处理、日志和监控基线</span>
+                          </div>
+                        </div>
+                      </td>
+                      <td><span class="tag owner">负责人</span></td>
+                      <td>
+                        <div class="member-stack">
+                          <span class="avatar small">AL</span>
+                          <span class="avatar small green">BO</span>
+                        </div>
+                      </td>
+                      <td>9 月 19 日</td>
+                      <td>
+                        <div class="icon-actions">
+                          <button class="icon-button" title="编辑">
+                            <svg class="icon"><use href="#i-edit"></use></svg>
+                          </button>
+                          <button class="icon-button" title="删除">
+                            <svg class="icon"><use href="#i-trash"></use></svg>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="pagination">
+                <span>共 4 条，每页 20 条</span>
+                <div class="pagination-pages">
+                  <button class="page-button">‹</button>
+                  <button class="page-button active">1</button>
+                  <button class="page-button">›</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="page" data-page-view="project">
+            <div class="breadcrumb">
+              <button data-page-target="projects">项目</button>
+              <span>/</span>
+              <span data-project-breadcrumb>产品重构</span>
+            </div>
+            <div class="project-hero">
+              <div class="project-hero-main">
+                <div class="project-hero-icon">
+                  <svg class="icon" style="width: 25px; height: 25px">
+                    <use href="#i-folder"></use>
+                  </svg>
+                </div>
+                <div style="min-width: 0">
+                  <h1 data-project-name>产品重构</h1>
+                  <p data-project-description>
+                    统一任务流转、项目权限和团队协作，形成可复用的全栈工程基线。
+                  </p>
+                  <div class="project-meta">
+                    <span>
+                      <svg class="icon" style="width: 14px; height: 14px">
+                        <use href="#i-users"></use>
+                      </svg>
+                      5 位成员
+                    </span>
+                    <span>
+                      <svg class="icon" style="width: 14px; height: 14px">
+                        <use href="#i-check-square"></use>
+                      </svg>
+                      18 项任务
+                    </span>
+                    <span>
+                      <svg class="icon" style="width: 14px; height: 14px">
+                        <use href="#i-clock"></use>
+                      </svg>
+                      更新于今天 10:42
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="header-actions">
+                <button class="button" data-open-modal="member-modal">
+                  <svg class="icon"><use href="#i-user-plus"></use></svg>
+                  添加成员
+                </button>
+                <button class="button" data-open-modal="project-edit-modal">
+                  <svg class="icon"><use href="#i-edit"></use></svg>
+                  编辑项目
+                </button>
+                <button class="button danger icon-only" title="删除项目">
+                  <svg class="icon"><use href="#i-trash"></use></svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="tabs">
+              <button class="tab active" data-tab="tasks">任务</button>
+              <button class="tab" data-tab="members">成员</button>
+              <button class="tab" data-tab="settings">项目设置</button>
+            </div>
+
+            <div class="tab-panel active" data-tab-panel="tasks">
+              <div class="task-summary-grid">
+                <div class="summary-cell">
+                  <span>全部任务</span>
+                  <strong>18</strong>
+                </div>
+                <div class="summary-cell">
+                  <span>待处理</span>
+                  <strong>7</strong>
+                </div>
+                <div class="summary-cell">
+                  <span>进行中</span>
+                  <strong>6</strong>
+                </div>
+                <div class="summary-cell">
+                  <span>已完成</span>
+                  <strong>5</strong>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-body" style="padding-bottom: 14px">
+                  <div class="toolbar">
+                    <div class="filter-grid">
+                      <div class="input-wrap">
+                        <svg class="icon"><use href="#i-search"></use></svg>
+                        <input
+                          class="input"
+                          id="task-search"
+                          type="search"
+                          placeholder="搜索任务标题或描述"
+                          aria-label="搜索任务"
+                        />
+                      </div>
+                      <select class="select" id="task-status-filter" aria-label="任务状态">
+                        <option value="all">全部状态</option>
+                        <option value="TODO">待处理</option>
+                        <option value="IN_PROGRESS">进行中</option>
+                        <option value="DONE">已完成</option>
+                      </select>
+                      <select class="select" id="task-priority-filter" aria-label="任务优先级">
+                        <option value="all">全部优先级</option>
+                        <option value="HIGH">高优先级</option>
+                        <option value="MEDIUM">中优先级</option>
+                        <option value="LOW">低优先级</option>
+                      </select>
+                      <select class="select" aria-label="任务负责人">
+                        <option>全部负责人</option>
+                        <option>Alice</option>
+                        <option>Bob</option>
+                        <option>陈晨</option>
+                      </select>
+                      <button class="button primary" data-open-modal="task-modal">
+                        <svg class="icon"><use href="#i-plus"></use></svg>
+                        新建任务
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div class="table-wrap">
+                  <table class="data-table">
+                    <colgroup>
+                      <col style="width: 30%" />
+                      <col style="width: 12%" />
+                      <col style="width: 11%" />
+                      <col style="width: 15%" />
+                      <col style="width: 14%" />
+                      <col style="width: 12%" />
+                      <col style="width: 6%" />
+                    </colgroup>
+                    <thead>
+                      <tr>
+                        <th class="cell-padding">任务</th>
+                        <th>状态</th>
+                        <th>优先级</th>
+                        <th>负责人</th>
+                        <th>截止时间</th>
+                        <th>更新时间</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody id="task-table-body">
+                      <tr class="row-link" data-status="IN_PROGRESS" data-priority="HIGH" data-page-target="task">
+                        <td class="cell-padding">
+                          <div class="task-title">
+                            <span class="task-title-icon">
+                              <svg class="icon" style="width: 14px; height: 14px">
+                                <use href="#i-check-square"></use>
+                              </svg>
+                            </span>
+                            <div>
+                              <strong>完成任务筛选与分页接口</strong>
+                              <span>支持关键字、状态、优先级、负责人和日期组合</span>
+                            </div>
+                          </div>
+                        </td>
+                        <td><span class="tag progress">进行中</span></td>
+                        <td><span class="tag high">高</span></td>
+                        <td>
+                          <div class="assignee-cell">
+                            <span class="avatar small">AL</span>
+                            <span>Alice</span>
+                          </div>
+                        </td>
+                        <td>9 月 26 日</td>
+                        <td>10 分钟前</td>
+                        <td>
+                          <button class="icon-button" title="任务详情">
+                            <svg class="icon"><use href="#i-arrow-right"></use></svg>
+                          </button>
+                        </td>
+                      </tr>
+                      <tr class="row-link" data-status="TODO" data-priority="MEDIUM" data-page-target="task">
+                        <td class="cell-padding">
+                          <div class="task-title">
+                            <span class="task-title-icon">
+                              <svg class="icon" style="width: 14px; height: 14px">
+                                <use href="#i-check-square"></use>
+                              </svg>
+                            </span>
+                            <div>
+                              <strong>补充项目成员管理交互</strong>
+                              <span>添加、移除与错误反馈</span>
+                            </div>
+                          </div>
+                        </td>
+                        <td><span class="tag todo">待处理</span></td>
+                        <td><span class="tag medium">中</span></td>
+                        <td>
+                          <div class="assignee-cell">
+                            <span class="avatar small green">BO</span>
+                            <span>Bob</span>
+                          </div>
+                        </td>
+                        <td>9 月 28 日</td>
+                        <td>1 小时前</td>
+                        <td>
+                          <button class="icon-button" title="任务详情">
+                            <svg class="icon"><use href="#i-arrow-right"></use></svg>
+                          </button>
+                        </td>
+                      </tr>
+                      <tr class="row-link" data-status="DONE" data-priority="LOW" data-page-target="task">
+                        <td class="cell-padding">
+                          <div class="task-title">
+                            <span class="task-title-icon">
+                              <svg class="icon" style="width: 14px; height: 14px">
+                                <use href="#i-check-square"></use>
+                              </svg>
+                            </span>
+                            <div>
+                              <strong>统一 API 响应与错误格式</strong>
+                              <span>成功、失败和 requestId 契约</span>
+                            </div>
+                          </div>
+                        </td>
+                        <td><span class="tag done">已完成</span></td>
+                        <td><span class="tag low">低</span></td>
+                        <td>
+                          <div class="assignee-cell">
+                            <span class="avatar small orange">CH</span>
+                            <span>陈晨</span>
+                          </div>
+                        </td>
+                        <td>9 月 22 日</td>
+                        <td>昨天</td>
+                        <td>
+                          <button class="icon-button" title="任务详情">
+                            <svg class="icon"><use href="#i-arrow-right"></use></svg>
+                          </button>
+                        </td>
+                      </tr>
+                      <tr class="row-link" data-status="IN_PROGRESS" data-priority="HIGH" data-page-target="task">
+                        <td class="cell-padding">
+                          <div class="task-title">
+                            <span class="task-title-icon">
+                              <svg class="icon" style="width: 14px; height: 14px">
+                                <use href="#i-check-square"></use>
+                              </svg>
+                            </span>
+                            <div>
+                              <strong>完善附件上传与受控下载</strong>
+                              <span>类型、大小、数量和权限校验</span>
+                            </div>
+                          </div>
+                        </td>
+                        <td><span class="tag progress">进行中</span></td>
+                        <td><span class="tag high">高</span></td>
+                        <td>
+                          <div class="assignee-cell">
+                            <span class="avatar small">AL</span>
+                            <span>Alice</span>
+                          </div>
+                        </td>
+                        <td><span class="tag overdue">已逾期</span></td>
+                        <td>2 小时前</td>
+                        <td>
+                          <button class="icon-button" title="任务详情">
+                            <svg class="icon"><use href="#i-arrow-right"></use></svg>
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="pagination">
+                  <span>共 18 条，每页 20 条</span>
+                  <div class="pagination-pages">
+                    <button class="page-button">‹</button>
+                    <button class="page-button active">1</button>
+                    <button class="page-button">›</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="tab-panel" data-tab-panel="members">
+              <div class="card">
+                <div class="card-header">
+                  <h2 class="card-title">项目成员</h2>
+                  <button class="button primary" data-open-modal="member-modal">
+                    <svg class="icon"><use href="#i-user-plus"></use></svg>
+                    添加成员
+                  </button>
+                </div>
+                <div class="table-wrap">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th class="cell-padding">成员</th>
+                        <th>角色</th>
+                        <th>加入时间</th>
+                        <th>操作</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td class="cell-padding">
+                          <div class="member-table-user">
+                            <span class="avatar small">AL</span>
+                            <div><strong>Alice</strong><span>alice@example.com</span></div>
+                          </div>
+                        </td>
+                        <td><span class="tag owner">负责人</span></td>
+                        <td>9 月 10 日</td>
+                        <td><span class="tag member">不可移除</span></td>
+                      </tr>
+                      <tr>
+                        <td class="cell-padding">
+                          <div class="member-table-user">
+                            <span class="avatar small green">BO</span>
+                            <div><strong>Bob</strong><span>bob@example.com</span></div>
+                          </div>
+                        </td>
+                        <td><span class="tag member">成员</span></td>
+                        <td>9 月 12 日</td>
+                        <td>
+                          <button class="button danger">移除</button>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="cell-padding">
+                          <div class="member-table-user">
+                            <span class="avatar small orange">CH</span>
+                            <div><strong>陈晨</strong><span>chen@example.com</span></div>
+                          </div>
+                        </td>
+                        <td><span class="tag member">成员</span></td>
+                        <td>9 月 15 日</td>
+                        <td>
+                          <button class="button danger">移除</button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <div class="tab-panel" data-tab-panel="settings">
+              <div class="card">
+                <div class="card-header">
+                  <h2 class="card-title">项目设置</h2>
+                </div>
+                <div class="card-body">
+                  <div class="settings-form">
+                    <label class="field">
+                      <span>项目名称</span>
+                      <input class="input" value="产品重构" />
+                    </label>
+                    <label class="field">
+                      <span>项目描述</span>
+                      <textarea class="textarea"
+                        >统一任务流转、项目权限和团队协作，形成可复用的全栈工程基线。</textarea
+                      >
+                    </label>
+                    <button class="button primary">保存设置</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="page" data-page-view="task">
+            <div class="breadcrumb">
+              <button data-page-target="project" data-project-breadcrumb>产品重构</button>
+              <span>/</span>
+              <span>任务详情</span>
+            </div>
+            <div class="task-detail-grid">
+              <div class="task-detail-main">
+                <div class="card">
+                  <div class="card-body" style="padding: 22px 24px">
+                    <div class="task-detail-head">
+                      <div>
+                        <div class="task-tags">
+                          <span class="tag progress">进行中</span>
+                          <span class="tag high">高优先级</span>
+                        </div>
+                        <h1>完成任务筛选与分页接口</h1>
+                      </div>
+                      <div class="header-actions">
+                        <button class="button" data-open-modal="task-edit-modal">
+                          <svg class="icon"><use href="#i-edit"></use></svg>
+                          编辑
+                        </button>
+                        <button class="button danger icon-only" title="删除任务">
+                          <svg class="icon"><use href="#i-trash"></use></svg>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card">
+                  <div class="card-header">
+                    <h2 class="card-title">任务描述</h2>
+                  </div>
+                  <div class="card-body">
+                    <p class="description">
+                      实现任务列表的筛选与分页查询，支持关键字、状态、优先级、负责人和截止时间组合筛选。
+
+                      需要保证任务只能返回当前项目数据，并继续使用项目成员权限校验。分页参数缺失时使用默认值，非法值返回字段级校验错误。
+                    </p>
+                  </div>
+                </div>
+
+                <div class="card">
+                  <div class="card-header">
+                    <h2 class="card-title">评论</h2>
+                    <span class="tag member">3 条评论</span>
+                  </div>
+                  <div class="card-body">
+                    <div class="comment-compose">
+                      <textarea
+                        class="textarea"
+                        id="comment-input"
+                        placeholder="写下你的评论..."
+                        aria-label="评论内容"
+                      ></textarea>
+                      <div class="compose-actions">
+                        <span class="compose-hint">最多 2000 个字符</span>
+                        <button class="button primary" id="publish-comment">发布评论</button>
+                      </div>
+                    </div>
+                    <div class="comment">
+                      <span class="avatar small green">BO</span>
+                      <div>
+                        <div class="comment-head">
+                          <div class="comment-author">
+                            <strong>Bob</strong>
+                            <time>今天 09:42</time>
+                          </div>
+                          <button class="icon-button" title="删除评论">
+                            <svg class="icon"><use href="#i-trash"></use></svg>
+                          </button>
+                        </div>
+                        <p class="comment-content">
+                          状态和优先级筛选建议都使用枚举白名单，非法值直接返回 VALIDATION_ERROR。
+                        </p>
+                      </div>
+                    </div>
+                    <div class="comment">
+                      <span class="avatar small">AL</span>
+                      <div>
+                        <div class="comment-head">
+                          <div class="comment-author">
+                            <strong>Alice</strong>
+                            <time>今天 10:16</time>
+                          </div>
+                          <button class="icon-button" title="删除评论">
+                            <svg class="icon"><use href="#i-trash"></use></svg>
+                          </button>
+                        </div>
+                        <p class="comment-content">
+                          已补充接口契约，负责人参数会先校验项目成员关系，再进入 Prisma 查询。
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <aside class="task-detail-main">
+                <div class="card">
+                  <div class="card-header">
+                    <h2 class="card-title">任务信息</h2>
+                  </div>
+                  <div class="card-body">
+                    <div class="property-list">
+                      <div class="property-row">
+                        <span class="property-label">负责人</span>
+                        <span class="property-value">
+                          <span class="avatar small">AL</span>
+                          Alice
+                        </span>
+                      </div>
+                      <div class="property-row">
+                        <span class="property-label">创建人</span>
+                        <span class="property-value">
+                          <span class="avatar small green">BO</span>
+                          Bob
+                        </span>
+                      </div>
+                      <div class="property-row">
+                        <span class="property-label">截止时间</span>
+                        <span class="property-value">9 月 26 日 18:00</span>
+                      </div>
+                      <div class="property-row">
+                        <span class="property-label">创建时间</span>
+                        <span class="property-value">9 月 20 日 15:30</span>
+                      </div>
+                      <div class="property-row">
+                        <span class="property-label">更新时间</span>
+                        <span class="property-value">10 分钟前</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card">
+                  <div class="card-header">
+                    <h2 class="card-title">附件</h2>
+                    <button class="button" id="fake-upload">
+                      <svg class="icon"><use href="#i-upload"></use></svg>
+                      上传
+                    </button>
+                  </div>
+                  <div class="card-body">
+                    <div class="attachment-list">
+                      <div class="attachment-item">
+                        <span class="file-icon">
+                          <svg class="icon"><use href="#i-file"></use></svg>
+                        </span>
+                        <div class="attachment-meta">
+                          <strong>api-spec.pdf</strong>
+                          <span>820 KB · Alice · 今天 08:50</span>
+                        </div>
+                        <button class="icon-button" title="下载">
+                          <svg class="icon"><use href="#i-download"></use></svg>
+                        </button>
+                      </div>
+                      <div class="attachment-item">
+                        <span class="file-icon image">
+                          <svg class="icon"><use href="#i-image"></use></svg>
+                        </span>
+                        <div class="attachment-meta">
+                          <strong>filter-flow.png</strong>
+                          <span>246 KB · Bob · 昨天 17:12</span>
+                        </div>
+                        <button class="icon-button" title="下载">
+                          <svg class="icon"><use href="#i-download"></use></svg>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </aside>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <div class="modal-layer" id="project-modal">
+      <div class="modal">
+        <div class="modal-header">
+          <h2>新建项目</h2>
+          <button class="icon-button" data-close-modal title="关闭">
+            <svg class="icon"><use href="#i-x"></use></svg>
+          </button>
+        </div>
+        <form class="modal-form" data-success-message="项目创建成功">
+          <div class="modal-body">
+            <label class="field">
+              <span>项目名称</span>
+              <input class="input" required maxlength="80" value="新的协作项目" />
+            </label>
+            <label class="field">
+              <span>项目描述</span>
+              <textarea class="textarea" maxlength="1000"
+                >描述项目目标和协作范围。</textarea
+              >
+            </label>
+          </div>
+          <div class="modal-footer">
+            <button class="button" type="button" data-close-modal>取消</button>
+            <button class="button primary" type="submit">保存</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="modal-layer" id="project-edit-modal">
+      <div class="modal">
+        <div class="modal-header">
+          <h2>编辑项目</h2>
+          <button class="icon-button" data-close-modal title="关闭">
+            <svg class="icon"><use href="#i-x"></use></svg>
+          </button>
+        </div>
+        <form class="modal-form" data-success-message="项目信息已更新">
+          <div class="modal-body">
+            <label class="field">
+              <span>项目名称</span>
+              <input class="input" required maxlength="80" value="产品重构" />
+            </label>
+            <label class="field">
+              <span>项目描述</span>
+              <textarea class="textarea" maxlength="1000"
+                >统一任务流转、项目权限和团队协作，形成可复用的全栈工程基线。</textarea
+              >
+            </label>
+          </div>
+          <div class="modal-footer">
+            <button class="button" type="button" data-close-modal>取消</button>
+            <button class="button primary" type="submit">保存</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="modal-layer" id="member-modal">
+      <div class="modal">
+        <div class="modal-header">
+          <h2>添加项目成员</h2>
+          <button class="icon-button" data-close-modal title="关闭">
+            <svg class="icon"><use href="#i-x"></use></svg>
+          </button>
+        </div>
+        <form class="modal-form" data-success-message="成员添加成功">
+          <div class="modal-body">
+            <label class="field">
+              <span>邮箱或用户名</span>
+              <input
+                class="input"
+                required
+                value="diana@example.com"
+                placeholder="输入已注册用户的邮箱或用户名"
+              />
+            </label>
+          </div>
+          <div class="modal-footer">
+            <button class="button" type="button" data-close-modal>取消</button>
+            <button class="button primary" type="submit">添加成员</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="modal-layer" id="task-modal">
+      <div class="modal">
+        <div class="modal-header">
+          <h2>新建任务</h2>
+          <button class="icon-button" data-close-modal title="关闭">
+            <svg class="icon"><use href="#i-x"></use></svg>
+          </button>
+        </div>
+        <form class="modal-form" data-success-message="任务创建成功">
+          <div class="modal-body">
+            <label class="field">
+              <span>任务标题</span>
+              <input class="input" required maxlength="120" value="补充任务列表空状态" />
+            </label>
+            <label class="field">
+              <span>任务描述</span>
+              <textarea class="textarea" maxlength="5000"
+                >覆盖无任务和筛选无结果两种空状态。</textarea
+              >
+            </label>
+            <div class="form-row">
+              <label class="field">
+                <span>状态</span>
+                <select class="select">
+                  <option>待处理</option>
+                  <option>进行中</option>
+                  <option>已完成</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>优先级</span>
+                <select class="select">
+                  <option>中优先级</option>
+                  <option>高优先级</option>
+                  <option>低优先级</option>
+                </select>
+              </label>
+            </div>
+            <div class="form-row">
+              <label class="field">
+                <span>负责人</span>
+                <select class="select">
+                  <option>Alice</option>
+                  <option>Bob</option>
+                  <option>陈晨</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>截止日期</span>
+                <input class="input" type="date" value="2026-09-30" />
+              </label>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="button" type="button" data-close-modal>取消</button>
+            <button class="button primary" type="submit">保存</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="modal-layer" id="task-edit-modal">
+      <div class="modal">
+        <div class="modal-header">
+          <h2>编辑任务</h2>
+          <button class="icon-button" data-close-modal title="关闭">
+            <svg class="icon"><use href="#i-x"></use></svg>
+          </button>
+        </div>
+        <form class="modal-form" data-success-message="任务已更新">
+          <div class="modal-body">
+            <label class="field">
+              <span>任务标题</span>
+              <input
+                class="input"
+                required
+                maxlength="120"
+                value="完成任务筛选与分页接口"
+              />
+            </label>
+            <div class="form-row">
+              <label class="field">
+                <span>状态</span>
+                <select class="select">
+                  <option>待处理</option>
+                  <option selected>进行中</option>
+                  <option>已完成</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>优先级</span>
+                <select class="select">
+                  <option>中等</option>
+                  <option selected>高</option>
+                  <option>低</option>
+                </select>
+              </label>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="button" type="button" data-close-modal>取消</button>
+            <button class="button primary" type="submit">保存</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="toast" id="toast">
+      <svg class="icon"><use href="#i-circle-check"></use></svg>
+      <span id="toast-text">操作成功</span>
+    </div>
+
+    <script>
+      const projectCatalog = {
+        product: {
+          name: "产品重构",
+          description: "统一任务流转、项目权限和团队协作，形成可复用的全栈工程基线。",
+        },
+        website: {
+          name: "官网改版",
+          description: "升级首页信息架构、内容表达和转化路径，统一品牌体验。",
+        },
+        mobile: {
+          name: "移动端体验优化",
+          description: "改善核心流程可用性与性能，让移动端操作更简单高效。",
+        },
+      };
+
+      const routeMeta = {
+        dashboard: ["看板", "全部工作区"],
+        projects: ["项目", "全部工作区"],
+        project: ["产品重构", "项目详情"],
+        task: ["任务详情", "产品重构"],
+      };
+
+      const loginShell = document.getElementById("login-shell");
+      const workspace = document.getElementById("workspace");
+      const pages = [...document.querySelectorAll("[data-page-view]")];
+      const navItems = [...document.querySelectorAll(".nav-item")];
+      const toast = document.getElementById("toast");
+      const toastText = document.getElementById("toast-text");
+      let toastTimer;
+      let currentProjectId = "product";
+
+      function showToast(message) {
+        toastText.textContent = message;
+        toast.classList.add("show");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.classList.remove("show"), 2200);
+      }
+
+      function selectProject(projectId) {
+        const project = projectCatalog[projectId];
+        if (!project) {
+          return;
+        }
+        currentProjectId = projectId;
+        document.querySelectorAll("[data-project-name]").forEach((element) => {
+          element.textContent = project.name;
+        });
+        document.querySelectorAll("[data-project-description]").forEach((element) => {
+          element.textContent = project.description;
+        });
+        document.querySelectorAll("[data-project-breadcrumb]").forEach((element) => {
+          element.textContent = project.name;
+        });
+        document.querySelectorAll(".project-nav-item").forEach((item) => {
+          item.classList.toggle("active", item.dataset.project === projectId);
+        });
+      }
+
+      function switchPage(page, options = {}) {
+        const validPage = routeMeta[page] ? page : "dashboard";
+        if (options.project) {
+          selectProject(options.project);
+        }
+        const activeTab =
+          validPage === "project" ? options.tab ?? "tasks" : options.tab;
+        const activeNav =
+          validPage === "project" ? activeTab : validPage;
+        pages.forEach((view) => {
+          view.classList.toggle("active", view.dataset.pageView === validPage);
+        });
+        navItems.forEach((item) => {
+          const isActive = item.dataset.nav === activeNav;
+          item.classList.toggle("active", isActive);
+          if (isActive) {
+            item.setAttribute("aria-current", "page");
+          } else {
+            item.removeAttribute("aria-current");
+          }
+        });
+        const [title, context] = routeMeta[validPage];
+        const project = projectCatalog[currentProjectId];
+        const projectPageTitle =
+          activeTab === "members" ? "成员" : activeTab === "tasks" ? "任务" : title;
+        document.getElementById("topbar-title").textContent =
+          validPage === "project" ? projectPageTitle : title;
+        document.getElementById("topbar-context").textContent =
+          validPage === "project" || validPage === "task" ? project.name : context;
+        if (activeTab) {
+          activateTab(activeTab);
+        }
+        document.querySelector(".content").scrollTop = 0;
+        window.location.hash = `#${validPage}${activeTab ? `/${activeTab}` : ""}`;
+      }
+
+      function activateTab(tabName) {
+        document.querySelectorAll("[data-tab]").forEach((tab) => {
+          tab.classList.toggle("active", tab.dataset.tab === tabName);
+        });
+        document.querySelectorAll("[data-tab-panel]").forEach((panel) => {
+          panel.classList.toggle("active", panel.dataset.tabPanel === tabName);
+        });
+      }
+
+      function openModal(id) {
+        const modal = document.getElementById(id);
+        if (modal) {
+          modal.classList.add("open");
+        }
+      }
+
+      function closeModal(modal) {
+        modal.classList.remove("open");
+      }
+
+      document.getElementById("login-form").addEventListener("submit", (event) => {
+        event.preventDefault();
+        loginShell.classList.add("hidden");
+        workspace.classList.remove("hidden");
+        switchPage("dashboard");
+      });
+
+      document.getElementById("register-link").addEventListener("click", () => {
+        showToast("原型中已保留注册页入口");
+      });
+
+      document.getElementById("logout-button").addEventListener("click", () => {
+        workspace.classList.add("hidden");
+        loginShell.classList.remove("hidden");
+      });
+
+      document.querySelectorAll("[data-page]").forEach((item) => {
+        item.addEventListener("click", () => {
+          if (item.dataset.project) {
+            switchPage(item.dataset.page, {
+              tab: "tasks",
+              project: item.dataset.project,
+            });
+            return;
+          }
+          if (item.dataset.openTab) {
+            switchPage(item.dataset.page, { tab: item.dataset.openTab });
+            return;
+          }
+          switchPage(item.dataset.page);
+        });
+      });
+
+      document.querySelectorAll("[data-page-target]").forEach((item) => {
+        item.addEventListener("click", (event) => {
+          event.stopPropagation();
+          switchPage(item.dataset.pageTarget, {
+            project: item.dataset.project,
+            tab: item.dataset.pageTarget === "project" ? "tasks" : undefined,
+          });
+        });
+      });
+
+      document.querySelectorAll("[data-tab]").forEach((tab) => {
+        tab.addEventListener("click", () => activateTab(tab.dataset.tab));
+      });
+
+      document.querySelectorAll("[data-open-modal]").forEach((button) => {
+        button.addEventListener("click", (event) => {
+          event.stopPropagation();
+          openModal(button.dataset.openModal);
+        });
+      });
+
+      document.querySelectorAll("[data-close-modal]").forEach((button) => {
+        button.addEventListener("click", () => closeModal(button.closest(".modal-layer")));
+      });
+
+      document.querySelectorAll(".modal-layer").forEach((layer) => {
+        layer.addEventListener("click", (event) => {
+          if (event.target === layer) {
+            closeModal(layer);
+          }
+        });
+      });
+
+      document.querySelectorAll(".modal-form").forEach((form) => {
+        form.addEventListener("submit", (event) => {
+          event.preventDefault();
+          const layer = form.closest(".modal-layer");
+          closeModal(layer);
+          showToast(form.dataset.successMessage);
+        });
+      });
+
+      document.getElementById("project-search").addEventListener("input", (event) => {
+        const keyword = event.target.value.trim().toLowerCase();
+        document.querySelectorAll("#project-table-body tr").forEach((row) => {
+          row.style.display = row.textContent.toLowerCase().includes(keyword) ? "" : "none";
+        });
+      });
+
+      document.querySelectorAll("#project-role-filter .segment").forEach((button) => {
+        button.addEventListener("click", () => {
+          document
+            .querySelectorAll("#project-role-filter .segment")
+            .forEach((item) => item.classList.remove("active"));
+          button.classList.add("active");
+          const role = button.dataset.role;
+          document.querySelectorAll("#project-table-body tr").forEach((row) => {
+            row.style.display = role === "all" || row.dataset.role === role ? "" : "none";
+          });
+        });
+      });
+
+      document.getElementById("task-search").addEventListener("input", (event) => {
+        const keyword = event.target.value.trim().toLowerCase();
+        document.querySelectorAll("#task-table-body tr").forEach((row) => {
+          row.style.display = row.textContent.toLowerCase().includes(keyword) ? "" : "none";
+        });
+      });
+
+      document.getElementById("task-status-filter").addEventListener("change", (event) => {
+        const value = event.target.value;
+        document.querySelectorAll("#task-table-body tr").forEach((row) => {
+          row.style.display = value === "all" || row.dataset.status === value ? "" : "none";
+        });
+      });
+
+      document
+        .getElementById("task-priority-filter")
+        .addEventListener("change", (event) => {
+          const value = event.target.value;
+          document.querySelectorAll("#task-table-body tr").forEach((row) => {
+            row.style.display =
+              value === "all" || row.dataset.priority === value ? "" : "none";
+          });
+        });
+
+      document.getElementById("publish-comment").addEventListener("click", () => {
+        const input = document.getElementById("comment-input");
+        if (!input.value.trim()) {
+          showToast("请先输入评论内容");
+          return;
+        }
+        input.value = "";
+        showToast("评论发布成功");
+      });
+
+      document.getElementById("fake-upload").addEventListener("click", () => {
+        showToast("已打开附件选择器");
+      });
+
+      document.getElementById("global-search").addEventListener("click", () => {
+        showToast("全局搜索为后续扩展能力");
+      });
+
+      const initialParts = window.location.hash.replace("#", "").split("/");
+      const initialRoute = initialParts[0];
+      const initialTab = initialParts[1];
+      if (initialRoute && routeMeta[initialRoute]) {
+        loginShell.classList.add("hidden");
+        workspace.classList.remove("hidden");
+        switchPage(initialRoute, { tab: initialTab });
+      }
+
+      const auditParams = new URLSearchParams(window.location.search);
+
+      if (auditParams.get("audit") === "nav") {
+        loginShell.classList.add("hidden");
+        workspace.classList.remove("hidden");
+        const checks = [
+          ["任务", '.nav-item[data-nav="tasks"]'],
+          ["成员", '.nav-item[data-nav="members"]'],
+          ["官网改版", '.project-nav-item[data-project="website"]'],
+          ["移动端体验优化", '.project-nav-item[data-project="mobile"]'],
+        ];
+        const results = checks.map(([label, selector]) => {
+          document.querySelector(selector).click();
+          return {
+            label,
+            activePage: document.querySelector(".page.active")?.dataset.pageView,
+            activeTab: document.querySelector("[data-tab].active")?.dataset.tab,
+            activeNav: document.querySelector(".nav-item.active")?.dataset.nav,
+            activeProject: document.querySelector(".project-nav-item.active")?.dataset
+              .project,
+            projectName: document.querySelector("[data-project-name]")?.textContent,
+            title: document.getElementById("topbar-title").textContent,
+            context: document.getElementById("topbar-context").textContent,
+          };
+        });
+        document.body.dataset.navAudit = JSON.stringify(results);
+      }
+
+      if (auditParams.has("audit")) {
+        requestAnimationFrame(() => {
+          const content = document.querySelector(".content");
+          const activePage = document.querySelector(".page.active");
+          const visibleElements = [
+            ...document.querySelectorAll(
+              ".page.active .card, .page.active .stat-card, .page.active .summary-cell, .page.active .button, .page.active .tag",
+            ),
+          ].filter((element) => {
+            const style = getComputedStyle(element);
+            const rect = element.getBoundingClientRect();
+            return (
+              style.display !== "none" &&
+              style.visibility !== "hidden" &&
+              rect.width > 0 &&
+              rect.height > 0
+            );
+          });
+
+          const overflow = visibleElements
+            .map((element) => {
+              const rect = element.getBoundingClientRect();
+              return {
+                selector:
+                  element.className ||
+                  element.tagName.toLowerCase(),
+                left: Number(rect.left.toFixed(1)),
+                right: Number(rect.right.toFixed(1)),
+                width: Number(rect.width.toFixed(1)),
+              };
+            })
+            .filter((item) => item.left < -0.5 || item.right > window.innerWidth + 0.5);
+
+          const overlaps = [];
+          for (let index = 0; index < visibleElements.length; index += 1) {
+            for (
+              let compareIndex = index + 1;
+              compareIndex < visibleElements.length;
+              compareIndex += 1
+            ) {
+              const first = visibleElements[index];
+              const second = visibleElements[compareIndex];
+              if (first.contains(second) || second.contains(first)) {
+                continue;
+              }
+              const firstRect = first.getBoundingClientRect();
+              const secondRect = second.getBoundingClientRect();
+              const width = Math.min(firstRect.right, secondRect.right) -
+                Math.max(firstRect.left, secondRect.left);
+              const height = Math.min(firstRect.bottom, secondRect.bottom) -
+                Math.max(firstRect.top, secondRect.top);
+              if (width > 2 && height > 2) {
+                overlaps.push({
+                  first: first.className,
+                  second: second.className,
+                  area: Number((width * height).toFixed(1)),
+                });
+              }
+            }
+          }
+
+          document.body.dataset.layoutAudit = JSON.stringify({
+            viewport: {
+              width: window.innerWidth,
+              height: window.innerHeight,
+            },
+            page: activePage?.dataset.pageView,
+            documentWidth: document.documentElement.scrollWidth,
+            contentWidth: content?.clientWidth,
+            contentScrollWidth: content?.scrollWidth,
+            activePageWidth: activePage?.getBoundingClientRect().width,
+            overflow,
+            overlaps,
+          });
+        });
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,75 @@
+# TaskFlow 需求文档
+
+## 文档信息
+
+- 版本：1.0
+- 日期：2026-09-23
+- 状态：第一版基线
+- 产品名称：TaskFlow
+- 适用范围：第一版本地全栈练手项目
+
+## 文档目的
+
+本目录把已确认的产品设计拆成可开发、可验收、可测试的需求基线。实现代码、实施计划、自动化测试和原型出现分歧时，按以下顺序判断：
+
+1. 已确认的设计文档。
+2. 本目录中的功能、权限和接口契约。
+3. 可交互原型呈现的信息层级与交互方式。
+4. 实施计划中的具体代码组织方式。
+
+接口字段、错误码和枚举值使用英文；面向用户的文案使用中文。
+
+## 文档导航
+
+| 文档 | 内容 | 主要读者 |
+| --- | --- | --- |
+| [01-product-requirements.md](./01-product-requirements.md) | 产品目标、范围、用户角色、用户故事和成功标准 | 产品、开发、测试 |
+| [02-user-flows-and-permissions.md](./02-user-flows-and-permissions.md) | 核心流程、权限矩阵、页面状态和导航 | 产品、前端、后端、测试 |
+| [03-functional-specification.md](./03-functional-specification.md) | 带编号的功能需求、校验规则和验收条件 | 开发、测试 |
+| [04-api-and-data-contracts.md](./04-api-and-data-contracts.md) | 数据模型、API 契约、分页、错误码和文件规则 | 前后端、测试 |
+| [05-acceptance-and-test-matrix.md](./05-acceptance-and-test-matrix.md) | 验收层级、测试追踪矩阵和发布门禁 | 开发、测试、维护者 |
+
+设计与原型：
+
+- [设计文档](../superpowers/specs/2026-09-23-taskflow-design.md)
+- [实施计划](../superpowers/plans/2026-09-23-taskflow-implementation.md)
+- [原型说明与截图索引](../product/README.md)
+- [可交互桌面原型](../product/prototypes/taskflow-prototype.html)
+- [桌面页面截图](../product/screenshots/)
+
+## 需求编号
+
+需求编号格式为 `FR-<领域>-<三位序号>`：
+
+| 前缀 | 领域 |
+| --- | --- |
+| `AUTH` | 注册、登录、会话和当前用户 |
+| `PROJ` | 项目和项目成员 |
+| `TASK` | 任务管理和任务筛选 |
+| `COMM` | 评论 |
+| `ATT` | 附件 |
+| `DASH` | 看板 |
+| `UX` | 全局交互与反馈 |
+
+每个功能需求必须满足：
+
+- 有唯一编号和明确优先级。
+- 可以映射到至少一条验收条件。
+- 可以在 [05-acceptance-and-test-matrix.md](./05-acceptance-and-test-matrix.md) 中找到测试层级。
+- 涉及权限时，同时符合 [02-user-flows-and-permissions.md](./02-user-flows-and-permissions.md)。
+
+## 优先级
+
+- `P0`：第一版发布阻断项，缺失或错误时不能验收。
+- `P1`：第一版必须完成，但可在核心链路完成后集中完善。
+- `P2`：不进入第一版，作为后续升级候选。
+
+本目录只纳入 `P0` 和 `P1`。设计文档“明确不在第一版范围内”的内容不创建第一版需求。
+
+## 变更规则
+
+1. 修改功能范围时，同时更新功能需求、接口契约和测试追踪矩阵。
+2. 修改字段或错误码时，同时更新设计文档和前端原型所需的数据示例。
+3. 修改权限规则时，必须增加或更新对应后端集成测试。
+4. 任何新增 `P0` 需求都必须给出验收条件和可执行验证方式。
+5. 不在需求文档中留下 `TBD` 或未定义占位项。
