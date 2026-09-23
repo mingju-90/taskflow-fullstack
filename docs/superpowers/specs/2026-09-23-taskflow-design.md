@@ -124,7 +124,7 @@
 仓库根目录下只有两个独立应用目录。前后端分别拥有自己的 `package.json`、依赖、脚本、环境变量和构建配置。
 
 ```text
-111/
+taskflow-fullstack/
 ├── client/
 │   ├── src/
 │   ├── tests/

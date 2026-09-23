@@ -25,7 +25,7 @@
 
 ## 全局约束
 
-- 项目根目录：`/Users/mingju/Desktop/练手代码/111`
+- 项目根目录：`/Users/mingju/Desktop/练手代码/taskflow-fullstack`
 - Git 分支：`main`
 - Node.js：20 或更高版本
 - 包管理器：npm
