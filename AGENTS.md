@@ -11,6 +11,15 @@
 - 代码标识符、API 字段、枚举值、包名、命令和文件名保持英文，不为了“中文化”重命名。
 - 提交类型前缀保留 `feat`、`fix`、`docs`、`test` 等英文约定，冒号后的摘要和正文使用中文。
 
+## 依赖管理
+
+- 下载、安装、新增和更新依赖统一使用 pnpm，不运行 `npm install`、`npm update`、`yarn add` 等包管理器命令。
+- 根目录安装依赖使用 `pnpm install`。
+- 安装生产依赖使用 `pnpm add <package>`，安装开发依赖使用 `pnpm add -D <package>`。
+- 更新依赖使用 `pnpm update` 或 `pnpm update <package>`。
+- `client` 和 `server` 的依赖独立管理，在对应目录内执行 pnpm 命令。
+- 依赖变更必须同步更新对应的 `pnpm-lock.yaml`，不得手动编辑锁文件。
+
 ## AI 修改代码时的默认行为
 
 Codex 新增或修改业务代码时，必须同步检查注释，而不是等用户再次要求：

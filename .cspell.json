@@ -4,6 +4,7 @@
   "ignorePaths": [
     "node_modules/**",
     "package-lock.json",
+    "**/pnpm-lock.yaml",
     "docs/**",
     ".gitmessage",
     "AGENTS.md",
