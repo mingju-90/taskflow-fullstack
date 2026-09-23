@@ -6,14 +6,13 @@ import path from 'node:path'
 import process from 'node:process'
 import prettier from 'prettier'
 
-const textExtensions = new Set([
+const spellCheckExtensions = new Set([
   '.cjs',
   '.css',
   '.html',
   '.js',
   '.json',
   '.jsx',
-  '.md',
   '.mjs',
   '.scss',
   '.ts',
@@ -220,7 +219,7 @@ for (const file of stagedFiles) {
   }
   await inspectFormatting(file, content)
 
-  if (textExtensions.has(extension) && !file.startsWith('docs/')) {
+  if (spellCheckExtensions.has(extension) && !file.startsWith('docs/')) {
     spellCheckFiles.push(file)
   }
 }

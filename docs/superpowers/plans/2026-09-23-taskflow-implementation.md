@@ -99,7 +99,8 @@
 - `scripts/validate-commit-message.mjs`：校验中文提交信息。
 - `AGENTS.md`：项目级 Codex 注释、JSDoc、模板注释和中文协作规范。
 - `.gitmessage`：中文提交模板。
-- `docs/`：设计文档和本实施计划。
+- `docs/`：设计文档、需求基线、项目进度和本实施计划。
+- `docs/PROGRESS.md`：当前快照、完成事项、决策原因、已知限制和恢复顺序。
 
 ### 后端
 
