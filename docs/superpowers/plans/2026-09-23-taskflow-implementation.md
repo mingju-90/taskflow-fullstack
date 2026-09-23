@@ -747,7 +747,7 @@ git commit -m "feat: add JWT authentication API"
 
 - 产出：Vue 应用启动入口、Router、基础样式和首页路由。
 
-- [ ] **步骤 1：安装依赖**
+- [x] **步骤 1：安装依赖**
 
 ```bash
 mkdir -p client/src/router client/src/views client/tests
@@ -765,23 +765,24 @@ npm install -D typescript vite @vitejs/plugin-vue vue-tsc vitest @vue/test-utils
     "dev": "vite",
     "build": "vue-tsc -b && vite build",
     "test": "vitest",
+    "test:run": "vitest run",
     "typecheck": "vue-tsc -b"
   }
 }
 ```
 
-- [ ] **步骤 2：先写失败测试**
+- [x] **步骤 2：先写失败测试**
 
 挂载 `App.vue` 并使用真实的 `router`，断言页面文本包含 `TaskFlow`。
 
-- [ ] **步骤 3：运行测试并确认失败**
+- [x] **步骤 3：运行测试并确认失败**
 
 ```bash
 cd client
-npm test -- --run tests/app-shell.test.ts
+npm run test:run -- tests/app-shell.test.ts
 ```
 
-- [ ] **步骤 4：实现 Vite、TypeScript 和 Vue 入口**
+- [x] **步骤 4：实现 Vite、TypeScript 和 Vue 入口**
 
 `vite.config.ts` 使用：
 
@@ -813,14 +814,14 @@ Pinia -> Router -> Element Plus -> mount('#app')
 VITE_API_BASE_URL=http://localhost:3000/api/v1
 ```
 
-- [ ] **步骤 5：验证并提交**
+- [x] **步骤 5：验证并提交**
 
 ```bash
-npm test -- --run tests/app-shell.test.ts
+npm run test:run -- tests/app-shell.test.ts
 npm run typecheck
 npm run build
 git add client
-git commit -m "chore: scaffold TaskFlow client"
+git commit -m "chore: 初始化 TaskFlow 前端工程"
 ```
 
 ---
