@@ -153,7 +153,7 @@ pnpm clean
 验收：
 
 - 根目录命令可以调度对应 workspace 包。
-- 单个服务仍可独立启动和测试。
+- 单个服务仍可独立启动和测试；但单包命令不会自动构建 `@taskflow/contracts`，在干净仓库中应先执行 `pnpm --filter @taskflow/contracts build`，再运行目标服务的命令。
 - 根目录 `dev` 使用 workspace 并行能力或稳定进程管理方案。
 
 ### F-04 建立最小 CI（已完成，2026-09-24）

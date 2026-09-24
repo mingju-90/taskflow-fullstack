@@ -5,8 +5,9 @@
 > 更新为 pnpm workspace 与 Turborepo。本文中的 Vue、Express、Prisma、SQLite 和业务设计仍然有效；
 > `client/`、`server/` 路径分别对应 `apps/client/`、`apps/server/`。
 >
-> 本文中的根目录安装和验证命令统一替换为 `pnpm` workspace 命令；
-> 各任务的业务代码仍然按原顺序实施。
+> 旧基线说明：正文中的 `npm install`、`npm ci`、`npm run`、`cd client/server`
+> 和独立锁文件只记录原始执行流程，不适用于当前仓库；请使用根目录 pnpm 命令。
+> 运行单包命令前，先执行 `pnpm --filter @taskflow/contracts build`。
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -67,6 +68,8 @@
 - 新增和修改业务代码时同步补充中文 JSDoc、模板注释和业务规则注释
 - 提交摘要、提交正文、Pull Request 和协作说明使用中文
 - 提交前必须通过 `.githooks/pre-commit` 和 `.githooks/commit-msg`
+
+> 旧基线说明：以下包管理器、npm workspace 和独立锁文件约束仅保留原始方案，不适用于当前仓库；请使用根目录 pnpm 命令。
 
 ## 质量门禁
 
@@ -541,6 +544,8 @@ git commit -m "feat: 增加统一错误处理和请求 ID"
 
 - 产出：`prisma`、`resetDatabase()`、`createUser()`、`createProjectWithOwner()`。
 
+> 旧基线命令：以下 `cd server`、`npm install`、`npm test` 和 `npm run` 步骤仅保留原始实施记录，不适用于当前仓库；请使用根目录 pnpm 命令，并在单包命令前先运行 `pnpm --filter @taskflow/contracts build`。
+
 - [ ] **步骤 1：安装 Prisma**
 
 ```bash
@@ -770,6 +775,8 @@ git commit -m "feat: add JWT authentication API"
 **接口：**
 
 - 产出：Vue 应用启动入口、Router、基础样式和首页路由。
+
+> 旧基线命令：以下 `cd client`、`npm init`、`npm install`、`npm test` 和 `npm run` 步骤仅保留原始实施记录，不适用于当前仓库；请使用根目录 pnpm 命令。
 
 - [x] **步骤 1：安装依赖**
 
@@ -2212,6 +2219,8 @@ git commit -m "chore: complete TaskFlow documentation and hardening"
 - 产出：GitHub Actions 工作流 `CI`。
 - 产出：工作流任务 `format-checks`、`server-checks`、`client-checks`、`e2e-smoke`。
 - 产出：失败时上传 `client/playwright-report/` 和 `client/test-results/`。
+
+> 旧基线命令：以下 `npm ci`、`npm run` 和独立锁文件步骤仅保留历史 CI 方案，不适用于当前仓库；请使用根目录 pnpm 命令和现有 `.github/workflows/ci.yml`。
 
 - [ ] **步骤 1：确认本地命令可以非交互运行**
 

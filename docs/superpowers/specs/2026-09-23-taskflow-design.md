@@ -4,6 +4,8 @@
 > `docs/superpowers/specs/2026-09-24-monorepo-engineering-upgrade-design.md`
 > 更新为 pnpm workspace 与 Turborepo。本文中的 Vue、Express、Prisma、SQLite 和业务设计仍然有效；
 > `client/`、`server/` 路径分别对应 `apps/client/`、`apps/server/`。
+>
+> 旧基线说明：本文保留 2026-09-23 的历史正文；“不使用 npm workspace”、`npm ci` 和 `npm run` 等描述不适用于当前仓库；请使用根目录 pnpm 命令。
 
 ## 文档状态
 
@@ -200,6 +202,8 @@ taskflow-fullstack/
 ├── package.json
 └── README.md
 ```
+
+> 旧基线说明：以下“不使用 npm workspace”和独立项目说明仅保留原始方案，不适用于当前仓库；请使用根目录 pnpm 命令。
 
 第一版不使用 npm workspace。根目录的 `package.json` 只管理 Prettier 等跨仓库开发工具，不参与应用运行。开发时需要分别启动前端和后端进程：
 
@@ -604,6 +608,8 @@ VITE_API_BASE_URL=http://localhost:3000/api/v1
 
 ### 持续集成
 
+> 旧基线说明：以下 Node.js 20、`npm ci` 和独立锁文件步骤仅保留历史方案，不适用于当前仓库；请使用根目录 pnpm 命令和现有 GitHub Actions 工作流。
+
 GitHub Actions 在 `push` 和 `pull_request` 时执行质量门禁：
 
 - 使用 Node.js 20 和 `npm ci` 安装锁定依赖。
@@ -686,3 +692,5 @@ Seed 使用幂等写入方式，重复执行不会产生重复数据。
 - 选择一个仓库、`client` 和 `server` 两个独立目录
 - 不使用 npm workspace，让前后端依赖和运行方式保持透明
 - 用户主写代码，Codex 重点提供 Node.js 和后端支持
+
+> 旧基线说明：以上“不使用 npm workspace”是原始设计决策，不适用于当前仓库；当前仓库使用 pnpm workspace。

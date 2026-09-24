@@ -307,6 +307,12 @@
 
 ## 当前可运行命令
 
+根目录命令会由 Turborepo 处理任务依赖；单包命令不会自动构建 `@taskflow/contracts`。在干净仓库中，先执行以下命令，再运行前端或后端单包命令：
+
+```bash
+pnpm --filter @taskflow/contracts build
+```
+
 ### 根目录
 
 ```bash

@@ -36,11 +36,12 @@ pnpm dev
 
 首次启动前，根据 `apps/server/.env.example` 创建本地环境配置。
 
-前端默认监听 `http://127.0.0.1:5173/`，后端默认监听 `http://127.0.0.1:3000`，健康检查地址为 `http://127.0.0.1:3000/api/v1/health`。按 `Ctrl+C` 会同时停止两个进程。
+前端默认监听 `http://127.0.0.1:5173/`，后端默认监听 `http://127.0.0.1:3000`，健康检查地址为 `http://127.0.0.1:3000/api/v1/health`。按 `Ctrl+C` 会停止所有开发任务。
 
-也可以分别启动：
+也可以分别启动。单包命令不会自动构建 `@taskflow/contracts`；在干净仓库中先构建共享契约，再执行目标包命令：
 
 ```bash
+pnpm --filter @taskflow/contracts build
 pnpm --filter @taskflow/client dev
 pnpm --filter @taskflow/server dev
 ```
