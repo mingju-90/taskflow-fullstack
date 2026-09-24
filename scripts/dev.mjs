@@ -8,7 +8,7 @@ const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const serverEnvPath = path.join(rootDir, 'apps', 'server', '.env')
 
 if (!existsSync(serverEnvPath)) {
-  console.error('未找到 server/.env，请先根据 server/.env.example 创建后端环境配置。')
+  console.error('未找到 apps/server/.env，请先根据 apps/server/.env.example 创建后端环境配置。')
   process.exit(1)
 }
 
