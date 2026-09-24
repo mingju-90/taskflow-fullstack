@@ -81,7 +81,7 @@ const stackItems: StackItem[] = [
         </div>
         <ul class="stack-grid">
           <li v-for="item in stackItems" :key="item.name" class="stack-card">
-            <span class="stack-indicator" aria-hidden="true"></span>
+            <span class="stack-indicator" aria-hidden="true" />
             <strong>{{ item.name }}</strong>
             <p>{{ item.description }}</p>
           </li>

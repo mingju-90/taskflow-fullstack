@@ -34,4 +34,15 @@ describe('TaskFlow API 契约', () => {
 
     expect(result.success).toBe(true)
   })
+
+  it('拒绝未知错误码', () => {
+    const result = errorResponseSchema.safeParse({
+      code: 'UNKNOWN_ERROR',
+      message: '未知错误',
+      details: null,
+      requestId: 'request-1',
+    })
+
+    expect(result.success).toBe(false)
+  })
 })

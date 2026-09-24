@@ -16,6 +16,11 @@ export function successResponseSchema<T extends z.ZodType>(dataSchema: T) {
   })
 }
 
+/**
+ * 统一错误响应 schema。
+ *
+ * 错误码只能使用稳定错误码集合，details 允许为 null 或字段级错误信息。
+ */
 export const errorResponseSchema = z.object({
   code: apiErrorCodeSchema,
   message: z.string(),
@@ -23,4 +28,5 @@ export const errorResponseSchema = z.object({
   requestId: z.string().min(1),
 })
 
+/** 统一错误响应的 TypeScript 类型。 */
 export type ErrorResponse = z.infer<typeof errorResponseSchema>

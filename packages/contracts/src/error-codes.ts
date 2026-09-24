@@ -1,5 +1,10 @@
 import { z } from 'zod'
 
+/**
+ * TaskFlow API 支持的稳定错误码集合。
+ *
+ * 新增错误码时必须同步接口文档和契约测试，避免前后端错误处理语义漂移。
+ */
 export const apiErrorCodes = [
   'ASSIGNEE_NOT_PROJECT_MEMBER',
   'ATTACHMENT_DELETE_FORBIDDEN',
@@ -28,6 +33,8 @@ export const apiErrorCodes = [
   'VALIDATION_ERROR',
 ] as const
 
+/** 校验响应错误码是否属于稳定错误码集合。 */
 export const apiErrorCodeSchema = z.enum(apiErrorCodes)
 
+/** TaskFlow API 统一使用的稳定错误码联合类型。 */
 export type ApiErrorCode = z.infer<typeof apiErrorCodeSchema>
