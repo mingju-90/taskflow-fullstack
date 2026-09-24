@@ -131,7 +131,7 @@ taskflow-fullstack/
 
 ## 版本策略
 
-- Node.js 固定为 22.x，通过 `.nvmrc`、根 `engines` 和 CI 保持一致。
+- Node.js 固定为 `>=22.22.3 <23.0.0`，通过 `.nvmrc`、根 `engines` 和 CI 保持一致。
 - pnpm 固定为 `10.17.0`，只在根 `package.json` 声明 `packageManager`。
 - 根目录维护唯一 `pnpm-lock.yaml`。
 - 删除根目录和子包的 npm 锁文件以及子包 pnpm 锁文件。
@@ -194,7 +194,8 @@ pnpm test
 pnpm build
 ```
 
-CI 使用 Node.js 22 和 pnpm 10.17.0。
+CI 使用 Node.js 22 和 pnpm 10.17.0；本地可安装范围与包声明保持为
+`>=22.22.3 <23.0.0`。
 
 缓存范围：
 

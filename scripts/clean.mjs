@@ -5,10 +5,14 @@ import { fileURLToPath } from 'node:url'
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const targets = [
   '.turbo',
+  'apps/client/.turbo',
   'apps/client/dist',
   'apps/client/coverage',
+  'apps/server/.turbo',
   'apps/server/dist',
   'apps/server/coverage',
+  'packages/config/.turbo',
+  'packages/contracts/.turbo',
   'packages/contracts/dist',
   'packages/contracts/coverage',
 ]

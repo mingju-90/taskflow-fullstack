@@ -1,3 +1,4 @@
+import { healthResponseSchema } from '@taskflow/contracts'
 import request from 'supertest'
 import { describe, expect, it } from 'vitest'
 import { createApp } from '../src/app.js'
@@ -5,8 +6,10 @@ import { createApp } from '../src/app.js'
 describe('GET /api/v1/health', () => {
   it('返回服务健康状态', async () => {
     const response = await request(createApp()).get('/api/v1/health')
+    const parsedBody = healthResponseSchema.safeParse(response.body)
 
     expect(response.status).toBe(200)
+    expect(parsedBody.success).toBe(true)
     expect(response.body).toEqual({
       code: 'OK',
       message: 'success',

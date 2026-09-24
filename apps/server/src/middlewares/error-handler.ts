@@ -1,4 +1,4 @@
-import type { ApiErrorCode } from '@taskflow/contracts'
+import type { ApiErrorCode, ErrorResponse } from '@taskflow/contracts'
 import type { NextFunction, Request, Response } from 'express'
 import { ZodError } from 'zod'
 import { AppError } from '../lib/app-error.js'
@@ -10,12 +10,14 @@ function sendError(
   message: string,
   details: unknown,
 ) {
-  response.status(status).json({
+  const body: ErrorResponse = {
     code,
     message,
     details,
     requestId: response.locals.requestId,
-  })
+  }
+
+  response.status(status).json(body)
 }
 
 /**

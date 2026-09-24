@@ -1,6 +1,14 @@
 import { z } from 'zod'
 import { apiErrorCodeSchema } from './error-codes.js'
 
+/** 统一成功响应结构，供服务端序列化和调用方类型约束复用。 */
+export type SuccessResponse<T> = {
+  code: 'OK'
+  message: string
+  data: T
+  requestId: string
+}
+
 /**
  * 创建统一成功响应 schema。
  *

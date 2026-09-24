@@ -94,11 +94,15 @@
 每次 `push` 和 `pull_request` 运行：
 
 1. 在仓库根目录执行 `pnpm install --frozen-lockfile`。
-2. 运行 `pnpm build` 生成共享契约和前后端构建产物。
-3. 运行 `pnpm lint`、`pnpm typecheck` 和 `pnpm test`。
-4. 在接入 Playwright 后，为端到端任务单独安装 Chromium。
+2. 运行 `pnpm format:check`。
+3. 运行 `pnpm lint`。
+4. 运行 `pnpm typecheck`。
+5. 运行 `pnpm test`。
+6. 运行 `pnpm build` 生成共享契约和前后端构建产物。
+7. 在接入 Playwright 后，为端到端任务单独安装 Chromium。
 
-CI 使用 Node.js 22、pnpm 10.17.0 和冻结锁文件。
+CI 使用 Node.js 22、pnpm 10.17.0 和冻结锁文件；本地版本范围与包声明保持为
+`>=22.22.3 <23.0.0`。
 
 ## 8. 发布门禁
 

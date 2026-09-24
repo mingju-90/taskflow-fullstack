@@ -1,3 +1,4 @@
+import type { SuccessResponse } from '@taskflow/contracts'
 import type { Response } from 'express'
 
 /**
@@ -10,10 +11,12 @@ import type { Response } from 'express'
  * @returns 已发送的 JSON 响应
  */
 export function sendSuccess<T>(response: Response, data: T, message = 'success') {
-  return response.status(200).json({
+  const body: SuccessResponse<T> = {
     code: 'OK',
     message,
     data,
     requestId: response.locals.requestId,
-  })
+  }
+
+  return response.status(200).json(body)
 }

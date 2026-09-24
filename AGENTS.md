@@ -14,11 +14,12 @@
 ## 依赖管理
 
 - 下载、安装、新增和更新依赖统一使用 pnpm，不运行 `npm install`、`npm update`、`yarn add` 等包管理器命令。
-- 根目录安装依赖使用 `pnpm install`。
-- 安装生产依赖使用 `pnpm add <package>`，安装开发依赖使用 `pnpm add -D <package>`。
-- 更新依赖使用 `pnpm update` 或 `pnpm update <package>`。
-- `client` 和 `server` 的依赖独立管理，在对应目录内执行 pnpm 命令。
-- 依赖变更必须同步更新对应的 `pnpm-lock.yaml`，不得手动编辑锁文件。
+- 根目录执行 `pnpm install` 安装整个 workspace 的依赖；仓库只保留根目录 `pnpm-lock.yaml`，不创建子包锁文件。
+- 根目录开发依赖使用 `pnpm add -Dw <package>`，更新使用 `pnpm update -Dw <package>`。
+- `apps/client` 依赖使用 `pnpm --filter @taskflow/client add <package>` 或 `pnpm --filter @taskflow/client add -D <package>` 管理。
+- `apps/server` 依赖使用 `pnpm --filter @taskflow/server add <package>` 或 `pnpm --filter @taskflow/server add -D <package>` 管理。
+- `packages/config` 和 `packages/contracts` 使用对应的 `pnpm --filter` 命令管理，不进入包目录单独安装。
+- 依赖变更必须通过 pnpm 同步更新根目录 `pnpm-lock.yaml`，不得手动编辑锁文件。
 
 ## AI 修改代码时的默认行为
 
@@ -129,7 +130,7 @@ return response.json(result)
 - 提交信息使用中文摘要，格式为 `<type>: <中文简述>`。
 - 提交正文说明背景、关键改动、验证命令和未完成事项。
 - 一个提交只处理一个清晰目标，不混入无关格式化或重构。
-- 提交前必须运行 `npm run format:check`。
+- 提交前必须运行 `pnpm format:check`。
 - 涉及代码时必须运行对应类型检查和测试。
 - 不在提交信息中写“misc”“update”或无法判断内容的宽泛描述。
 
@@ -137,14 +138,14 @@ return response.json(result)
 
 仓库通过 `.githooks/pre-commit` 自动校验暂存区。AI 和人工提交都必须执行以下流程：
 
-1. 运行 `npm run format`。
+1. 运行 `pnpm format`。
 2. 使用 `git add` 暂存目标文件。
-3. 运行 `npm run commit:check`。
+3. 运行 `pnpm commit:check`。
 4. 逐段阅读 `git diff --cached`，检查中文文案语义、业务命名和上下文是否合适。
-5. 修复问题后重新暂存，再次运行 `npm run commit:check`。
+5. 修复问题后重新暂存，再次运行 `pnpm commit:check`。
 6. 提交。
 
-`npm run commit:check` 会检查：
+`pnpm commit:check` 会检查：
 
 - 暂存区与工作区内容是否一致。
 - Prettier 格式和 `git diff --check`。
@@ -169,7 +170,7 @@ feat: 增加项目成员权限校验
 
 - 添加 OWNER 和 MEMBER 权限矩阵
 - 覆盖非项目成员访问接口的集成测试
-- 验证：npm test -- --run tests/projects.test.ts
+- 验证：pnpm test -- --run tests/projects.test.ts
 ```
 
 ```text
@@ -197,6 +198,6 @@ git config commit.template .gitmessage
 - 关键业务逻辑具备中文注释。
 - 导出 API 具备必要 JSDoc。
 - 复杂 Vue 模板区块具备结构注释。
-- `npm run format:check` 通过。
+- `pnpm format:check` 通过。
 - 对应类型检查和测试通过。
 - 提交信息使用中文并准确描述改动。

@@ -13,7 +13,7 @@
 ## 全局约束
 
 - 所有说明、代码注释、测试描述、文档和提交信息使用中文。
-- Node.js 固定为 22.x，pnpm 固定为 `10.17.0`。
+- Node.js 固定为 `>=22.22.3 <23.0.0`，pnpm 固定为 `10.17.0`。
 - 依赖安装和更新只使用 pnpm，不运行 npm 或 Yarn 安装命令。
 - 根目录只保留一份 `pnpm-lock.yaml`。
 - 不修改 Prisma schema、SQLite 数据库、API 路径、响应字段和状态码。
@@ -137,7 +137,7 @@ prefer-workspace-packages=true
   "private": true,
   "description": "TaskFlow full-stack learning project",
   "engines": {
-    "node": ">=22.0.0 <23.0.0",
+    "node": ">=22.22.3 <23.0.0",
     "pnpm": "10.17.0"
   },
   "packageManager": "pnpm@10.17.0",

@@ -100,7 +100,7 @@ TaskFlow/
 目标：
 
 - 根目录和各包声明一致的 `packageManager`。
-- 明确 Node.js 版本策略，建议当前使用 Node.js 20 或 22 LTS。
+- 明确 Node.js 版本策略，当前使用 `>=22.22.3 <23.0.0`。
 - 兼容的公共依赖尽量统一版本，避免同一工具在前后端使用不同主版本。
 
 为什么现在做：
@@ -117,7 +117,7 @@ TaskFlow/
 
 验收：
 
-- 根目录、`client` 和 `server` 均有 `engines` 和 `packageManager`。
+- 根目录声明唯一的 `packageManager`，根目录和 `apps/server` 的 `engines.node` 使用一致范围。
 - 新增 `.nvmrc` 或 `.node-version`。
 - CI 和本地使用相同 Node.js 与 pnpm 主版本。
 

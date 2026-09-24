@@ -1,3 +1,4 @@
+import { errorResponseSchema } from '@taskflow/contracts'
 import express from 'express'
 import request from 'supertest'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -43,8 +44,10 @@ beforeEach(() => {
 describe('统一错误处理', () => {
   it('将 AppError 转换为对应状态和业务码', async () => {
     const response = await request(createErrorTestApp()).get('/app-error')
+    const parsedBody = errorResponseSchema.safeParse(response.body)
 
     expect(response.status).toBe(409)
+    expect(parsedBody.success).toBe(true)
     expect(response.body).toEqual({
       code: 'MEMBER_ALREADY_EXISTS',
       message: '用户已在项目中',
@@ -55,8 +58,10 @@ describe('统一错误处理', () => {
 
   it('将未匹配路由转换为 ROUTE_NOT_FOUND', async () => {
     const response = await request(createApp()).get('/api/v1/not-exists')
+    const parsedBody = errorResponseSchema.safeParse(response.body)
 
     expect(response.status).toBe(404)
+    expect(parsedBody.success).toBe(true)
     expect(response.body).toEqual({
       code: 'ROUTE_NOT_FOUND',
       message: '接口不存在',
@@ -67,8 +72,10 @@ describe('统一错误处理', () => {
 
   it('将 Zod 校验错误转换为字段级 details', async () => {
     const response = await request(createErrorTestApp()).get('/validation-error')
+    const parsedBody = errorResponseSchema.safeParse(response.body)
 
     expect(response.status).toBe(400)
+    expect(parsedBody.success).toBe(true)
     expect(response.body).toEqual({
       code: 'VALIDATION_ERROR',
       message: '请求参数不合法',
@@ -79,8 +86,10 @@ describe('统一错误处理', () => {
 
   it('未知错误返回 INTERNAL_SERVER_ERROR 且不泄露堆栈', async () => {
     const response = await request(createErrorTestApp()).get('/unknown-error')
+    const parsedBody = errorResponseSchema.safeParse(response.body)
 
     expect(response.status).toBe(500)
+    expect(parsedBody.success).toBe(true)
     expect(response.body).toEqual({
       code: 'INTERNAL_SERVER_ERROR',
       message: '服务器内部错误',

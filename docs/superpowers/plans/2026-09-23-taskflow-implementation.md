@@ -8,6 +8,7 @@
 > 旧基线说明：正文中的 `npm install`、`npm ci`、`npm run`、`cd client/server`
 > 和独立锁文件只记录原始执行流程，不适用于当前仓库；请使用根目录 pnpm 命令。
 > 运行单包命令前，先执行 `pnpm --filter @taskflow/contracts build`。
+> 工程目录迁移不改变功能依赖顺序，各任务的业务代码仍按原顺序实施。
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
