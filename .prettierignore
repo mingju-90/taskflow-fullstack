@@ -1,10 +1,11 @@
 node_modules/
+.turbo/
 dist/
 coverage/
 playwright-report/
 test-results/
-server/uploads/
-server/prisma/*.db
+apps/server/uploads/
+apps/server/prisma/*.db
 *.db
 package-lock.json
 .env

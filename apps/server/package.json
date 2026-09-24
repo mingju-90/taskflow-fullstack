@@ -1,5 +1,5 @@
 {
-  "name": "taskflow-server",
+  "name": "@taskflow/server",
   "version": "0.0.0",
   "private": true,
   "description": "TaskFlow 后端服务",
@@ -30,6 +30,7 @@
     "supertest": "^7.3.0",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
+    "vite": "8.3.0",
     "vitest": "^5.0.1"
   }
 }

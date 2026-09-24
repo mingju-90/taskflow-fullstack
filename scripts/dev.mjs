@@ -5,7 +5,7 @@ import process from 'node:process'
 import { fileURLToPath } from 'node:url'
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
-const serverEnvPath = path.join(rootDir, 'server', '.env')
+const serverEnvPath = path.join(rootDir, 'apps', 'server', '.env')
 
 if (!existsSync(serverEnvPath)) {
   console.error('未找到 server/.env，请先根据 server/.env.example 创建后端环境配置。')
@@ -17,14 +17,14 @@ const processes = [
   {
     name: 'client',
     child: spawn(pnpmCommand, ['run', 'dev'], {
-      cwd: path.join(rootDir, 'client'),
+      cwd: path.join(rootDir, 'apps', 'client'),
       stdio: 'inherit',
     }),
   },
   {
     name: 'server',
     child: spawn(pnpmCommand, ['run', 'dev'], {
-      cwd: path.join(rootDir, 'server'),
+      cwd: path.join(rootDir, 'apps', 'server'),
       stdio: 'inherit',
     }),
   },

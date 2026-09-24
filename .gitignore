@@ -1,5 +1,6 @@
 node_modules/
 .pnpm-store/
+.turbo/
 dist/
 coverage/
 playwright-report/
@@ -8,7 +9,7 @@ pnpm-debug.log*
 .env
 .env.*
 !.env.example
-server/uploads/
-server/prisma/*.db
+apps/server/uploads/
+apps/server/prisma/*.db
 *.db
 .DS_Store
