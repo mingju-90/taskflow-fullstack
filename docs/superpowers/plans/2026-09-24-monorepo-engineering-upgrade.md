@@ -66,7 +66,7 @@ turbo.json                     任务图和缓存规则
 
 ---
 
-### 任务 1：迁移应用目录并建立 workspace
+### Task 1：迁移应用目录并建立 workspace
 
 **文件：**
 
@@ -271,7 +271,7 @@ git commit -m "refactor: 迁移应用目录到 pnpm workspace" -m "- 移动前�
 
 ---
 
-### 任务 2：建立共享配置、接口契约和静态检查
+### Task 2：建立共享配置、接口契约和静态检查
 
 **文件：**
 
@@ -916,7 +916,7 @@ git commit -m "feat: 增加共享配置和接口契约" -m "- 建立 TypeScript�
 
 ---
 
-### 任务 3：接入 Turborepo、统一命令、CI 和文档
+### Task 3：接入 Turborepo、统一命令、CI 和文档
 
 **文件：**
 
