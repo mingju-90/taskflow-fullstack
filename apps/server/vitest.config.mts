@@ -1,10 +1,10 @@
+import { baseVitestConfig } from '@taskflow/config/vitest/base'
 import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
   test: {
+    ...baseVitestConfig,
     environment: 'node',
-    clearMocks: true,
-    restoreMocks: true,
     env: {
       NODE_ENV: 'test',
       DATABASE_URL: 'file:./test.db',

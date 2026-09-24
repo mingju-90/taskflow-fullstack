@@ -2,11 +2,11 @@ import express from 'express'
 import request from 'supertest'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { z } from 'zod'
-import { createApp } from '../src/app'
-import { AppError } from '../src/lib/app-error'
-import { errorHandler } from '../src/middlewares/error-handler'
-import { requestContext } from '../src/middlewares/request-context'
-import { notFoundHandler } from '../src/middlewares/not-found'
+import { createApp } from '../src/app.js'
+import { AppError } from '../src/lib/app-error.js'
+import { errorHandler } from '../src/middlewares/error-handler.js'
+import { requestContext } from '../src/middlewares/request-context.js'
+import { notFoundHandler } from '../src/middlewares/not-found.js'
 
 // 用真实中间件构造测试应用，并插入生产代码中暂时不存在的错误路由。
 const createErrorTestApp = () => {

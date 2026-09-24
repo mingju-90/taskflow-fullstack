@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from 'express'
-import { AppError } from '../lib/app-error'
+import { AppError } from '../lib/app-error.js'
 
 /**
  * 处理未匹配的 API 路由，并交给统一错误中间件响应。

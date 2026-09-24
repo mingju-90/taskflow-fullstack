@@ -6,7 +6,7 @@ if (!existsSync('.git')) {
   process.exit(0)
 }
 
-let currentHooksPath = ''
+let currentHooksPath
 
 try {
   currentHooksPath = execFileSync('git', ['config', '--local', '--get', 'core.hooksPath'], {

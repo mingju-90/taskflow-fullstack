@@ -1,4 +1,5 @@
 {
+  "extends": "@taskflow/config/tsconfig/base.json",
   "compilerOptions": {
     "composite": true,
     "esModuleInterop": true,

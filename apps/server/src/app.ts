@@ -1,11 +1,11 @@
 import cors from 'cors'
 import express from 'express'
 import helmet from 'helmet'
-import { env } from './config/env'
-import { errorHandler } from './middlewares/error-handler'
-import { notFoundHandler } from './middlewares/not-found'
-import { requestContext } from './middlewares/request-context'
-import { healthRouter } from './routes/health.route'
+import { env } from './config/env.js'
+import { errorHandler } from './middlewares/error-handler.js'
+import { notFoundHandler } from './middlewares/not-found.js'
+import { requestContext } from './middlewares/request-context.js'
+import { healthRouter } from './routes/health.route.js'
 
 /**
  * 创建并配置 TaskFlow 后端 Express 应用。

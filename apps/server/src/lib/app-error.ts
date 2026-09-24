@@ -1,3 +1,5 @@
+import type { ApiErrorCode } from '@taskflow/contracts'
+
 /**
  * 表示可安全返回给客户端的业务错误。
  */
@@ -10,7 +12,7 @@ export class AppError extends Error {
    */
   constructor(
     public readonly status: number,
-    public readonly code: string,
+    public readonly code: ApiErrorCode,
     message: string,
     public readonly details: unknown = null,
   ) {

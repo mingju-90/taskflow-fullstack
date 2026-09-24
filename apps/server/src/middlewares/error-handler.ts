@@ -1,11 +1,12 @@
+import type { ApiErrorCode } from '@taskflow/contracts'
 import type { NextFunction, Request, Response } from 'express'
 import { ZodError } from 'zod'
-import { AppError } from '../lib/app-error'
+import { AppError } from '../lib/app-error.js'
 
 function sendError(
   response: Response,
   status: number,
-  code: string,
+  code: ApiErrorCode,
   message: string,
   details: unknown,
 ) {

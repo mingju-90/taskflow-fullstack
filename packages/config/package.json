@@ -1,0 +1,27 @@
+{
+  "name": "@taskflow/config",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./eslint/base": "./src/eslint/base.mjs",
+    "./eslint/node": "./src/eslint/node.mjs",
+    "./eslint/vue": "./src/eslint/vue.mjs",
+    "./tsconfig/base.json": "./tsconfig/base.json",
+    "./vitest/base": "./src/vitest/base.ts"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint-plugin-vue": "^10.11.1",
+    "globals": "^17.12.0",
+    "typescript-eslint": "^8.70.1"
+  },
+  "devDependencies": {
+    "eslint": "^10.11.0",
+    "typescript": "^6.0.3"
+  }
+}

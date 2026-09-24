@@ -1,15 +1,9 @@
-import vue from '@vitejs/plugin-vue'
 import { baseVitestConfig } from '@taskflow/config/vitest/base'
 import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
-  plugins: [vue()],
-  server: {
-    port: 5173,
-  },
   test: {
     ...baseVitestConfig,
-    environment: 'jsdom',
-    globals: true,
+    environment: 'node',
   },
 })
