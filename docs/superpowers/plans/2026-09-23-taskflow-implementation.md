@@ -1,5 +1,13 @@
 # TaskFlow 全栈项目中文实施计划
 
+> 2026-09-24 调整：仓库工程结构已由
+> `docs/superpowers/specs/2026-09-24-monorepo-engineering-upgrade-design.md`
+> 更新为 pnpm workspace 与 Turborepo。本文中的 Vue、Express、Prisma、SQLite 和业务设计仍然有效；
+> `client/`、`server/` 路径分别对应 `apps/client/`、`apps/server/`。
+>
+> 本文中的根目录安装和验证命令统一替换为 `pnpm` workspace 命令；
+> 各任务的业务代码仍然按原顺序实施。
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **目标：** 在一个仓库中完成 Vue 3 + Element Plus + Express + Prisma 任务管理系统，同时保证用户负责主要代码实现，Codex 重点提供 Node.js 和后端支持。

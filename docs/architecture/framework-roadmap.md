@@ -27,25 +27,23 @@
 
 当前已经具备：
 
-- `client` 和 `server` 独立工程。
+- `apps/client` 和 `apps/server` workspace 包。
+- pnpm workspace、唯一根锁文件和 Turborepo 任务图。
 - 根目录 `pnpm dev` 联调启动脚本。
+- 根目录统一的开发、构建、测试、类型检查、lint 和清理命令。
 - 根目录 Prettier、cspell、Git hooks 和提交信息校验。
+- 共享 TypeScript、ESLint、Vitest 配置包和 Zod 接口契约包。
+- ESLint 静态检查和 GitHub Actions 最小质量门禁。
 - 后端环境变量校验、健康检查、统一错误处理和 `requestId`。
 - 前端 Vue、Vue Router、Pinia、Axios、Element Plus 基础入口。
 - 中文需求、设计、原型、实施计划和进度文档。
 
 当前主要缺口：
 
-- 尚未建立 pnpm workspace。
-- 根目录和前端同时保留 npm 锁文件与 pnpm 锁文件。
-- 根目录、前端和后端没有统一的 Node、pnpm 和工具版本策略。
-- 根目录命令面不完整，缺少 `build`、`test`、`typecheck`、`lint` 和 `clean`。
-- 没有真实 CI 工作流。
-- 没有统一 ESLint 或等效静态检查。
-- 没有共享配置包和 API 契约包。
 - 后端运行时缺少优雅停机、启动失败处理和监听地址配置。
 - 日志仍是临时 `console.error`，没有结构化日志接口。
-- 没有测试分层、覆盖率和依赖升级策略。
+- 尚未建立单元、集成和端到端测试分层与覆盖率策略。
+- 尚未建立部署、依赖升级和发布版本治理。
 
 ## 目标结构
 
@@ -57,8 +55,9 @@
 TaskFlow/
 ├── pnpm-workspace.yaml
 ├── package.json
-├── client/
-├── server/
+├── apps/
+│   ├── client/
+│   └── server/
 └── packages/
     ├── config/
     └── contracts/
@@ -70,7 +69,7 @@ TaskFlow/
 
 ## P0：可复现和可验证
 
-### F-01 建立 pnpm workspace
+### F-01 建立 pnpm workspace（已完成，2026-09-24）
 
 目标：
 
@@ -96,7 +95,7 @@ TaskFlow/
 - 仓库中不存在 `package-lock.json`、`yarn.lock` 和子包独立锁文件。
 - `pnpm -r` 可以发现所有 workspace 包。
 
-### F-02 统一版本和包管理器约束
+### F-02 统一版本和包管理器约束（已完成，2026-09-24）
 
 目标：
 
@@ -122,7 +121,7 @@ TaskFlow/
 - 新增 `.nvmrc` 或 `.node-version`。
 - CI 和本地使用相同 Node.js 与 pnpm 主版本。
 
-### F-03 统一根目录命令
+### F-03 统一根目录命令（已完成，2026-09-24）
 
 目标：
 
@@ -157,7 +156,7 @@ pnpm clean
 - 单个服务仍可独立启动和测试。
 - 根目录 `dev` 使用 workspace 并行能力或稳定进程管理方案。
 
-### F-04 建立最小 CI
+### F-04 建立最小 CI（已完成，2026-09-24）
 
 目标：
 
@@ -194,7 +193,7 @@ pnpm build
 
 ## P1：共享、运行时和质量基础
 
-### F-05 建立共享配置包
+### F-05 建立共享配置包（已完成，2026-09-24）
 
 目标：
 
@@ -219,7 +218,7 @@ pnpm build
 - `client` 和 `server` 通过 `packages/config` 继承配置。
 - 修改公共规则只需要修改一处。
 
-### F-06 确定接口契约来源
+### F-06 确定接口契约来源（已完成，2026-09-24）
 
 目标：
 
@@ -300,7 +299,7 @@ pnpm build
 - 未知异常记录堆栈，但响应不泄露堆栈。
 - malformed JSON、请求体过大和文件错误返回正确状态码。
 
-### F-09 增加静态检查
+### F-09 增加静态检查（已完成，2026-09-24）
 
 目标：
 
@@ -474,7 +473,7 @@ e2e
 3. F-04：建立最小 CI。
 4. F-05、F-06：共享配置和接口契约基础。
 5. F-07、F-08：运行时生命周期、错误分类和日志接口。
-6. F-09、F-10：静态检查和测试分层。
+6. F-10：测试分层。
 7. F-11 至 F-14：部署、升级和发布治理。
 
 ## 暂不引入
@@ -482,7 +481,7 @@ e2e
 当前规模不需要：
 
 - 微服务拆分。
-- Nx、Turborepo 或 Bazel。
+- Nx 和远程构建缓存。
 - CQRS、事件溯源和消息总线。
 - 多仓库和独立发布流水线。
 - 为业务功能提前建立复杂抽象。

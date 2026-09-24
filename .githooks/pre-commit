@@ -1,4 +1,4 @@
 #!/bin/sh
 set -eu
 
-npm run commit:check
+pnpm run commit:check

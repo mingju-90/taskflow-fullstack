@@ -12,9 +12,9 @@
 
 ## 2. 测试命名
 
-- 后端测试：`server/tests/<domain>.test.ts`
-- 前端测试：`client/tests/<domain>.test.ts`
-- 端到端测试：`client/e2e/<flow>.spec.ts`
+- 后端测试：`apps/server/tests/<domain>.test.ts`
+- 前端测试：`apps/client/tests/<domain>.test.ts`
+- 端到端测试：`apps/client/e2e/<flow>.spec.ts`
 - 测试名称使用“行为 + 预期结果”，避免只写“works”。
 
 ## 3. 需求追踪矩阵
@@ -93,15 +93,12 @@
 
 每次 `push` 和 `pull_request` 运行：
 
-1. 安装 `server` 依赖并生成 Prisma Client。
-2. 运行后端类型检查、集成测试和构建。
-3. 安装 `client` 依赖。
-4. 运行前端类型检查、单元测试和构建。
-5. 安装 Playwright Chromium。
-6. 运行端到端冒烟测试。
-7. 任何步骤失败时整个工作流失败。
+1. 在仓库根目录执行 `pnpm install --frozen-lockfile`。
+2. 运行 `pnpm build` 生成共享契约和前后端构建产物。
+3. 运行 `pnpm lint`、`pnpm typecheck` 和 `pnpm test`。
+4. 在接入 Playwright 后，为端到端任务单独安装 Chromium。
 
-快速静态检查可以并行执行，端到端测试依赖前后端构建通过。CI 使用 Node.js 20，锁定依赖使用 `npm ci`。
+CI 使用 Node.js 22、pnpm 10.17.0 和冻结锁文件。
 
 ## 8. 发布门禁
 

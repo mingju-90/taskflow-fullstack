@@ -1,5 +1,10 @@
 # TaskFlow 全栈练手项目设计
 
+> 2026-09-24 调整：仓库工程结构已由
+> `docs/superpowers/specs/2026-09-24-monorepo-engineering-upgrade-design.md`
+> 更新为 pnpm workspace 与 Turborepo。本文中的 Vue、Express、Prisma、SQLite 和业务设计仍然有效；
+> `client/`、`server/` 路径分别对应 `apps/client/`、`apps/server/`。
+
 ## 文档状态
 
 - 日期：2026-09-23

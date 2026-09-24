@@ -1,4 +1,4 @@
 #!/bin/sh
 set -eu
 
-npm run commit:message -- "$1"
+pnpm run commit:message -- "$1"

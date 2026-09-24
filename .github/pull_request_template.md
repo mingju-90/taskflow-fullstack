@@ -15,13 +15,11 @@
 
 ## 验证结果
 
-- [ ] `npm run format:check`
-- [ ] 后端类型检查
-- [ ] 后端测试
-- [ ] 前端类型检查
-- [ ] 前端测试
-- [ ] 前后端构建
-- [ ] Playwright 冒烟测试
+- [ ] `pnpm format:check`
+- [ ] `pnpm lint`
+- [ ] `pnpm typecheck`
+- [ ] `pnpm test`
+- [ ] `pnpm build`
 
 验证命令和结果：
 

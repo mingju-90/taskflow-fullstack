@@ -6,6 +6,14 @@ export const vueConfig = [
   ...pluginVue.configs['flat/recommended'],
   {
     files: ['**/*.vue'],
+    rules: {
+      // 纯排版交给 Prettier，避免与 ESLint 的 Vue 格式规则重复报告。
+      'vue/max-attributes-per-line': 'off',
+      'vue/singleline-html-element-content-newline': 'off',
+    },
+  },
+  {
+    files: ['**/*.vue'],
     languageOptions: {
       parserOptions: {
         parser: tseslint.parser,

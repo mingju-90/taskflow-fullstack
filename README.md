@@ -8,73 +8,52 @@ TaskFlow 是一个用于练习全栈开发的项目、任务和成员协作系�
 - 后端：Node.js、TypeScript、Express、Prisma
 - 测试：Vitest、Vue Test Utils、Supertest、Playwright
 - 包管理：pnpm
+- 工程化：pnpm workspace、Turborepo、ESLint、Prettier、Vitest
 
 ## 环境要求
 
-- Node.js 20 或更高版本
-- pnpm 10 或兼容版本
+- Node.js 22.x
+- pnpm 10.17.0
 
 ## 项目结构
 
 ```text
-client/   前端应用
-server/   后端服务
-docs/     需求、设计、原型和进度文档
-scripts/  根目录开发与校验脚本
+apps/client/        Vue 前端应用
+apps/server/        Express 后端服务
+packages/config/    共享工程配置
+packages/contracts/ Zod 接口契约
+docs/               需求、设计、原型和进度文档
+scripts/            根目录开发与校验脚本
 ```
 
 ## 快速开始
 
-根目录安装仓库级工具：
-
 ```bash
-pnpm install
-```
-
-安装前端和后端依赖：
-
-```bash
-pnpm --dir client install
-pnpm --dir server install
-```
-
-根据 `server/.env.example` 创建本地环境配置。准备完成后，在根目录同时启动前端和后端：
-
-```bash
+nvm use
+corepack pnpm install
 pnpm dev
 ```
+
+首次启动前，根据 `apps/server/.env.example` 创建本地环境配置。
 
 前端默认监听 `http://127.0.0.1:5173/`，后端默认监听 `http://127.0.0.1:3000`，健康检查地址为 `http://127.0.0.1:3000/api/v1/health`。按 `Ctrl+C` 会同时停止两个进程。
 
 也可以分别启动：
 
 ```bash
-pnpm --dir client dev
-pnpm --dir server dev
+pnpm --filter @taskflow/client dev
+pnpm --filter @taskflow/server dev
 ```
 
 ## 验证命令
 
-在仓库根目录执行格式检查：
+在仓库根目录执行：
 
 ```bash
 pnpm format:check
-```
-
-前端测试和类型检查：
-
-```bash
-cd client
-pnpm test:run
+pnpm lint
 pnpm typecheck
-```
-
-后端测试、类型检查和构建：
-
-```bash
-cd server
 pnpm test
-pnpm typecheck
 pnpm build
 ```
 

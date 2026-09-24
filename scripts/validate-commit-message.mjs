@@ -1,7 +1,8 @@
 // ai-commit-check-ignore-file：本文件包含提交信息规则本身，跳过文本规则自检。
 import { readFileSync } from 'node:fs'
 
-const messageFile = process.argv[2]
+// pnpm 会将显式分隔符 `--` 一并转发给脚本，这里同时兼容 npm 和 pnpm 的参数形式。
+const messageFile = process.argv.slice(2).find((argument) => argument !== '--')
 
 const rawMessage = messageFile ? readFileSync(messageFile, 'utf8') : readFileSync(0, 'utf8')
 const lines = rawMessage

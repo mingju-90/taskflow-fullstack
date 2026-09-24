@@ -15,21 +15,22 @@
 
 ## 当前快照
 
-| 项目         | 当前状态                                                  |
-| ------------ | --------------------------------------------------------- |
-| 日期         | 2026-09-23                                                |
-| Git 分支     | `main`                                                    |
-| 最近功能提交 | `6a7abee chore: 增加根目录联调启动脚本`                   |
-| 远端状态     | `main` 领先 `origin/main` 1 个提交                        |
-| 工作区       | 无任务相关未提交改动                                      |
-| 根目录工具链 | 已启用 Prettier、cspell、EditorConfig、Git hooks          |
-| 后端         | 基础工程、健康检查、统一错误处理和请求 ID 已完成          |
-| 前端         | 已初始化，可开发、测试、类型检查和构建                    |
-| 需求与设计   | 已完成第一版基线                                          |
-| 交互原型     | 已完成 HTML 原型和桌面截图                                |
-| CI 实施计划  | 已写入任务 19，npm 命令和锁文件配置需迁移到 pnpm 后再实施 |
+| 项目         | 当前状态                                                |
+| ------------ | ------------------------------------------------------- |
+| 日期         | 2026-09-24                                              |
+| Git 分支     | `main`                                                  |
+| Task 3 基线  | `2596a4a fix: 修复共享契约审查问题`                     |
+| 远端状态     | 本地 `main` 领先 `origin/main`，待统一同步              |
+| 工作区       | Task 3 已完成本地验收，提交状态以 Git 历史为准          |
+| 仓库结构     | pnpm workspace，包含 apps 和 packages 包                |
+| 根目录工具链 | Turborepo、ESLint、Prettier、cspell、Git hooks          |
+| 质量门禁     | 已增加 GitHub Actions，覆盖格式、lint、类型、测试和构建 |
+| 后端         | 基础工程、健康检查、统一错误处理和请求 ID 已完成        |
+| 前端         | 已初始化，可开发、测试、类型检查和构建                  |
+| 需求与设计   | 已完成第一版基线                                        |
+| 交互原型     | 已完成 HTML 原型和桌面截图                              |
 
-当前本地 Node.js 为 `v22.19.0`，pnpm 为 `v10.17.0`，满足 Node.js 20 或更高版本的运行要求。
+当前本地 Node.js 为 `v22.22.3`，pnpm 为 `v10.17.0`，与 `.nvmrc` 和 CI 配置一致。
 
 ## 已完成内容
 
@@ -107,7 +108,7 @@
 
 - 减少格式差异对代码审查的干扰。
 - 让编辑器、本地脚本和后续 CI 使用同一标准。
-- 根目录只承载跨仓库工具，不引入 npm workspace，`client` 和 `server` 仍保持独立安装。
+- 根目录统一承载 workspace 工具，`apps/client` 和 `apps/server` 共用根依赖图和锁文件。
 
 ### 4. 项目级 AI 协作规范
 
@@ -166,18 +167,18 @@
 - Vue Router、Pinia、Axios 和 Element Plus 入口接入。
 - 应用根组件、基础路由、全局样式和工程状态首页。
 - 应用外壳组件测试。
-- 前端独立 `package.json`、锁文件和 `.env.example`。
+- 前端独立 `package.json` 和 `.env.example`，依赖由根 workspace 统一管理。
 
 关键文件：
 
-- `client/package.json`
-- `client/vite.config.ts`
-- `client/src/main.ts`
-- `client/src/App.vue`
-- `client/src/router/index.ts`
-- `client/src/views/HomeView.vue`
-- `client/src/styles/base.css`
-- `client/tests/app-shell.test.ts`
+- `apps/client/package.json`
+- `apps/client/vite.config.ts`
+- `apps/client/src/main.ts`
+- `apps/client/src/App.vue`
+- `apps/client/src/router/index.ts`
+- `apps/client/src/views/HomeView.vue`
+- `apps/client/src/styles/base.css`
+- `apps/client/tests/app-shell.test.ts`
 
 为什么这样做：
 
@@ -190,7 +191,7 @@
 
 已完成：
 
-- 独立 `server` 项目和 pnpm 锁文件。
+- `apps/server` workspace 包。
 - TypeScript 开发、构建、测试和类型检查脚本。
 - 环境变量校验、Express 基础中间件和统一应用工厂。
 - `GET /api/v1/health` 健康检查接口。
@@ -198,16 +199,16 @@
 
 关键文件：
 
-- `server/package.json`
-- `server/tsconfig.json`
-- `server/tsconfig.build.json`
-- `server/vitest.config.mts`
-- `server/.env.example`
-- `server/src/config/env.ts`
-- `server/src/app.ts`
-- `server/src/server.ts`
-- `server/src/routes/health.route.ts`
-- `server/tests/health.test.ts`
+- `apps/server/package.json`
+- `apps/server/tsconfig.json`
+- `apps/server/tsconfig.build.json`
+- `apps/server/vitest.config.mts`
+- `apps/server/.env.example`
+- `apps/server/src/config/env.ts`
+- `apps/server/src/app.ts`
+- `apps/server/src/server.ts`
+- `apps/server/src/routes/health.route.ts`
+- `apps/server/tests/health.test.ts`
 
 为什么这样做：
 
@@ -229,16 +230,16 @@
 
 关键文件：
 
-- `server/src/lib/app-error.ts`
-- `server/src/lib/response.ts`
-- `server/src/middlewares/error-handler.ts`
-- `server/src/middlewares/not-found.ts`
-- `server/src/middlewares/request-context.ts`
-- `server/src/types/express.d.ts`
-- `server/src/app.ts`
-- `server/src/routes/health.route.ts`
-- `server/tests/error-handling.test.ts`
-- `server/tests/health.test.ts`
+- `apps/server/src/lib/app-error.ts`
+- `apps/server/src/lib/response.ts`
+- `apps/server/src/middlewares/error-handler.ts`
+- `apps/server/src/middlewares/not-found.ts`
+- `apps/server/src/middlewares/request-context.ts`
+- `apps/server/src/types/express.d.ts`
+- `apps/server/src/app.ts`
+- `apps/server/src/routes/health.route.ts`
+- `apps/server/tests/error-handling.test.ts`
+- `apps/server/tests/health.test.ts`
 
 为什么这样做：
 
@@ -253,7 +254,8 @@
 
 - 根目录新增 `pnpm dev` 脚本。
 - 同时启动 Vite 前端和 Express 后端，并按 `Ctrl+C` 统一停止。
-- 启动前检查 `server/.env`，缺少环境配置时给出中文提示。
+- 启动前检查 `apps/server/.env`，缺少环境配置时给出中文提示。
+- Turbo 统一调度 contracts、前端和后端的开发任务。
 
 关键文件：
 
@@ -287,13 +289,34 @@
 - 在任务 3 的数据层开始前，先统一依赖、命令、CI 和共享边界，可以降低后续返工。
 - 单独记录框架待办，避免与业务需求和实施计划混在一起。
 
+### 11. Monorepo 工程升级
+
+已完成：
+
+- 迁移到 `apps/client` 和 `apps/server`。
+- 建立 pnpm workspace 和唯一根锁文件。
+- 建立 `packages/config` 和 `packages/contracts`。
+- 接入 Turborepo、ESLint、统一根命令和 GitHub Actions。
+- 固定 Node.js 22 与 pnpm 10.17.0。
+
+为什么这样做：
+
+- 统一依赖图和任务入口，减少前后端配置分叉。
+- 用 Zod 契约连接前后端，避免错误码和响应结构重复定义。
+- 在业务数据层开始前建立质量门禁，降低后续迁移成本。
+
 ## 当前可运行命令
 
 ### 根目录
 
 ```bash
-pnpm install
+corepack pnpm install
 pnpm dev
+pnpm build
+pnpm test
+pnpm typecheck
+pnpm lint
+pnpm clean
 pnpm format
 pnpm format:check
 pnpm commit:check
@@ -308,12 +331,10 @@ printf 'feat: 增加示例功能\n' | pnpm commit:message
 ### 前端
 
 ```bash
-cd client
-pnpm install
-pnpm dev
-pnpm test:run
-pnpm typecheck
-pnpm build
+pnpm --filter @taskflow/client dev
+pnpm --filter @taskflow/client test
+pnpm --filter @taskflow/client typecheck
+pnpm --filter @taskflow/client build
 ```
 
 默认开发地址为 `http://127.0.0.1:5173/`。如果端口被占用，Vite 会自动选择下一个可用端口。
@@ -321,15 +342,13 @@ pnpm build
 ### 后端
 
 ```bash
-cd server
-pnpm install
-pnpm dev
-pnpm test
-pnpm typecheck
-pnpm build
+pnpm --filter @taskflow/server dev
+pnpm --filter @taskflow/server test
+pnpm --filter @taskflow/server typecheck
+pnpm --filter @taskflow/server build
 ```
 
-默认健康检查地址为 `http://127.0.0.1:3000/api/v1/health`。首次启动前需要根据 `server/.env.example` 创建本地 `server/.env`。
+默认健康检查地址为 `http://127.0.0.1:3000/api/v1/health`。首次启动前需要根据 `apps/server/.env.example` 创建本地 `apps/server/.env`。
 
 ## 已验证结果
 
@@ -343,26 +362,30 @@ pnpm build
 - 后端生产构建通过。
 - Prettier、cspell 和暂存区校验通过。
 - `pre-commit` 和 `commit-msg` 已在真实提交中执行。
+- Task 3 冻结安装、格式、lint、类型检查、测试、构建和清理命令均通过。
+- 根 `pnpm lint` 已消除 Vue 纯排版警告，4 个 workspace lint 任务全部通过。
+- 根 `pnpm test` 运行 contracts、前端和后端共 11 个用例，全部通过；服务端测试需要本地监听权限。
+- `pnpm dev` 实际启动 contracts watch、Vite 和 tsx watch，前端返回 TaskFlow HTML，健康检查返回 `code: "OK"`、`data.status: "ok"` 和 `requestId`。
+- `Ctrl+C` 后本次启动的 workspace 进程全部退出，5173 和 3000 端口不再监听。
 
 ## 已知限制与风险
 
 - 后端目前只有健康检查、统一错误处理和请求 ID，数据库、认证和业务 API 尚未实现。
 - 结构化 HTTP 日志尚未实现，未知异常暂由 `console.error` 记录。
-- 根目录和 `client` 同时保留 npm 锁文件与 pnpm 锁文件，需要统一到 pnpm 后再提交。
-- 实施计划和 GitHub Actions 章节仍包含 npm 命令，需要迁移到 pnpm。
 - Element Plus 当前在入口全量安装，生产构建有单个 JS 包超过 500 kB 的提示；后续可按路由和组件做按需加载。
-- GitHub Actions 目前只有实施计划中的任务 19，真实 `.github/workflows/ci.yml` 尚未创建。
+- 尚未建立测试分层；Playwright 和端到端测试按后续任务接入。
+- GitHub Actions 已声明质量门禁，但本次本地验收不能替代远端工作流运行结果。
 - 原型 HTML 与 Vue 页面是两个阶段，原型不是最终组件实现。
 
 ## 下一阶段推荐顺序
 
-任务 1、任务 2 和前端任务 5 已完成。下一步继续实现后端基础设施：
+Monorepo 工程升级 Task 1 至 Task 3、原任务 1、原任务 2 和前端任务 5 已完成。
+下一步继续实现后端基础设施：
 
-1. 框架 P0：pnpm workspace、锁文件和版本策略。
-2. 框架 P0：根目录统一命令和最小 CI。
-3. 框架 P1：共享配置、接口契约和运行时基础。
-4. 任务 3：Prisma 数据模型、迁移、测试数据库和种子数据。
-5. 任务 4 及后续：认证和业务功能。
+1. 框架 F-07、F-08：后端运行时生命周期、日志和错误分类。
+2. 框架 F-10：测试分层和覆盖率策略。
+3. 原实施计划任务 3：Prisma 数据模型、迁移、测试数据库和种子数据。
+4. 原实施计划任务 4 及后续：认证和业务功能。
 
 每个任务继续按以下顺序推进：
 
@@ -385,8 +408,9 @@ pnpm build
 docs/superpowers/specs/2026-09-23-taskflow-design.md，
 以及 docs/superpowers/plans/2026-09-23-taskflow-implementation.md 中“任务 3”的内容。
 
-检查 git status 和最近提交，确认工作区状态。当前任务 1、任务 2 和前端任务 5 已完成，
-请从实施计划任务 3 开始，先写失败测试，再实现最小代码，
+检查 git status 和最近提交，确认工作区状态。Monorepo 工程升级 Task 1 至 Task 3、
+原任务 1、原任务 2 和前端任务 5 已完成，请从原实施计划任务 3 开始，
+先写失败测试，再实现最小代码，
 遵守中文 JSDoc、Vue 模板注释、业务注释和中文提交规范。
 不要重复已完成的设计、需求、原型、前端初始化、后端健康检查和错误处理工作。
 ```
@@ -397,9 +421,9 @@ docs/superpowers/specs/2026-09-23-taskflow-design.md，
 git status --short --branch
 git log -3 --oneline
 pnpm format:check
-cd client
-pnpm test:run
+pnpm lint
 pnpm typecheck
+pnpm test
 ```
 
 若上述状态与本文档不一致，以仓库实际状态为准，并先更新本文档再继续开发。
